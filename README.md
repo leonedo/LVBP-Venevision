@@ -1,6 +1,14 @@
-# HTML-templates
+# LVBP-Venevision
 
-Plantilla base para gráficos Lottie en CasparCG usando webcg-framework, con un state machine **multi-etapa** que permite gráficos secuenciales (entrada → loop1 → pausa → loop2 → salida) controlados desde CasparCG.
+Gráficos Lottie de la LVBP para Venevisión, para CasparCG con webcg-framework. Cada gráfico es una
+carpeta con su `index.html`, su `data.json` y su `data.md` (las claves del UPDATE):
+
+| Carpeta | Qué es |
+|---|---|
+| `score/` | Pizarra: barras de los dos equipos, carreras, inning, bases, conteo, outs y barra de bateador y lanzador |
+
+El resto de este README es el de la base, [HTML-templates](https://github.com/leonedo/HTML-templates):
+plantilla para gráficos Lottie en CasparCG usando webcg-framework, con un state machine **multi-etapa** que permite gráficos secuenciales (entrada → loop1 → pausa → loop2 → salida) controlados desde CasparCG.
 
 ---
 
@@ -131,7 +139,10 @@ El evento `SET DATA "..."` desde CasparCG dispara el reemplazo. Convenciones:
 | **Texto** | key del data == nombre de capa de texto en el Lottie | `updateDocumentData` sobre la capa |
 | **Color** | key contiene `"color"` (case-insensitive) | `style.fill` del CSS `.{key}` |
 | **Opacidad** | key contiene `"opacidad"` (case-insensitive) | `style.opacity` del CSS `.{key}` |
-| **Imagen** | capa con `refId` que incluya `"image"` | reemplaza `href` del `<image>` SVG |
+| **Imagen** | capa con `refId` que incluya `"image"` | reemplaza `href` del `<image>` SVG; si la ruta no carga, queda vacía (sin el ícono de imagen rota) |
+
+Las keys de color y de opacidad son sólo CSS: una capa de imagen o de texto con clase `*_opacidad`
+se prende y se apaga sin que cambie su imagen ni su texto.
 
 Ejemplo:
 
@@ -150,6 +161,9 @@ CG 1-10 UPDATE 10 "<templateData>
 ⚠ **Un texto que puede llegar más largo que el del diseño** (una fecha, un número) conviene
 pasarlo a **texto de caja** en el JSON: `index.js` ya llama a `canResizeFont(true)` y Lottie le
 baja el cuerpo hasta que entra, en vez de salirse. Receta en [textos-de-caja.md](textos-de-caja.md).
+
+⚠ **Mayúsculas:** Lottie no aplica el All Caps de After Effects. Si la capa lo tiene (`ca: 1` en
+el JSON), `index.js` pasa a mayúsculas el texto que llega; si no, lo muestra tal cual.
 
 ### Update markers (transición visual al cambiar data)
 
@@ -213,7 +227,7 @@ El intervalo está alineado a la marca de minuto/segundo, así que el cambio ocu
 
 ## Testeo local con webcg-devtools
 
-Los samples en [samples/](samples/) cargan `webcg-devtools.umd.js` que monta una UI de control en el browser. Abrir el HTML con Live Server de VSCode (o cualquier server estático) para mandar eventos sin CasparCG.
+Cada `<gráfico>/index.html` carga `webcg-devtools.umd.js` —una UI de control en el browser— cuando se abre con Live Server de VSCode (puerto 5500) o en cualquier puerto con `?debug=true` en la URL (ej. `python3 -m http.server 5510` y `http://localhost:5510/score/index.html?debug=true`). Sin panel, desde la consola: `play()`, `update('{"clave":"valor"}')`, `next()`, `stop()`.
 
 ---
 

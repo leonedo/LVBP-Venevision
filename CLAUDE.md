@@ -2,6 +2,115 @@
 
 Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
+## Este repo: LVBP para Venevisión
+
+Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
+(c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
+proyecto*). Por ahora un gráfico, en LT Energy (`font/LTEnergyVFVF.ttf`: fuente variable con un
+solo eje, `ital`, que por defecto es la Regular). Las keys del UPDATE están en su `data.md`.
+
+| Carpeta | Qué es | Flujo | Salida |
+|---|---|---|---|
+| `score/` | Pizarra arriba a la izquierda: logo de Venevisión, barras de visita y local (escudo y siglas), carreras, inning con sus flechas, bases, conteo y outs; abajo, la barra de bateador (apellido, average, actuación) y lanzador (apellido, lanzamientos, velocidad) | `play` (0–54) → stages `marcador` → `jugadores` (la barra sube, 65–90) → `sinjugadores` (la barra baja, 100–125), los tres `pause` | `salida`: la entrada al revés (1,8 s); desde `jugadores`, `salida_jugadores` baja antes la barra (3 s) |
+
+Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
+arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces `visita_vs_local`).
+Son del 2026-10-13: si el gráfico cambia, hay que regenerarlas. No entran al zip (`.gitattributes`).
+
+No hay video de referencia del diseñador. El export no trae salida (su marker `stop`, 90–120, no
+anima nada) ni la bajada de la barra de jugadores: las dos son la animación de entrada al revés,
+como en todos los gráficos de Meridiano. Si el diseñador manda una salida propia, reemplaza a ésta.
+
+Claves: las del score de LVBP-Meridiano donde dicen lo mismo, para que el controlador le mande a
+los dos la misma data: `conteobolasystrikes`, `outs`, `inning`, `INNINGarriba_opacidad` /
+`INNINGabajo_opacidad`, `CARRERASVISITA` / `CARRERASLOCAL`, `PRIMERALLENA_opacidad` (y `SEGUNDA`,
+`TERCERA`), `PRIMEROUT_opacidad` / `SEGUNDOOUT_opacidad`, `bateador`, `average`, `lanzador`,
+`lanzamientos`, y las mismas siglas de escudo: `<SIGLAS>VISITA_opacidad` y `<SIGLAS>LOCAL_opacidad`
+con `AGUI`, `ANZ` (Caribes), `BRAVOS`, `CARD`, `LEO`, `MAGA`, `TIBUS`, `TIGRES`. Propias de éste:
+`EQUIPOVISITA` / `EQUIPOLOCAL` (las siglas escritas sobre la barra), `actuacion` (el 2-1 del
+bateador), `velocidad` (el número; `MPH` es la capa fija `mph`). No tiene las de Meridiano
+`lvbp`, `meridianotv` ni `logomeridiano`.
+
+Barras de equipo: son **imágenes** (`images/img_0–7` local, `img_8–15` visita, con el escudo como
+marca de agua), una encima de otra en cada lado y todas visibles al arrancar: el controlador manda
+`1` a la que va y `0` a las otras siete, como en Meridiano. Que la clave sea `_opacidad` en una capa
+de imagen es lo que destapó el arreglo de *claves sólo CSS* de `index.js`: antes el número se
+escribía como ruta y la barra desaparecía.
+
+Textos: salen en mayúsculas aunque lleguen en minúsculas (ver *Mayúsculas* en Convenciones del
+Lottie). `bateador` y `lanzador` son sólo el apellido: al tamaño del diseño entran unas 7 letras en
+el bateador (`CASTILLO` baja de 21 a 20, `RODRÍGUEZ` a 17) y 8 en el lanzador (`RODRÍGUEZ` a 19);
+más largos encogen dentro de su lugar. Siglas, carreras e inning van centrados sobre el eje del
+texto del diseño; la velocidad, alineada a la derecha contra `MPH`.
+
+### Cuando llega un export nuevo del diseñador
+
+El zip es `SCOREBUG.zip` (carpeta `SCOREBUG/` con `data.json`, `images/` y `FONT/`). La receta es
+`herramientas/prep.js`: buscar las capas por `nm` (los índices cambian) y comparar contra
+`git show HEAD:score/data.json`.
+
+- **Clases:** `.BOLASYSTRIKES` → `conteobolasystrikes`, `.INNINGS` → `inning`, `.ALTAINNING` /
+  `.BAJAINNING` → `INNINGarriba_opacidad` / `INNINGabajo_opacidad`, `.<N>BASELLENA` →
+  `<N>LLENA_opacidad`, `.PRIMEROUT` / `.SEGUNDOOUT` → `*_opacidad`, `.APELLIDOLANZADOR` →
+  `lanzador`, `.NUMERODELANZAMIENTOS` → `lanzamientos`, `.VELOCIDADNUMERO` → `velocidad`,
+  `.AVERAGE` → `average`, `.ACTUACIONENTURNOS` → `actuacion`, `.EQUIPOVISITANTE` →
+  `EQUIPOVISITA`, y las barras `.BARRA<EQUIPO><LOCAL|VISITA>` → `<SIGLAS><LOCAL|VISITA>_opacidad`.
+  Llegaron mal y se repiten: las dos carreras con la **misma** clase `CARRERAS` (una clave cambiaba
+  las dos) → `CARRERASVISITA` / `CARRERASLOCAL`; el bateador como `,APELLIDOBATEADOR` (con coma: sin
+  clase) → `bateador`; `.BARRABRAVOSLOCAL_` con un `_` de más; `OUTS` y `MPH` sin clase (textos
+  fijos) → `outs` / `mph`.
+- **Máscara que falta:** la barra de Águilas local (`.BARRAAGUILASLOCAL`) llega con `tt` y sin su
+  máscara encima: Lottie la mateaba con el texto `EQUIPOLOCAL` y la barra sólo se veía por adentro
+  de las letras. `prep.js` le pone una copia de `mascaralocal`, como las otras siete.
+- **Fuente:** `fPath` llega como la carpeta (`SCOREBUG/FONT`): pasa a `font/LTEnergyVFVF.ttf`.
+- **All Caps:** llega apagado en conteo, outs, inning y toda la barra de jugadores: `prep.js` lo
+  prende en todas las capas de texto y el lint lo controla.
+- **Textos de caja** ([textos-de-caja.md](textos-de-caja.md)): todas las cajas llegan de AE con
+  `lh` 0.01 (un texto largo partía en líneas encimadas en vez de encoger): va 1.2 del cuerpo. Las de
+  la barra de jugadores cruzaban la barra entera (`lanzador` 193 px, `lanzamientos` 464): `bateador`
+  a 80 (8 px antes del average), `lanzador` a 89 centrado (6 px antes de los lanzamientos),
+  `lanzamientos` a 46 centrado (entra `P.100`), `actuacion` a 42.1 (8 px antes del final de la
+  barra), con `H` 18 en los nombres. `velocidad` llegaba alineada a la izquierda y pegada a `MPH`
+  (un `100` se metía en `MPH`): pasa a la derecha, terminando donde termina el `90` del diseño, y el
+  texto por defecto pierde el espacio final. `inning`, las carreras y las siglas pasan de izquierda
+  a centrados sobre el eje del texto del diseño (Lw medidos: `10` 8.3422, `00` 26.0547, `TIG`
+  32.1412). Con el texto del diseño, el resultado es idéntico al píxel al export en 15 frames.
+- **Markers:** los del diseñador (`start`, `hold`, `stop`) se reemplazan por los de la tabla de
+  arriba. La entrada del marcador termina en el 53 (los outs) y la barra sube del 65 al 90: si eso
+  cambia, mover `ENTRADA`, `SUBE` y `BAJA` en `prep.js`. La bajada de la barra (100–125) la arma
+  `prep.js` con los keyframes de la subida al revés (curvas invertidas); comprobado frame a frame
+  contra la subida. El `stop` global está en el frame 0, que está vacío: un `stop` durante la
+  entrada corta.
+- **Imágenes:** las 16 barras del export van tal cual a `score/images/`.
+
+### QA
+
+- Juzgar con el runtime real y la fuente cargada (`score/index.html` en el browser o con
+  Playwright). `lottie_render` del editor usa una fuente de reemplazo: no sirve para revisar textos.
+- Los 56 cruces visita × local, entrada frame a frame, data al aire con el gráfico pausado, `next` y
+  `stop` desde cada stage, y que el layer se suelte.
+- Textos: apellidos largos (que encojan dentro de su lugar), números de más cifras (`P.100`, `100`
+  de velocidad, `10-4`, `1.000`, inning `10`) y textos en minúsculas (que salgan en mayúsculas).
+- Por `file://`, como lo abre CasparCG: Chromium con `--allow-file-access-from-files`.
+
+### Herramientas
+
+En [herramientas/](herramientas/), fuera del zip; las de render y análisis vienen de LVBP-Meridiano.
+Los scripts de render necesitan un server estático en la raíz del repo (`python3 -m http.server
+5510`) y Playwright: el del Lottie Layer Editor, o `PLAYWRIGHT=<ruta a index.mjs>` (en un contenedor
+con Playwright global, `$(npm root -g)/playwright/index.mjs`).
+
+| Script | Para qué |
+|---|---|
+| `prep.js` | La receta de arriba, ejecutable: prepara el export del diseñador. Instrucciones en su encabezado |
+| `shot.mjs` | Frames de un gráfico con data: `node herramientas/shot.mjs <url> <salida> '<json>' <frames> [x,y,w,h]`; `JSON=<archivo>` sirve otro data.json para comparar versiones |
+| `matrix.mjs` | Muchas variantes de data en una carga (todos los cruces…), con reporte de textos y consola |
+| `onair.mjs` | Un flujo al aire (update, play, next, stop) con capturas en cada paso |
+| `lifecycle.mjs` | Tiempos de play → pausa → stop → salida, y que el layer se suelte |
+| `sheet.py` | Hojas de contacto con etiqueta (así se arman las de `capturas/`) |
+| `lint.py` | Chequeo estructural de todos los gráficos |
+| `dump.py`, `kf.py`, `deepdiff.py` | Analizar un export: capas, keyframes y diferencias contra lo publicado |
+
 ## Modelo del proyecto
 
 El root contiene los **archivos compartidos** que todos los gráficos consumen vía `../`:
@@ -16,6 +125,10 @@ El root contiene los **archivos compartidos** que todos los gráficos consumen v
 Cada gráfico vive en una **subcarpeta hermana** con su `MiAnim.json` y un `index.html` propio que apunta a `../index.js`, `../lottie.js`, `../webcg-framework.umd.js`. Si un gráfico necesita lógica muy particular, se copia el `index.js` localmente y se edita ahí.
 
 La **doc de data de cada gráfico** (`MiAnim.md`: keys con ejemplo, invokes, markers —la que un controlador usa como contrato—) la **genera el Lottie Layer Editor** al guardar el JSON (`generateDocumentationMd`, `core/lottie-core.js`). No se escribe a mano: el siguiente guardado la pisa. Si dice algo mal, se arregla en el generador, no en el `.md`. No entra al zip del release (`*.md export-ignore`).
+
+En este repo es `<gráfico>/data.md`. El del score se armó con el formato del generador desde el
+JSON preparado (no pasó por el editor) y lleva a mano las notas de los markers y de las barras de
+equipo: si el editor lo regenera, reponerlas desde *Este repo*.
 
 ## Convenciones del Lottie
 
@@ -282,7 +395,7 @@ Cada clip se dispara una vez al cruzar su `inframe`; todos los flags se resetean
 
 ## Testeo local
 
-Los samples en [samples/](samples/) cargan `../webcg-devtools.umd.js` que monta una UI de control en el browser. Abrirlos con Live Server de VSCode (o cualquier server estático) para mandar eventos manualmente sin CasparCG.
+Cada `<gráfico>/index.html` carga `../webcg-devtools.umd.js` —una UI de control en el browser— cuando se abre en el puerto 5500, el de Live Server de VSCode, o en cualquier puerto con `?debug=true` en la URL (ej. `python3 -m http.server 5510` y `http://localhost:5510/score/index.html?debug=true`). El panel acepta el payload en modo JSON. Sin panel, desde la consola: `play()`, `update('{"clave":"valor"}')`, `next()`, `stop()`.
 
 ## Releases
 
@@ -294,6 +407,9 @@ Tags semver gestionados con [release.sh](release.sh) + `gh release create`:
 Tasks de VSCode en [.vscode/tasks.json](.vscode/tasks.json) cubren Mac y Windows (Git Bash).
 
 **No correr `release.sh` sin pedir confirmación** — crea release público en GitHub.
+
+Antes de `release.sh`, `git fetch --tags`: `gh release create` crea el tag sólo en GitHub y
+`release.sh` calcula la versión con los tags locales, así que sin traerlos repite una que ya existe.
 
 ## Deploy: qué entra al zip del release
 
