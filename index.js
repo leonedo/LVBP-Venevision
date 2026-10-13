@@ -418,6 +418,12 @@ webcg.on('data', function (data) {
                     let cl = animElement.data.cl;
                     let newPath;
 
+                    // Las claves de color y de opacidad son sólo CSS (arriba): no son
+                    // un texto ni una ruta. Antes una capa de imagen con clave
+                    // `_opacidad` perdía la imagen —el 1 o el 0 se escribía como su
+                    // href— y una de texto mostraba el número.
+                    if (/color|opacidad/i.test(cl)) continue;
+
                     if (animElement.data.hasOwnProperty('refId') && animElement.data.refId.includes('image')) {
                         // Antes esto quedaba fuera de cualquier try: un `cl` con espacios
                         // tiraba acá y cortaba el for, dejando sin actualizar todas las

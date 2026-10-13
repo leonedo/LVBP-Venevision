@@ -66,6 +66,10 @@ o con cursivas **cambian de cara** (a la del diseño): revisarlos antes de salir
 - cualquier key que contenga `color` → cambia el `fill` CSS de `.{key}`
 - cualquier key que contenga `opacidad` → cambia el `opacity` CSS de `.{key}`
 
+Esas keys son **sólo CSS**: el contenido de la capa no se toca. Una capa de imagen o de texto con
+clase `*_opacidad` se prende y se apaga, pero no cambia su imagen ni su texto (antes el `1` o el `0`
+se escribía como ruta de la imagen —que desaparecía— o como texto).
+
 ⚠ **El nombre de la capa tiene que ser un identificador CSS válido.** Se interpola en un
 selector de clase, así que no puede tener espacios ni arrancar con dígito. `Logo induveca 4`
 no funciona: Lottie escribe `cl` al atributo `class` y eso son en realidad tres clases
