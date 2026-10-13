@@ -1,0 +1,516 @@
+# CLAUDE.md
+
+Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
+
+## Modelo del proyecto
+
+El root contiene los **archivos compartidos** que todos los gráficos consumen vía `../`:
+
+- [index.js](index.js) — lógica principal de todos los gráficos (NO se modifica salvo bug fix general)
+- [lottie.js](lottie.js) — librería Lottie
+- [webcg-framework.umd.js](webcg-framework.umd.js) — runtime de CasparCG webcg
+- [webcg-devtools.umd.js](webcg-devtools.umd.js) — devtools para testear localmente con UI gráfica
+- [index.html](index.html) — plantilla de referencia, se copia en cada gráfico
+- [.gitattributes](.gitattributes) — qué NO entra al zip del release. Viaja a cada repo derivado, ver "Deploy"
+
+Cada gráfico vive en una **subcarpeta hermana** con su `MiAnim.json` y un `index.html` propio que apunta a `../index.js`, `../lottie.js`, `../webcg-framework.umd.js`. Si un gráfico necesita lógica muy particular, se copia el `index.js` localmente y se edita ahí.
+
+La **doc de data de cada gráfico** (`MiAnim.md`: keys con ejemplo, invokes, markers —la que un controlador usa como contrato—) la **genera el Lottie Layer Editor** al guardar el JSON (`generateDocumentationMd`, `core/lottie-core.js`). No se escribe a mano: el siguiente guardado la pisa. Si dice algo mal, se arregla en el generador, no en el `.md`. No entra al zip del release (`*.md export-ignore`).
+
+## Convenciones del Lottie
+
+El nombre de la capa en AE → clase CSS del SVG renderizado. Es el contrato entre el Lottie y el `index.js`.
+
+**Capas de texto reemplazables:** la key del data de CasparCG debe matchear el nombre de la capa.
+
+**Texto que puede no entrar** (una fecha, un número, un nombre): pasarlo a **texto de caja**
+—`sz` + `ps` en `t.d.k[i].s`— para que encoja en vez de salirse. `index.js` ya llama a
+`canResizeFont(true)`. Se hace a mano en el JSON y, siguiendo la receta, queda idéntico al
+píxel con el texto del diseño: [textos-de-caja.md](textos-de-caja.md).
+
+**Fuentes:** las `origin: 0` (archivo aparte) y las `origin: 3` (URL o base64 en el JSON)
+las registra `index.js` y las **espera antes** de `lottie.loadAnimation` (`cargarFuentes()`),
+porque Lottie mide cada letra una sola vez y una fuente que llega tarde deja medidas de la
+de reserva para siempre. Tope `FONT_WAIT_MS` (2,5 s): una fuente más lenta que eso, o rota,
+sale con la de reserva y deja un `[fuentes]` en la consola. Las `origin: 1/2` (CSS de Google
+o Typekit) las registra y espera Lottie (hasta 5 s).
+
+Cada `@font-face` declara el peso y el estilo que Lottie pide en el `<text>`, con su misma
+tabla (`propiedadesDeFuente()`). Así conviven varios pesos de una familia: antes ganaba
+una sola cara y, en un gráfico con Kanit Light y Kanit Black, las capas en Black salían en
+Light. Dos cosas que eso le pide al Lottie:
+
+- ⚠ La tabla de Lottie sólo distingue Bold, Black, Medium, Regular/Normal, Light/Thin e
+  Italic, como **palabras sueltas** del `fStyle`. Dos estilos de la **misma familia** que no
+  distingue (SemiBold, ExtraBold, Book, Heavy, `BoldItalic` junto) se pintan los dos con el
+  último. Arreglo: darle a cada cara su propio `fFamily` en el JSON (p. ej. su `fName`).
+- ⚠ El `fStyle` tiene que decir la verdad sobre el archivo. Antes la `@font-face` decía
+  400 y `normal`, y Chrome compensaba con negrita u oblicua **sintéticas** cuando el
+  archivo no estaba marcado así: uno Regular rotulado Bold salía en negrita falsa, uno
+  recto rotulado Italic salía inclinado, y alguno cursivo, con doble inclinación. Ahora se
+  pinta el archivo tal cual.
+
+Al portar este `index.js` a un repo derivado, los gráficos con varios pesos de una familia
+o con cursivas **cambian de cara** (a la del diseño): revisarlos antes de salir al aire.
+
+**Capas reservadas (clase obligatoria):**
+- `time` → reloj automático
+- `date` → fecha automática
+
+**Keys reservadas en data (matching por substring, case-insensitive):**
+- cualquier key que contenga `color` → cambia el `fill` CSS de `.{key}`
+- cualquier key que contenga `opacidad` → cambia el `opacity` CSS de `.{key}`
+
+⚠ **El nombre de la capa tiene que ser un identificador CSS válido.** Se interpola en un
+selector de clase, así que no puede tener espacios ni arrancar con dígito. `Logo induveca 4`
+no funciona: Lottie escribe `cl` al atributo `class` y eso son en realidad tres clases
+sueltas (`Logo`, `induveca`, `4`), con lo cual ningún selector la alcanza. Peor: sin la
+guarda de `classSelector()` el selector inválido tira `DOMException` y —como color y opacidad
+corren sincrónicos dentro del handler de `data`— se lleva puesto el **UPDATE entero**, no sólo
+esa capa. `classSelector()` degrada eso a "no encontrado", pero el arreglo de fondo es
+renombrar. El audit del Lottie Layer Editor lo reporta como `invalid-class`.
+
+## Markers
+
+Los markers se generan a mano o con una tool externa, no desde AE.
+
+`index.js` pre-procesa el JSON antes de pasárselo a Lottie: si un marker tiene un campo `payload` que es **objeto**, lo serializa a `cm` por debajo (`m.cm = JSON.stringify(m.payload)`). Esto permite **dos formas equivalentes** de declarar markers:
+
+- **Forma limpia (recomendada):** `payload` como objeto, `cm` opcional (puede llevar el nombre o ser ignorado).
+- **Forma compacta:** todo va serializado dentro de `cm` (la usaba la versión anterior).
+
+Lottie en runtime siempre reconstruye `marker.payload` parseando el `cm` final — primero intenta `JSON.parse(cm)`, después `key:value\r\nkey:value`, y como fallback `{name: cm}`. Lo que recibe `index.js` desde `anim.markers` es siempre `payload` ya armado.
+
+### Markers básicos (regulares)
+
+`cm` es solo el nombre. Lottie produce `payload = {name: cm}`.
+
+```json
+{ "tm": 0, "dr": 300, "cm": "play" }
+```
+
+Markers reservados por nombre (invocados desde CasparCG o usados internamente):
+- `play` — entrada (CALL `play`)
+- `stop` — salida (CALL `stop`)
+- `bola1`..`bola6` — usados por handlers custom `entrada1`..`entrada6` (gráfico de bingo/lotería)
+
+Cualquier otro marker regular puede invocarse vía `playAnimation <name>` o referenciarse desde un stage como su `update`.
+
+### Stage markers
+
+Definen segmentos del flujo donde el operador puede pausar/loopear y avanzar.
+
+**Forma limpia (recomendada):**
+
+```json
+{ "tm": 0, "dr": 300, "cm": "play", "payload": { "name": "play", "type": "pause", "order": 1, "update": "update" } }
+```
+
+**Forma compacta (equivalente, retrocompatible):**
+
+```json
+{ "tm": 0, "dr": 300, "cm": "{\"name\":\"play\",\"type\":\"pause\",\"order\":1,\"update\":\"update\"}" }
+```
+
+Las dos formas producen el mismo `marker.payload` en runtime.
+
+| Campo del payload | Valores | Notas |
+|---|---|---|
+| `name` | string libre | Identificador. Usado para `goto <name>` desde CasparCG y para `goToAndPlay` interno |
+| `type` | `"loop"` o `"pause"` | Comportamiento al final del segmento |
+| `order` | `1`, `2`, `3`, ... | Orden secuencial para el evento `next`. Único entre stages |
+| `update` | `"<markerName>"` (opcional) | Marker que se reproduce cuando llega data en este stage. Si no está, fallback al marker global `update` (si existe). Si tampoco, silent replacement |
+| `updateDelay` | número (opcional) | Frames a esperar dentro del update segment antes de aplicar text replacement. Default `0` |
+| `stop` | `"<markerName>"` (opcional) | Marker que se reproduce cuando llega `stop` mientras este stage está activo. Self-contained (`playSegments` sobre `tm → tm+dr`). Si no está o el marker no existe, fallback al marker global `stop` |
+
+**Comportamiento de stages:**
+
+Ambos tipos usan el segmento `tm → tm + dr` simétricamente. Lo que cambia es qué pasa al final:
+- `loop`: salta de vuelta a `tm` (loopea)
+- `pause`: ejecuta `anim.pause()` y queda detenido. Para pausar exacto en `tm`, `dr: 0`
+
+Pauses y loops se pueden mezclar libremente en el mismo gráfico.
+
+**Comportamiento del `update`:**
+
+El update marker solo se dispara si **la animación está pausada** cuando llega la data. Si está reproduciéndose (loop, transición entre stages, o un update ya en curso), se hace silent replacement — el próximo frame ya muestra el cambio.
+
+Cuando llega data y `anim.isPaused === true`, `index.js` resuelve el update marker en este orden:
+1. **Dentro de un stage:** stage.update si existe, else marker global `update` como fallback. Reproducción con `goToAndPlay` — la pause action del stage corta al final del segmento del stage
+2. **Sin stage activo (gráfico sin stages, o pausado entre stages):** marker global `update`. Reproducción con `playSegments([tm, tm+dr])` — aislado al segmento del marker, no continúa al resto del timeline
+3. **Si no hay update aplicable:** silent replacement + `renderFrame()` para repintar el frame congelado
+
+Cuando hay update marker resuelto, text/color/image replacement se aplica a `framesMilliseconds * updateDelay` (el delay viene del stage; en modo sin stage, default 0).
+
+Implicación práctica: un loop nunca se interrumpe por data, aunque tenga `update` definido en el payload (el campo se ignora silenciosamente porque el loop está siempre playing). Si querés interrumpir un loop visualmente al cambiar data, usá un stage `pause` en su lugar.
+
+Un mismo update marker puede ser referenciado por múltiples stages, o servir como fallback global.
+
+**Comportamiento del `stop` custom:**
+
+Cuando llega el evento `stop` desde CasparCG:
+1. Si el stage actual tiene `stop: "<name>"` y existe ese marker → reproduce solo el segmento `tm → tm+dr` con `playSegments` (queda en el último frame, sin pasar al resto del timeline)
+2. Si no → reproduce el marker global `stop` con `goToAndPlay`. Con `dr > 0` es también sólo `tm → tm+dr`: Lottie 5.13 convierte `goToAndPlay` sobre un marker con duración en `playSegments`. Con `dr: 0` no anima: suelta el layer al instante
+
+Útil para gráficos donde la salida visual depende del estado actual (ej. cada stage tiene su propia animación de cierre).
+
+## Eventos de CasparCG
+
+| Evento | Comportamiento |
+|---|---|
+| `play` | Arranca, reproduce el segmento `play`, activa state machine de stages |
+| `stop` | Reproduce el segmento `stop`, resetea state |
+| `next` | Salta al siguiente stage por `order` usando `goToAndPlay(<nombre>)`. Si no hay siguiente, warn y no-op. Funciona igual en pause y loop |
+| `goto <name>` | Salta al stage con ese nombre |
+| `playAnimation <name>` | Salta a cualquier marker (no necesariamente stage) |
+| `data {...}` | Reemplaza textos/colores/opacidad/imágenes; dispara update marker si el stage actual lo define |
+| `entrada1..6` | Custom: salta a markers `bola1..bola6` |
+| `startclock` / `stopclock` | Control manual del reloj automático |
+
+### ⚠ El contrato de salida — `window.remove()`
+
+**`stop` no termina cuando termina la animación: termina cuando el gráfico suelta el
+layer.** Lo hace `index.js` solo, en `releaseLayer()`; ningún gráfico escribe la llamada.
+
+Por qué hace falta, medido contra **CasparCG 2.6.0** el 2026-08-13:
+
+- `CG STOP` es literalmente `producer->call("stop()")` — una llamada JS a una página que el
+  servidor no introspecciona. **CasparCG no se entera de que el template paró.**
+- Después de un `CG STOP` el layer sigue reportando `producer=html` con el mismo
+  `file/path`, indefinidamente. `INFO <ch>-<layer>` devuelve un XML **idéntico byte a
+  byte** antes y después, y `CG INFO` ni siquiera existe (`400 ERROR`).
+- `window.remove()` —que CasparCG inyecta en toda página— cierra el navegador y vacía el
+  estado del productor: el servidor **deja de publicar `foreground/file/path` a los 43 ms**.
+  Esa ausencia es la única señal con la que un controlador puede saber que el layer quedó
+  libre.
+
+Consecuencia práctica: un gráfico que no suelta el layer se queda cargado aunque no se vea,
+y en un controlador con **layer compartido** —varios gráficos por el mismo layer, que es el
+caso de ZFX La Suerte— eso deja al operador sin saber qué hay al aire.
+
+Cómo se cumple:
+
+| Pieza | Qué hace |
+|---|---|
+| `webcg.on('stop')` | Levanta `exiting` y arma el respaldo de `EXIT_FALLBACK_MS` (5 s) |
+| `completeHandler()` | Primera rama: si `exiting`, suelta el layer. Va primero a propósito |
+| `releaseLayer()` | Llama a `window.remove()` si existe; fuera de CasparCG deja un `console.info` |
+| `cancelExit()` | Sólo `play` cancela la salida: volver al aire antes de que termine la animación **no** suelta el layer. `next` / `goto` / `playAnimation` / el global de un stage se **ignoran** durante una salida |
+
+⚠ **Los 5 s de `EXIT_FALLBACK_MS` son contrato con los controladores, no un detalle de
+`index.js`.** Un controlador puede asumir que un gráfico que cumple el contrato suelta el
+layer, como mucho, 5 s después de que su salida **empieza**, y de ahí saca su margen tras
+una salida (cue-qs-beisbol: `SALIDA_MAXIMA_TEMPLATE_MS`). Dos consecuencias:
+
+- **La salida dura ≤ 4,5 s**: el `dr / fr` del marker `stop` y de cada `stop` custom de
+  stage. Una más larga **la corta el respaldo**: suelta el layer a mitad de la animación y al
+  aire se ve el corte. Con 5 s justos compiten `complete` y el respaldo.
+- **Sin marker `stop` o con `dr: 0` no hay animación de salida.** Sin marker, el layer se
+  suelta al terminar el segmento en curso (al instante si estaba en pausa). Con `dr: 0`, al
+  instante siempre: corta lo que se esté viendo, también una entrada a medias.
+- **Cambiar `EXIT_FALLBACK_MS` es cambiar el contrato con todos los controladores**, no
+  ajustar un gráfico. Un gráfico que necesita una salida más larga no cabe en esta plantilla.
+
+Los 5 s cuentan desde que la salida **corre**, no desde el `CG STOP`. Un `stop` que llega
+con el gráfico todavía cargando espera la carga (JSON y fuentes) y entonces tiene sus 5 s:
+hasta ~10 s desde el `CG STOP`. Si la carga pasa de 5 s, el respaldo que se armó al llegar
+el `stop` suelta el layer sin animar.
+
+El respaldo además es la red de un gráfico roto: si el JSON no carga no hay animación que
+termine, y sin él el layer se quedaría ocupado para siempre.
+
+⚠ **`remove` es nombre global reservado.** Un gráfico que declare su propia
+`function remove()` pisa la que inyecta CasparCG: deja de soltarse el layer **y** se rompe
+`CG REMOVE`.
+
+**Prueba de salida** — todo gráfico nuevo la pasa antes de publicarse: ponerlo al aire,
+mandarle `stop`, y comprobar que el controlador ve el layer libre solo, sin forzar nada. Si
+hay que forzarlo, el gráfico no está terminado.
+
+### Invocación directa de stages (shortcut)
+
+Cada stage marker queda expuesto como función global en `window`, así que desde CasparCG se puede invocar directo en vez de pasar por `goto`.
+
+Sintaxis CasparCG: `CG <channel>-<videoLayer> INVOKE <cg_layer> "<method>"` — en este setup `cg_layer` siempre es `1`.
+
+```
+CG 1-10 INVOKE 1 "intro()"       # equivalente a INVOKE 1 "goto('intro')"
+```
+
+Reglas:
+- Solo aplica a stages (markers con `type` y `order`). Markers regulares siguen vía `playAnimation`.
+- No se exponen los nombres reservados: `play`, `stop`, `next`, `update`, `goto`, `playAnimation`, `startclock`, `stopclock`.
+- Nombres que no son identificadores JS válidos (espacios, guiones, empieza con dígito) se saltean con warning — usar `goto('<name>')` en ese caso.
+- Si el nombre colisiona con un global existente (ej. un stage llamado `anim`), se saltea con warning.
+- Los `()` son obligatorios — `INVOKE 1 "intro"` solo lee la referencia, no la ejecuta.
+- ⚠ El global no existe hasta que cargan el JSON **y sus fuentes** (hasta `FONT_WAIT_MS` más). Un `INVOKE 1 "intro()"` justo después del `CG ADD` se pierde con un `ReferenceError`; `goto('intro')` existe desde el principio y espera a la carga. Un controlador que manda el stage pegado al ADD usa `goto`.
+
+## Reemplazo de imágenes
+
+Si una capa con clase (`cl`) tiene `refId` que incluye `image`, `index.js` reemplaza el `href` del `<image>` SVG con el valor del data.
+
+## Audio
+
+Para SFX one-shot por entrada (uno o varios clips):
+1. Agregar un `<audio id="sfx_<i>" src="../audio/aud_<i>.mp3" preload="auto">` por clip en `<head>` (índice 0-based)
+2. Definir `let audio_clips = [{ src: '../audio/aud_0.mp3', inframe: 5 }, ...]` antes de cargar `../index.js`
+
+Cada clip se dispara una vez al cruzar su `inframe`; todos los flags se resetean en cada `play`. El `src` en `audio_clips` es informativo (el `<audio id="sfx_<i>">` es el que efectivamente se reproduce).
+
+## Reloj/fecha
+
+- `window.ENABLE_CLOCK = true` antes de cargar `../index.js` para arrancar al cargar
+- `window.CLOCK_SECONDS = true` para incluir segundos (intervalo 1s vs 60s alineado al minuto)
+- Control manual: CALL `startclock` / `stopclock` (stop deja los textos vacíos)
+- Formato: `time` → `02:45 PM` en-US, `date` → `dd/mm/yyyy` es-DO
+
+## Testeo local
+
+Los samples en [samples/](samples/) cargan `../webcg-devtools.umd.js` que monta una UI de control en el browser. Abrirlos con Live Server de VSCode (o cualquier server estático) para mandar eventos manualmente sin CasparCG.
+
+## Releases
+
+Tags semver gestionados con [release.sh](release.sh) + `gh release create`:
+- `./release.sh` → patch estable
+- `./release.sh minor` / `major`
+- `./release.sh patch pre` → pre-release `vX.Y.Z-pre.N`
+
+Tasks de VSCode en [.vscode/tasks.json](.vscode/tasks.json) cubren Mac y Windows (Git Bash).
+
+**No correr `release.sh` sin pedir confirmación** — crea release público en GitHub.
+
+## Deploy: qué entra al zip del release
+
+El artefacto que se copia al server de playout es el **"Source code (zip)"** que GitHub genera del tag — `release.sh` no empaqueta nada, sólo taggea. Lo único que controla el contenido de ese zip es [.gitattributes](.gitattributes) con `export-ignore`. El porqué de cada línea, las cinco trampas del mecanismo y los ejemplos están en el README, sección "Qué entra al zip de un Release". Acá van las reglas de uso.
+
+### Este repo es la plantilla: el `.gitattributes` viaja a cada paquete derivado
+
+- El bloque genérico (`*.md` menos README, `/.vscode`, `/.claude`, `/release.sh`, `/webcg-devtools.umd.js`, `/samples`) es interno en **cualquier** repo de gráficos. No se toca ni acá ni en el derivado.
+- Lo interno de UN proyecto va **sólo** en la sección marcada del final, y en el repo derivado — nunca subirlo al bloque genérico de la plantilla. Si dudás de si algo es genérico o específico, es específico.
+- Al arrancar un paquete nuevo desde esta plantilla, la única línea a revisar es `/samples`: si ese repo usa `samples/` para gráficos reales y no para ejemplos, hay que borrarla. Es la única del bloque genérico que puede morder.
+
+### Antes de agregar una exclusión
+
+1. `git ls-files` — sólo lo trackeado puede entrar al zip. Lo que ya está en `.gitignore` no necesita línea (sería decoración).
+2. Comprobar que ningún `.html`/`.js` la referencia, sin confiar en un grep literal: hay rutas armadas por concatenación en runtime (así carga `webcg-framework.umd.js` a los devtools) y puede haber diferencias de mayúsculas entre lo que pide el HTML y el nombre real del archivo.
+3. Anclar con `/` inicial, y en directorios **sin** barra final. Un patrón suelto matchea en cualquier nivel y se lleva homónimos de otras carpetas.
+4. Rutas con tilde o ñ: guardar el patrón en **NFC** (git usa NFC, macOS escribe NFD) o no matchea nunca.
+
+**Nunca excluir un gráfico ni un asset de gráfico** aunque hoy no se use — otra versión del controlador puede invocarlo. Si parece que sobra, preguntar antes de sacarlo.
+
+### Verificar antes de decir que está listo
+
+```bash
+git check-attr export-ignore -- README.md <la ruta nueva>
+git archive --worktree-attributes --format=zip -o /tmp/t.zip HEAD && unzip -l /tmp/t.zip
+```
+
+- `--worktree-attributes` es obligatorio si todavía no commiteaste: `git archive HEAD` lee el `.gitattributes` **del commit**, y sin eso parece que la lista entera no sirve.
+- `git check-attr` reporta `unspecified` para archivos dentro de un directorio con `export-ignore`, aunque `git archive` sí saltee el subárbol entero. **Verificar contra el archive real, no contra `check-attr`.**
+- Asserts concretos, no "se ve bien": cero entradas que matcheen los patrones excluidos, `README.md` presente y el resto de los `.md` ausente, todos los HTML de entrada dentro con todo lo que cargan, y md5 idéntico worktree↔zip en los archivos CRLF (`index.html`, `webcg-framework.umd.js`) — ese último atrapa una regla `text` metida sin querer.
+
+### Dos límites conocidos, no son bugs
+
+- `export-ignore` sólo aplica al commit que se taggea: los releases ya publicados siguen generando el zip completo, el primero recortado es el próximo tag.
+- No es seguridad: lo excluido sigue en la historia del repo y en cualquier clon.
+
+## Cosas que NO hay que hacer
+
+- No modificar `index.js` del root para resolver una necesidad de UN gráfico — copiarlo a la subcarpeta del gráfico y editar ahí.
+- No cambiar nombres de markers/clases reservados (`play`, `stop`, `time`, `date`, `bola1..6`) — rompen el contrato con CasparCG y el index.js.
+- **No declarar una `function remove()` global** — pisa la `window.remove()` que inyecta CasparCG y con ella el contrato de salida (ver *Eventos de CasparCG*).
+- No llamar a `window.remove()` desde un gráfico: lo hace `index.js` al terminar la animación de salida. Llamarla antes corta la salida en seco.
+- No cambiar `EXIT_FALLBACK_MS` ni hacer una salida de más de 4,5 s: los 5 s son el contrato con los controladores (ver *Eventos de CasparCG*).
+- No reusar nombres de stages — cada `payload.name` debe ser único.
+- No repetir `order` entre stages.
+- No tocar `lottie.js` ni `webcg-framework.umd.js` (son vendors).
+- No agregar al bloque genérico del `.gitattributes` una exclusión que sea específica de un proyecto — va en la sección marcada del final, y en el repo derivado.
+- No meter reglas `text`, `eol` ni `* text=auto` en `.gitattributes` — `index.html` y `webcg-framework.umd.js` están en CRLF y una normalización los reescribe enteros. Ese archivo lleva sólo `export-ignore`.
+
+## Pendiente / a futuro
+
+- **External loops** (`loopExternal` legacy con `loop.json` separado) se eliminó en la reescritura. Si vuelve a hacer falta, se reimplementará con un diseño propio integrado al modelo de stages.
+- **`loopDelay`** (frames muertos entre iteraciones de loop) tampoco se migró. Se puede emular agregando frames "muertos" al final del segmento del loop en el Lottie.
+
+---
+
+## Spec completa de markers (referencia para tools)
+
+Esta sección es la fuente de verdad para cualquier tool que genere markers. Documenta exactamente qué soporta el `index.js` actual y qué NO.
+
+### Forma base de cualquier marker
+
+```json
+{ "tm": <frame inicio>, "dr": <duración en frames>, "cm": "<string>", "payload": { ... } (opcional) }
+```
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| `tm` | number | Frame absoluto donde arranca el segmento. Obligatorio |
+| `dr` | number | Duración del segmento en frames. Obligatorio. Para "punto" usar `0` |
+| `cm` | string | Comment field. Si el marker no trae `payload` objeto, este campo se parsea para producir el payload. Obligatorio |
+| `payload` | object | Opcional. Si está y es objeto, `index.js` lo serializa a `cm` antes de pasárselo a Lottie. Forma recomendada para stages |
+
+### Cómo `index.js` arma el `payload` final
+
+1. Pre-procesa el JSON antes de cargar: si `marker.payload` es objeto, sobrescribe `marker.cm = JSON.stringify(marker.payload)`.
+2. Le pasa el JSON a Lottie como `animationData`.
+3. Lottie parsea `cm` para producir el `marker.payload` definitivo:
+   - **`JSON.parse(cm)`** — si es JSON válido, `payload = parsed`.
+   - **`key:value\r\nkey:value`** — si tiene al menos un `clave: valor` separado por `\r\n`, parsea key/value (valores quedan como strings).
+   - **Fallback**: `payload = { name: cm }` — para markers simples cuyo nombre es literalmente el contenido de `cm`.
+
+Resultado neto: emitir `payload: {...}` (forma limpia) y emitir `cm: "{...JSON...}"` (forma compacta) son **equivalentes**.
+
+### Categoría 1: Markers regulares (no-stage)
+
+`payload` es solo `{ name: "..." }`. Se usan para:
+- Trigger desde CasparCG por nombre conocido (`play`, `stop`, etc.)
+- Target de `playAnimation <name>` desde CasparCG
+- Ser referenciados como `update` desde un stage marker
+
+**Forma simple (recomendada para regulars):**
+```json
+{ "tm": 0, "dr": 100, "cm": "play" }
+```
+
+Lottie produce `payload = { name: "play" }`.
+
+**Forma JSON (también válida pero innecesaria para regulars):**
+```json
+{ "tm": 0, "dr": 100, "cm": "{\"name\":\"play\"}" }
+```
+
+#### Nombres reservados (no reusar para otra cosa)
+
+| Nombre | Uso |
+|---|---|
+| `play` | Disparado por evento `play` desde CasparCG. Puede ser stage. |
+| `stop` | Disparado por evento `stop` desde CasparCG. **No** debería ser stage. |
+| `bola1`, `bola2`, ..., `bola6` | Disparados por `entrada1`..`entrada6` (custom bingo). |
+
+### Categoría 2: Stage markers
+
+Definen el state machine multi-etapa. Llevan `name`, `type` y `order`.
+
+**Forma limpia (recomendada para tools nuevas):**
+```json
+{ "tm": 0, "dr": 100, "cm": "play", "payload": { "name": "play", "type": "pause", "order": 1, "update": "update1" } }
+```
+
+**Forma compacta (equivalente, retrocompatible):**
+```json
+{ "tm": 0, "dr": 100, "cm": "{\"name\":\"play\",\"type\":\"pause\",\"order\":1,\"update\":\"update1\"}" }
+```
+
+`index.js` acepta cualquiera de las dos. Si `payload` es objeto, lo serializa a `cm` antes de pasárselo a Lottie.
+
+#### Schema del payload
+
+| Campo | Tipo | Requerido | Validación |
+|---|---|---|---|
+| `name` | string | Sí | Único entre TODOS los markers (no solo stages). Usado para `goto <name>` y para `goToAndPlay` interno |
+| `type` | string | Sí | Exactamente `"loop"` o `"pause"` |
+| `order` | number | Sí | Entero positivo. **Único entre stages**, secuencial recomendado (1, 2, 3, ...) |
+| `update` | string | No | Nombre de otro marker (regular). Si está, se reproduce ese marker cuando llega data. Si no está, fallback al marker global `update` (si existe) |
+| `updateDelay` | number | No | Frames a esperar dentro del update segment antes del text replacement. Default `0` |
+| `stop` | string | No | Nombre de otro marker (regular). Si está, se reproduce ese cuando llega `stop` mientras este stage está activo (con `playSegments`, self-contained). Si no está, fallback al marker global `stop` |
+
+#### Comportamiento al final del segmento (`tm + dr`)
+
+- `loop`: salta a `tm` (loopea hasta `next`/`goto`).
+- `pause`: ejecuta `anim.pause()` (queda detenido hasta `next`/`goto`).
+
+Para pausar **exacto en `tm`** (sin reproducir un segmento previo), usar `dr: 0`.
+
+#### Stage marker que también es `play`
+
+El marker `play` puede ser un stage. Se invoca normalmente con el evento `play` desde CasparCG, y al terminar el segmento ejecuta el comportamiento de stage. Es el patrón recomendado cuando el primer stage del flujo coincide con la entrada.
+
+```json
+{ "tm": 0, "dr": 100, "cm": "play", "payload": { "name": "play", "type": "pause", "order": 1, "update": "update1" } }
+```
+
+### Categoría 3: Update markers
+
+Son markers regulares (sin `type`/`order`) que se referencian desde un stage:
+
+```json
+{ "tm": 200, "dr": 30, "cm": "update1" }
+```
+
+- El `name` debe matchear el campo `update` de algún stage.
+- Un mismo update marker puede ser referenciado por varios stages.
+- Cuando termina la reproducción, la animación queda en el último frame del segmento (no vuelve al stage marker).
+
+### Reglas de validación que el tool debería enforcear
+
+✅ **Hacer:**
+- Generar `tm`, `dr`, `cm` para todo marker
+- Para regulars: `cm = "<name>"` (string simple, sin payload)
+- Para stages: emitir `payload: { name, type, order, update?, updateDelay? }` como objeto (forma limpia). `cm` puede ser el nombre o irrelevante. Alternativamente `cm = JSON.stringify(payload)` sin campo `payload` (forma compacta) — `index.js` acepta ambas
+- `payload.name` único en todo el set de markers
+- `payload.order` único entre stages, idealmente secuencial sin huecos
+- `dr >= 0` siempre
+- Si un stage define `update`, el marker referenciado debe existir
+- Asegurarse de incluir al menos el marker `play` y `stop` (no son obligatorios para que el index.js no crashee, pero CasparCG espera poder mandar play/stop)
+
+❌ **NO hacer:**
+- No reusar nombres entre markers
+- No repetir `order` entre stages
+- No usar `type` distinto de `"loop"` o `"pause"`
+- No declarar `type` en update markers (los convertiría en stages, lo cual no querés)
+- No declarar `update` apuntando a otro stage marker (debería apuntar a uno regular)
+- No usar nombres reservados (`stop`, `bola1..6`) como name de stages
+- No emitir un `payload` con `cm` también stringificado del mismo payload — usar uno o el otro
+
+### Lo que NO está soportado (pre-eliminado o futuro)
+
+| Feature | Estado | Workaround actual |
+|---|---|---|
+| `loopExternal: true` (loop en archivo separado) | Eliminado | No hay; pendiente de re-diseño |
+| `loopDelay` (frames muertos entre iteraciones de loop) | Eliminado | Agregar frames "muertos" al final del segmento del loop |
+| Marker `update` legacy (sin stage owner) | Eliminado | Cualquier data triggerea update solo si el stage actual lo declara |
+| `prev` (navegación hacia atrás) | No implementado | Usar `goto <stageName>` para saltar atrás |
+| Multiple updates por stage | No implementado | Un solo `update` por stage |
+
+### Ejemplos completos
+
+**Gráfico simple (entrada con pausa + salida) — forma limpia:**
+```json
+"markers": [
+    { "tm": 0, "dr": 100, "cm": "play", "payload": { "name": "play", "type": "pause", "order": 1, "update": "update1" } },
+    { "tm": 200, "dr": 30, "cm": "update1" },
+    { "tm": 500, "dr": 100, "cm": "stop" }
+]
+```
+
+**Gráfico multi-etapa (entrada → loop → pausa → salida) — forma limpia:**
+```json
+"markers": [
+    { "tm": 0, "dr": 50, "cm": "play" },
+    { "tm": 50, "dr": 60, "cm": "intro", "payload": { "name": "intro", "type": "loop", "order": 1 } },
+    { "tm": 200, "dr": 100, "cm": "detalle", "payload": { "name": "detalle", "type": "pause", "order": 2, "update": "update_detalle" } },
+    { "tm": 350, "dr": 40, "cm": "update_detalle" },
+    { "tm": 500, "dr": 100, "cm": "stop" }
+]
+```
+
+**Update marker compartido entre stages — forma limpia:**
+```json
+"markers": [
+    { "tm": 0, "dr": 50, "cm": "play", "payload": { "name": "play", "type": "pause", "order": 1, "update": "fade" } },
+    { "tm": 100, "dr": 50, "cm": "detalle", "payload": { "name": "detalle", "type": "pause", "order": 2, "update": "fade" } },
+    { "tm": 200, "dr": 30, "cm": "fade" },
+    { "tm": 400, "dr": 100, "cm": "stop" }
+]
+```
+
+**Equivalente compacto (todo en `cm` stringificado):**
+```json
+"markers": [
+    { "tm": 0, "dr": 100, "cm": "{\"name\":\"play\",\"type\":\"pause\",\"order\":1,\"update\":\"update1\"}" },
+    { "tm": 200, "dr": 30, "cm": "update1" },
+    { "tm": 500, "dr": 100, "cm": "stop" }
+]
+```

@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Release Win",
+      "type": "shell",
+      "command": "./release.sh",
+      "options": {
+        "shell": {
+          "executable": "C:\\Program Files\\Git\\bin\\bash.exe",
+          "args": ["-c"]
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Release Macos",
+      "type": "shell",
+      "command": "./release.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "Pre-Release Win",
+      "type": "shell",
+      "command": "./release.sh patch pre",
+      "options": {
+        "shell": {
+          "executable": "C:\\Program Files\\Git\\bin\\bash.exe",
+          "args": ["-c"]
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Pre-Release Macos",
+      "type": "shell",
+      "command": "./release.sh patch pre",
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <!--AUDIO_TAGS-->
+    <title>Lower Hosts</title>
+
+    <style>
+
+        #bm {
+            position: fixed;
+        }
+
+        body {
+            overflow: hidden;
+            margin: 0;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bm"></div>
+
+
+
+
+    <!-- Scripts -->
+    <script>
+        let data_file = "MiAnimacion.json";  // nombre del archivo Lottie
+
+        // --- AUDIO ---
+        // let audio_clips = [{ src: '../audio/aud_0.mp3', inframe: 5 }];
+
+        // --- RELOJ / FECHA ---
+        // Requiere capas de texto en el Lottie con clase "time" y/o "date"
+        // window.ENABLE_CLOCK = true;       // activa el reloj automatico al cargar
+        // window.CLOCK_SECONDS = true;      // muestra segundos (intervalo baja a 1s)
+    </script>
+    <script src="../webcg-framework.umd.js"></script>
+     <script>
+        if (location.port === "5500") {
+            document.write('<script src="../webcg-devtools.umd.js"><\/script>');
+        }
+    </script>
+    <script src="../lottie.js"></script>
+    <script src="../index.js"></script>
+
+</body>
+
+</html>

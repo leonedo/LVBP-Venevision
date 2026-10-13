@@ -1,0 +1,38 @@
+# Qué NO entra al zip que GitHub genera para un Release ("Source code (zip)").
+#
+# Ese zip es el artefacto de deploy: se baja del release y se descomprime en el server de playout.
+# `release.sh` no arma el zip, sólo taggea y llama `gh release create` — el zip lo genera GitHub
+# desde el tag, así que este archivo es el único control sobre qué contiene.
+#
+# Este repo es la plantilla base. Todo lo de acá abajo es genérico: es interno en CUALQUIER repo de
+# gráficos. Las exclusiones propias de un proyecto van en la sección del final, no acá arriba.
+#
+# OJO: en este archivo NO va ninguna regla `text`, `eol` ni `* text=auto`. Normalizar finales de
+# línea reescribe archivos enteros, e `index.html` y `webcg-framework.umd.js` están en CRLF.
+# Este archivo lleva `export-ignore` y nada más.
+#
+# Cómo agregar y verificar una exclusión: README.md, sección "Qué entra al zip de un Release".
+
+# --- Herramientas de desarrollo. El playout no las carga. ---
+/release.sh               export-ignore
+/.vscode                  export-ignore
+/.claude                  export-ignore
+# webcg-devtools sólo se carga con Live Server (puerto 5500) o con ?debug=true en la URL —
+# ambos caminos son de desarrollo, nunca de playout.
+/webcg-devtools.umd.js    export-ignore
+# samples/ son gráficos de ejemplo para testear con devtools, no material de producción.
+# Si un repo derivado usa samples/ para gráficos reales, borrá esta línea.
+/samples                  export-ignore
+
+# --- Documentación. Se queda el README, que es lo único que ayuda a quien descomprima el zip. ---
+# gitattributes no admite `!patron`, pero sí desactivar un atributo con `-` en una línea posterior.
+# El orden importa: la línea de abajo pisa a la de arriba.
+*.md                      export-ignore
+/README.md               -export-ignore
+
+# --- Exclusiones propias de este proyecto ---
+# Agregá acá lo que sea interno de ESTE repo y de ningún otro: gráficos huérfanos, JSONs viejos,
+# carpetas de trabajo. Anclá siempre con `/` inicial (sin barra final en directorios) — un patrón
+# suelto matchea en cualquier nivel y puede llevarse gráficos homónimos de otras carpetas.
+# Ejemplo:
+# /viejo/loop_old.json    export-ignore
