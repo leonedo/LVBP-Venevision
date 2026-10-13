@@ -125,17 +125,39 @@ function cargarFuentes(json) {
     return Promise.race([Promise.all(cargas), tiempo]).then(() => clearTimeout(tope));
 }
 
+// Lee el JSON con XMLHttpRequest, no con fetch: CasparCG abre los templates como
+// file:// y el Chromium de CasparCG 2.3.x rechaza fetch() sobre ese esquema
+// ("URL scheme "file" is not supported"). En 2.6.0 fetch sí funciona, pero XHR
+// sirve en las dos (es lo que usaba Lottie por dentro con `path:`). Con file://
+// XHR devuelve status 0 aunque haya leído bien: el éxito se decide por el contenido.
+function loadJSON(url) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.onload = () => {
+            const ok = (xhr.status >= 200 && xhr.status < 300) || (xhr.status === 0 && xhr.responseText);
+            if (!ok) {
+                reject(new Error(`HTTP ${xhr.status}`));
+                return;
+            }
+            try {
+                resolve(JSON.parse(xhr.responseText));
+            } catch (err) {
+                reject(err);
+            }
+        };
+        xhr.onerror = () => reject(new Error(`XHR failed: ${url}`));
+        xhr.send();
+    });
+}
+
 // Pre-fetch the JSON so we can normalize markers (object payload -> stringified cm)
 // before Lottie parses them. Lottie only reads `cm` to populate `marker.payload`,
 // so the user's tool can emit either the legacy stringified-cm form or a clean
 // `{ ..., payload: { name, type, order, update? } }` object.
 const animPromise = new Promise((resolve, reject) => {
     console.log('loading ' + data_file);
-    fetch(data_file)
-        .then(r => {
-            if (!r.ok) throw new Error(`HTTP ${r.status}`);
-            return r.json();
-        })
+    loadJSON(data_file)
         .then(json => {
             if (json.markers) {
                 json.markers.forEach(m => {
@@ -407,6 +429,13 @@ webcg.on('data', function (data) {
                             const image = group ? group.querySelector('image') : null;
 
                             if (image) {
+                                // Una ruta que no carga (mal escrita, o el archivo no está)
+                                // muestra al aire el ícono de imagen rota del navegador: si
+                                // falla, la imagen queda vacía. El href vacío también tira
+                                // error, pero ese ya no muestra nada.
+                                image.onerror = () => {
+                                    if (image.getAttribute('href')) image.removeAttribute('href');
+                                };
                                 image.setAttribute('href', newPath);
                             }
                         } catch (err) {
@@ -421,7 +450,11 @@ webcg.on('data', function (data) {
                         // Lo que no es texto ni número (null, un booleano, un objeto) se
                         // vacía, como antes, en vez de pintar "false" u "[object Object]".
                         const valor = normalizeValue(data[cl]);
-                        const texto = (typeof valor === 'string' || typeof valor === 'number') ? String(valor) : '';
+                        let texto = (typeof valor === 'string' || typeof valor === 'number') ? String(valor) : '';
+                        // Lottie no aplica el All Caps de After Effects (ca: 1 en el
+                        // documento de texto): sin esto, un texto que llega en minúsculas
+                        // sale en minúsculas aunque en AE la capa se vea en mayúsculas.
+                        if (animElement.data.t.d.k[0].s.ca === 1) texto = texto.toUpperCase();
                         try {
                             animElement.canResizeFont(true);
                             animElement.updateDocumentData({ t: texto }, 0);

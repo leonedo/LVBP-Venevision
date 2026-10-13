@@ -28,6 +28,11 @@ El nombre de la capa en AE → clase CSS del SVG renderizado. Es el contrato ent
 `canResizeFont(true)`. Se hace a mano en el JSON y, siguiendo la receta, queda idéntico al
 píxel con el texto del diseño: [textos-de-caja.md](textos-de-caja.md).
 
+**Mayúsculas:** Lottie no aplica el All Caps de After Effects (`ca: 1` en `t.d.k[i].s`): un texto
+que llega en minúsculas saldría en minúsculas aunque en AE la capa se vea en mayúsculas.
+`index.js` pasa a mayúsculas el texto del UPDATE en las capas que lo tienen; en las que no, lo deja
+como llega.
+
 **Fuentes:** las `origin: 0` (archivo aparte) y las `origin: 3` (URL o base64 en el JSON)
 las registra `index.js` y las **espera antes** de `lottie.loadAnimation` (`cargarFuentes()`),
 porque Lottie mide cada letra una sola vez y una fuente que llega tarde deja medidas de la
@@ -249,6 +254,13 @@ Reglas:
 
 Si una capa con clase (`cl`) tiene `refId` que incluye `image`, `index.js` reemplaza el `href` del `<image>` SVG con el valor del data.
 
+Si la ruta no carga (mal escrita, o el archivo no está), la imagen queda vacía: sin eso, el navegador
+muestra al aire su ícono de imagen rota. `""` también la deja vacía.
+
+Lottie dibuja la imagen en el tamaño del asset (`w` × `h`) y por defecto recorta (`xMidYMid slice`)
+una de otra proporción. Para un logo que tiene que entrar entero, `"pr": "xMidYMid meet"` en el
+asset.
+
 ## Audio
 
 Para SFX one-shot por entrada (uno o varios clips):
@@ -324,6 +336,7 @@ git archive --worktree-attributes --format=zip -o /tmp/t.zip HEAD && unzip -l /t
 - No reusar nombres de stages — cada `payload.name` debe ser único.
 - No repetir `order` entre stages.
 - No tocar `lottie.js` ni `webcg-framework.umd.js` (son vendors).
+- **No usar `fetch()` para leer archivos del template** (el JSON del Lottie, etc.). CasparCG abre los templates como `file://`, y en **CasparCG 2.3.x** su Chromium rechaza `fetch` sobre ese esquema (`URL scheme "file" is not supported`, visto con LVBP-Stats). En 2.6.0 `fetch` sí funciona, así que el problema solo aparece en clientes con el server viejo. `index.js` usa `loadJSON()` con `XMLHttpRequest`, que funciona en las dos versiones. Con Live Server (`http://`) los dos funcionan, así que al testear en el browser no se ve.
 - No agregar al bloque genérico del `.gitattributes` una exclusión que sea específica de un proyecto — va en la sección marcada del final, y en el repo derivado.
 - No meter reglas `text`, `eol` ni `* text=auto` en `.gitattributes` — `index.html` y `webcg-framework.umd.js` están en CRLF y una normalización los reescribe enteros. Ese archivo lleva sólo `export-ignore`.
 
