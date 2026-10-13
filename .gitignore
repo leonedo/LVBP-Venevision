@@ -2,3 +2,6 @@
 **/.DS_Store
 Thumbs.db
 .claude/settings.local.json
+
+# backups que deja el guardado del editor / MCP (lottie_save)
+*.bak
