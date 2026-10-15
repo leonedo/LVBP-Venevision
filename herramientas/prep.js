@@ -244,7 +244,26 @@ const PUERTA = {
     MAG: 'MAGA', TIB: 'TIBUS', TIG: 'TIGRES'
 };
 const OPACIDAD_PUERTA = 49;            // la del diseño: pasa al CSS de defensiva/index.html
+// El escudo de las compuertas lleva en AE un Emboss (y un Hue/Saturation) que Lottie no pinta. El
+// Emboss deja lo liso en 50 % de gris y lo mezcla 45 % con el original (blanco): 0.55 × 0.5 +
+// 0.45 = 0.725. Sin eso el escudo es blanco puro, el color dodge lo quema casi a blanco y se ve
+// mucho más fuerte que en el diseño. El gris va como efecto Fill, que Lottie sí pinta (con un
+// filtro SVG, como las sombras). Si el diseñador manda los PNG con los efectos ya aplicados,
+// sacarlo (GRIS_PUERTA = null).
+const GRIS_PUERTA = 0.725;
 const ENTRADA_DEF = 53;                // la entrada termina en el 52 (el título)
+// Un efecto Fill de AE tal como lo exporta bodymovin. Lottie lee el color (3.º) y la opacidad (7.º).
+const relleno = (gris, ix) => ({
+    ty: 21, nm: 'Fill', np: 9, mn: 'ADBE Fill', ix, en: 1, ef: [
+        { ty: 10, nm: 'Fill Mask', mn: 'ADBE Fill-0001', ix: 1, v: { a: 0, k: 0, ix: 1 } },
+        { ty: 7, nm: 'All Masks', mn: 'ADBE Fill-0007', ix: 2, v: { a: 0, k: 0, ix: 2 } },
+        { ty: 2, nm: 'Color', mn: 'ADBE Fill-0002', ix: 3, v: { a: 0, k: [gris, gris, gris, 1], ix: 3 } },
+        { ty: 7, nm: 'Invert', mn: 'ADBE Fill-0006', ix: 4, v: { a: 0, k: 0, ix: 4 } },
+        { ty: 0, nm: 'Horizontal Feather', mn: 'ADBE Fill-0003', ix: 5, v: { a: 0, k: 0, ix: 5 } },
+        { ty: 0, nm: 'Vertical Feather', mn: 'ADBE Fill-0004', ix: 6, v: { a: 0, k: 0, ix: 6 } },
+        { ty: 0, nm: 'Opacity', mn: 'ADBE Fill-0005', ix: 7, v: { a: 0, k: 1, ix: 7 } }
+    ]
+});
 if (hay('DEFENSIVA')) {
     const d = load(path.join(SRC, 'DEFENSIVA/data.json'));
 
@@ -304,6 +323,10 @@ if (hay('DEFENSIVA')) {
         // puerta va (MAG está al revés): el lado sale del parent.
         if (l.ks.o.a || l.ks.o.k !== OPACIDAD_PUERTA) throw new Error(`compuerta ${l.nm}: opacidad ${JSON.stringify(l.ks.o.k)}`);
         l.ks.o.k = 100;
+        if (GRIS_PUERTA !== null) {
+            if (l.ef.some(e => e.ty === 21)) throw new Error(`compuerta ${l.nm}: ya trae un Fill`);
+            l.ef.push(relleno(GRIS_PUERTA, l.ef.length + 1));
+        }
         l.ln = `puerta${sig}${lado[l.parent]}`;
         vistos[l.ln] = 1;
         rename(d, l.nm, sig + '_opacidad');

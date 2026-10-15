@@ -78,5 +78,8 @@ for g in GRAFICOS:
     if g in PUERTAS:
         if PUERTAS[g] not in html: p(g, 'index.html no le pone su opacidad al escudo de las compuertas')
         for l in d['layers']:
-            if (l.get('ln') or '').startswith('puerta') and l['ks']['o'].get('k') != 100: p(g, f'compuerta {l["ln"]}: opacidad en la capa (va en el CSS)')
+            if not (l.get('ln') or '').startswith('puerta'): continue
+            if l['ks']['o'].get('k') != 100: p(g, f'compuerta {l["ln"]}: opacidad en la capa (va en el CSS)')
+            # el gris del Emboss de AE, que Lottie no pinta (prep.js, GRIS_PUERTA)
+            if not any(e.get('ty') == 21 for e in l.get('ef', [])): p(g, f'compuerta {l["ln"]}: sin el Fill gris (sale blanca)')
 print('\n'.join(problems) if problems else f'lint: sin problemas ({", ".join(GRAFICOS)})')

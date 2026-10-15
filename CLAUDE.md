@@ -64,8 +64,14 @@ como la defensiva de Meridiano): el controlador manda `1` al que defiende y `0` 
 El escudo de las compuertas va al 49 % del diseño (con fusión *color dodge*), pero ese 49 % no está
 en la capa sino en el CSS de su `<image>` (`g[id^="puerta"] > image`, por el `ln`
 `puerta<SIGLAS><izq|der>` de la capa): el UPDATE escribe su `opacity` en la capa y lo pisaría con
-un 1. Los efectos de AE de esos escudos (Emboss, Hue/Saturation, Tone) Lottie no los pinta: salen
-planos, como en las capturas. La compuerta de Águilas no vino en el export: llegó aparte, como PNG
+un 1. Los efectos de AE de esos escudos Lottie no los pinta: el Emboss (relieve) y el
+Hue/Saturation (el Tone es de audio: no se ve). El Emboss dejaba el escudo gris, y sin él el PNG
+blanco con *color dodge* se quemaba casi a blanco y se veía mucho más fuerte que en el diseño. El
+gris vuelve con un efecto **Fill** al 72,5 % (lo liso del Emboss, 50 % de gris mezclado 45 % con el
+blanco), que Lottie sí pinta con un filtro SVG, como las sombras: el escudo da el brillo azul del
+diseño, pero sin relieve. Lo eligió Leon el 2026-10-15 entre el blanco al 49 % y al 30 %; si el
+diseñador manda los PNG con los efectos aplicados, se saca (`GRIS_PUERTA = null` en `prep.js` y el
+chequeo del Fill en el lint). La compuerta de Águilas no vino en el export: llegó aparte, como PNG
 (`images/compuerta_aguilas.png`, 2026-10-15), y `prep.js` le arma las dos capas con las de Caribes.
 
 Textos: en mayúsculas, como en el score. Los apellidos van como se los manda el controlador a
@@ -133,8 +139,9 @@ cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
   no contra todo: al abrirse la puerta, la parte de la máscara a la izquierda de ese origen
   aparecía como una franja azul que tapaba el centro del campo y cortaba el DEFENSIVA. `prep.js` la
   cambia por la complementaria sin invertir: la misma diagonal, cerrada por la derecha.
-- **Compuertas:** el 49 % pasa de la capa al CSS (ver arriba) y cada una lleva su `ln`. Sin
-  compuerta de Águilas en el export, `prep.js` la arma desde `images/compuerta_aguilas.png`.
+- **Compuertas:** el 49 % pasa de la capa al CSS, cada una lleva su `ln` y suma el Fill gris (ver
+  arriba). Sin compuerta de Águilas en el export, `prep.js` la arma desde
+  `images/compuerta_aguilas.png`.
 - **Fuente:** `fPath` llega como `FONT/LT Energy`: pasa a `font/LTEnergy-Regular.ttf`.
 - **All Caps:** llega apagado en todas las capas de texto: `prep.js` lo prende.
 - **Textos de caja:** los apellidos ya llegan de caja (con `lh` 52, no parten en líneas encimadas),
@@ -145,8 +152,9 @@ cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
   si algún keyframe pasa de ahí). Todas las capas arrancan en el frame 1.
 - **Imágenes:** las 19 del export van tal cual a `defensiva/images/`, más `compuerta_aguilas.png`.
 
-Comparado frame a frame contra el export (con sólo la máscara arreglada y el mismo equipo): igual
-salvo 1 o 2 niveles de 255 dentro del escudo de las compuertas, por el 49 % en el `<image>`.
+Comparado frame a frame contra el export (con sólo la máscara arreglada y el mismo equipo), antes
+del Fill gris: igual salvo 1 o 2 niveles de 255 dentro del escudo de las compuertas, por el 49 % en
+el `<image>`. El Fill sólo cambia el escudo, sin costo de frames medible en la entrada.
 
 ### QA
 

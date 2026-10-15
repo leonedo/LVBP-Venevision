@@ -7311,6 +7311,98 @@
               }
             }
           ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 4,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
+              }
+            }
+          ]
         }
       ],
       "ip": 1,
@@ -7600,6 +7692,98 @@
                 "a": 0,
                 "k": 45,
                 "ix": 4
+              }
+            }
+          ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 3,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
               }
             }
           ]
@@ -7982,6 +8166,98 @@
               }
             }
           ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 4,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
+              }
+            }
+          ]
         }
       ],
       "ip": 1,
@@ -8271,6 +8547,98 @@
                 "a": 0,
                 "k": 45,
                 "ix": 4
+              }
+            }
+          ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 3,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
               }
             }
           ]
@@ -8653,6 +9021,98 @@
               }
             }
           ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 4,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
+              }
+            }
+          ]
         }
       ],
       "ip": 1,
@@ -8942,6 +9402,98 @@
                 "a": 0,
                 "k": 45,
                 "ix": 4
+              }
+            }
+          ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 3,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
               }
             }
           ]
@@ -9320,6 +9872,98 @@
               "v": {
                 "a": 0,
                 "k": 20,
+                "ix": 7
+              }
+            }
+          ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 4,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
                 "ix": 7
               }
             }
@@ -9703,6 +10347,98 @@
               }
             }
           ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 4,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
+              }
+            }
+          ]
         }
       ],
       "ip": 1,
@@ -9995,6 +10731,98 @@
               }
             }
           ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 3,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
+              }
+            }
+          ]
         }
       ],
       "ip": 1,
@@ -10284,6 +11112,98 @@
                 "a": 0,
                 "k": 45,
                 "ix": 4
+              }
+            }
+          ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 3,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
               }
             }
           ]
@@ -10666,6 +11586,98 @@
               }
             }
           ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 4,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
+              }
+            }
+          ]
         }
       ],
       "ip": 1,
@@ -10955,6 +11967,98 @@
                 "a": 0,
                 "k": 45,
                 "ix": 4
+              }
+            }
+          ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 3,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
               }
             }
           ]
@@ -11337,6 +12441,98 @@
               }
             }
           ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 4,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
+              }
+            }
+          ]
         }
       ],
       "ip": 1,
@@ -11626,6 +12822,98 @@
                 "a": 0,
                 "k": 45,
                 "ix": 4
+              }
+            }
+          ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 3,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
               }
             }
           ]
@@ -12008,6 +13296,98 @@
               }
             }
           ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 4,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
+              }
+            }
+          ]
         }
       ],
       "ip": 1,
@@ -12297,6 +13677,98 @@
                 "a": 0,
                 "k": 45,
                 "ix": 4
+              }
+            }
+          ]
+        },
+        {
+          "ty": 21,
+          "nm": "Fill",
+          "np": 9,
+          "mn": "ADBE Fill",
+          "ix": 3,
+          "en": 1,
+          "ef": [
+            {
+              "ty": 10,
+              "nm": "Fill Mask",
+              "mn": "ADBE Fill-0001",
+              "ix": 1,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 1
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "All Masks",
+              "mn": "ADBE Fill-0007",
+              "ix": 2,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 2
+              }
+            },
+            {
+              "ty": 2,
+              "nm": "Color",
+              "mn": "ADBE Fill-0002",
+              "ix": 3,
+              "v": {
+                "a": 0,
+                "k": [
+                  0.725,
+                  0.725,
+                  0.725,
+                  1
+                ],
+                "ix": 3
+              }
+            },
+            {
+              "ty": 7,
+              "nm": "Invert",
+              "mn": "ADBE Fill-0006",
+              "ix": 4,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 4
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Horizontal Feather",
+              "mn": "ADBE Fill-0003",
+              "ix": 5,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 5
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Vertical Feather",
+              "mn": "ADBE Fill-0004",
+              "ix": 6,
+              "v": {
+                "a": 0,
+                "k": 0,
+                "ix": 6
+              }
+            },
+            {
+              "ty": 0,
+              "nm": "Opacity",
+              "mn": "ADBE Fill-0005",
+              "ix": 7,
+              "v": {
+                "a": 0,
+                "k": 1,
+                "ix": 7
               }
             }
           ]
