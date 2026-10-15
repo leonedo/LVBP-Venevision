@@ -6,6 +6,11 @@ REPO = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..') + '/'
 problems = []
 def p(g, msg): problems.append(f'{g}: {msg}')
 GRAFICOS = sorted(g for g in os.listdir(REPO) if os.path.isfile(REPO + g + '/data.json') and os.path.isfile(REPO + g + '/index.html'))
+# Clases repetidas a propósito. En la defensiva, la clave del equipo prende su barra y las dos
+# mitades del escudo de las compuertas (prep.js): las tres capas, la misma clase.
+REPETIDAS = {'defensiva': re.compile(r'[A-Z]+_opacidad')}
+# Las compuertas de la defensiva: su 49 % va en el CSS (prep.js), no en la capa.
+PUERTAS = {'defensiva': 'g[id^="puerta"] > image'}
 for g in GRAFICOS:
     d = json.load(open(REPO + g + '/data.json'))
     html = open(REPO + g + '/index.html').read()
@@ -27,7 +32,7 @@ for g in GRAFICOS:
     for cid, c in comps.items(): check_layers(c['layers'], cid)
     cls = [l['cl'] for l in d['layers'] if l.get('cl')]
     for c in set(cls):
-        if cls.count(c) > 1: p(g, f'clase duplicada {c}')
+        if cls.count(c) > 1 and not (g in REPETIDAS and REPETIDAS[g].fullmatch(c)): p(g, f'clase duplicada {c}')
         if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_-]*', c): p(g, f'clase inválida {c!r}')
     for l in d['layers']:
         nm = l.get('nm', '')
@@ -70,4 +75,8 @@ for g in GRAFICOS:
     for sel in re.findall(r'\.([A-Za-z_]+_opacidad)', html):
         if sel not in cls: p(g, f'index.html oculta .{sel}, que no existe')
     if 'data_file = "data.json"' not in html: p(g, 'index.html no carga data.json')
+    if g in PUERTAS:
+        if PUERTAS[g] not in html: p(g, 'index.html no le pone su opacidad al escudo de las compuertas')
+        for l in d['layers']:
+            if (l.get('ln') or '').startswith('puerta') and l['ks']['o'].get('k') != 100: p(g, f'compuerta {l["ln"]}: opacidad en la capa (va en el CSS)')
 print('\n'.join(problems) if problems else f'lint: sin problemas ({", ".join(GRAFICOS)})')

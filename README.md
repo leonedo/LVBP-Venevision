@@ -6,6 +6,7 @@ carpeta con su `index.html`, su `data.json` y su `data.md` (las claves del UPDAT
 | Carpeta | Qué es |
 |---|---|
 | `score/` | Pizarra: barras de los dos equipos, carreras, inning, bases, conteo, outs y barra de bateador y lanzador |
+| `defensiva/` | Pantalla completa: dos compuertas con el escudo del equipo se abren sobre el campo con las 9 posiciones y sus jugadores; arriba, la barra del equipo y DEFENSIVA |
 
 El resto de este README es el de la base, [HTML-templates](https://github.com/leonedo/HTML-templates):
 plantilla para gráficos Lottie en CasparCG usando webcg-framework, con un state machine **multi-etapa** que permite gráficos secuenciales (entrada → loop1 → pausa → loop2 → salida) controlados desde CasparCG.
