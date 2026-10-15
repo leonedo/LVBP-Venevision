@@ -6,11 +6,12 @@ REPO = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..') + '/'
 problems = []
 def p(g, msg): problems.append(f'{g}: {msg}')
 GRAFICOS = sorted(g for g in os.listdir(REPO) if os.path.isfile(REPO + g + '/data.json') and os.path.isfile(REPO + g + '/index.html'))
-# Clases repetidas a propósito. En la defensiva, la clave del equipo prende su barra y las dos
-# mitades del escudo de las compuertas (prep.js): las tres capas, la misma clase.
-REPETIDAS = {'defensiva': re.compile(r'[A-Z]+_opacidad')}
-# Las compuertas de la defensiva: su 49 % va en el CSS (prep.js), no en la capa.
-PUERTAS = {'defensiva': 'g[id^="puerta"] > image'}
+# Clases repetidas a propósito. En la defensiva y la ofensiva, la clave del equipo prende su barra,
+# las dos mitades del escudo de las compuertas y (en la ofensiva) las dos pantallas de color de las
+# puertas (prep.js): la misma clase en todas.
+REPETIDAS = {g: re.compile(r'[A-Z]+_opacidad') for g in ('defensiva', 'ofensiva')}
+# Las compuertas: su 49 % va en el CSS (prep.js), no en la capa.
+PUERTAS = {g: 'g[id^="puerta"] > image' for g in ('defensiva', 'ofensiva')}
 for g in GRAFICOS:
     d = json.load(open(REPO + g + '/data.json'))
     html = open(REPO + g + '/index.html').read()

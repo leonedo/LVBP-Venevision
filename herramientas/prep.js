@@ -218,6 +218,100 @@ if (hay('SCOREBUG')) {
     save(path.join(REPO, 'score/data.json'), d);
 }
 
+// ---------------------------------------------------------------- compuertas (defensiva, ofensiva)
+// Los dos son de pantalla completa: dos compuertas con el escudo del equipo que se abren, y la barra
+// del equipo arriba. Las compuertas llegan abreviadas distinto que las barras (y en la ofensiva, las
+// pantallas de color de las puertas, otra vez distinto); acá también, las siglas tal cual.
+const PUERTA = {
+    AGUI: 'AGUI', AGUIL: 'AGUI', AGUILAS: 'AGUI', ANZ: 'ANZ', BRA: 'BRAVOS', BRAV: 'BRAVOS', CARD: 'CARD',
+    LEO: 'LEO', MAG: 'MAGA', TIB: 'TIBUS', TIG: 'TIGRES'
+};
+for (const s of Object.values(SIGLAS)) PUERTA[s] = s;
+const OPACIDAD_PUERTA = 49;            // la del diseño: pasa al CSS del index.html del gráfico
+// El escudo de las compuertas lleva en AE un Emboss (y un Hue/Saturation) que Lottie no pinta. El
+// Emboss deja lo liso en 50 % de gris y lo mezcla 45 % con el original (blanco): 0.55 × 0.5 +
+// 0.45 = 0.725. Sin eso el escudo es blanco puro, el color dodge lo quema casi a blanco y se ve
+// mucho más fuerte que en el diseño. El gris va como efecto Fill, que Lottie sí pinta (con un
+// filtro SVG, como las sombras). Si el diseñador manda los PNG con los efectos ya aplicados,
+// sacarlo (GRIS_PUERTA = null).
+const GRIS_PUERTA = 0.725;
+// Las puertas de Tigres son de un azul casi negro y el color dodge no lo puede aclarar: con el gris
+// de los demás su escudo casi no se veía. Al 95 % se ve como el de Tiburones o Magallanes (lo eligió
+// Leon el 2026-10-15 entre 72,5, 85, 90 y 95).
+const GRIS_EQUIPO = { TIGRES: 0.95 };
+const ENTRADA_DEF = 53;                // la entrada termina en el 52 (el título)
+// Un efecto Fill de AE tal como lo exporta bodymovin. Lottie lee el color (3.º) y la opacidad (7.º).
+const relleno = (gris, ix) => ({
+    ty: 21, nm: 'Fill', np: 9, mn: 'ADBE Fill', ix, en: 1, ef: [
+        { ty: 10, nm: 'Fill Mask', mn: 'ADBE Fill-0001', ix: 1, v: { a: 0, k: 0, ix: 1 } },
+        { ty: 7, nm: 'All Masks', mn: 'ADBE Fill-0007', ix: 2, v: { a: 0, k: 0, ix: 2 } },
+        { ty: 2, nm: 'Color', mn: 'ADBE Fill-0002', ix: 3, v: { a: 0, k: [gris, gris, gris, 1], ix: 3 } },
+        { ty: 7, nm: 'Invert', mn: 'ADBE Fill-0006', ix: 4, v: { a: 0, k: 0, ix: 4 } },
+        { ty: 0, nm: 'Horizontal Feather', mn: 'ADBE Fill-0003', ix: 5, v: { a: 0, k: 0, ix: 5 } },
+        { ty: 0, nm: 'Vertical Feather', mn: 'ADBE Fill-0004', ix: 6, v: { a: 0, k: 0, ix: 6 } },
+        { ty: 0, nm: 'Opacity', mn: 'ADBE Fill-0005', ix: 7, v: { a: 0, k: 1, ix: 7 } }
+    ]
+});
+// Ancho y alto de un PNG (su IHDR).
+const medidasPng = f => { const b = fs.readFileSync(f); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
+
+// El equipo: una clave, <SIGLAS>_opacidad, prende su barra (arriba), las dos mitades del escudo de
+// las compuertas y las dos pantallas de color de las puertas (`extra` capas por equipo, ya
+// renombradas). `lado`: ind del parent de cada puerta → 'izq' / 'der'. `gris`: el gris
+// del escudo de un equipo cuando no es GRIS_PUERTA.
+function equipoEnPuertas(d, lado, grafico, extra, gris = {}) {
+    const vistos = {};
+    for (const l of d.layers) {
+        let m = l.nm.match(/^\.BARRA_([A-Z]+)_VISITA(?:_1)?\.png$/);
+        if (m) {
+            if (!SIGLAS[m[1]]) throw new Error(`barra de equipo desconocido ${m[1]}`);
+            rename(d, l.nm, SIGLAS[m[1]] + '_opacidad');
+            continue;
+        }
+        m = l.nm.match(/^\.COMPUERTA([A-Z]+?)(?:IZQ|DER)$/);
+        if (!m) continue;
+        const sig = PUERTA[m[1]];
+        if (!sig || !lado[l.parent]) throw new Error(`compuerta ${l.nm}: equipo o puerta desconocidos`);
+        // El escudo va al 49 %, pero el UPDATE escribe su _opacidad en la capa y pisaría ese
+        // 49 con un 1: la capa queda al 100 y el 49 % lo pone el CSS en su <image>, por el
+        // id (ln) que la distingue de la barra. Los nombres IZQ/DER del export no dicen en qué
+        // puerta va (MAG está al revés en la defensiva): el lado sale del parent.
+        if (l.ks.o.a || l.ks.o.k !== OPACIDAD_PUERTA) throw new Error(`compuerta ${l.nm}: opacidad ${JSON.stringify(l.ks.o.k)}`);
+        l.ks.o.k = 100;
+        if (GRIS_PUERTA !== null) {
+            if (l.ef.some(e => e.ty === 21)) throw new Error(`compuerta ${l.nm}: ya trae un Fill`);
+            l.ef.push(relleno(gris[sig] ?? GRIS_PUERTA, l.ef.length + 1));
+        }
+        l.ln = `puerta${sig}${lado[l.parent]}`;
+        vistos[l.ln] = 1;
+        rename(d, l.nm, sig + '_opacidad');
+    }
+    const conPuerta = new Set(Object.keys(vistos).map(id => id.replace(/^puerta|izq$|der$/g, '')));
+    for (const s of conPuerta) if (!vistos[`puerta${s}izq`] || !vistos[`puerta${s}der`]) throw new Error(`compuerta ${s}: falta una mitad`);
+    for (const s of Object.values(SIGLAS)) {
+        const n = d.layers.filter(l => l.nm === `.${s}_opacidad`).length;
+        if (n !== 1 + extra + (conPuerta.has(s) ? 2 : 0)) throw new Error(`${s}_opacidad: ${n} capas`);
+        if (!conPuerta.has(s)) console.warn(`· ${grafico}: sin compuerta de ${s}: con ese equipo las compuertas salen sin escudo`);
+    }
+}
+
+// Máscara invertida de una puerta. Lottie la invierte contra un rectángulo del tamaño de la
+// composición desde el (0, 0) de la capa, no contra todo: al correrse la puerta, la parte de la
+// máscara a la izquierda de ese (0, 0) aparece como una franja que tapa el centro. Va la
+// complementaria, sin invertir: la misma diagonal, cerrada por la derecha más allá del borde del
+// rectángulo de la puerta (en la defensiva termina en el 957.6).
+function complementaria(l) {
+    const mk = l.masksProperties;
+    if (!mk || mk.length !== 1 || !mk[0].inv || mk[0].pt.a) throw new Error(`${l.nm}: máscara inesperada`);
+    const v = mk[0].pt.k.v;
+    if (v.length !== 4 || v[1][0] !== -1016 || v[2][0] !== -1016) throw new Error(`${l.nm}: vértices inesperados`);
+    const g = l.shapes[0].it, rc = g.find(s => s.ty === 'rc'), tr = g.find(s => s.ty === 'tr');
+    const borde = tr.p.k[0] + (rc.p.k[0] + rc.s.k[0] / 2 - tr.a.k[0]) * tr.s.k[0] / 100;
+    if (borde >= 1016) throw new Error(`${l.nm}: la puerta pasa de la máscara (${borde})`);
+    v[1][0] = v[2][0] = 1016;
+    mk[0].inv = false;
+}
+
 // ---------------------------------------------------------------- defensiva
 // Las claves son las de la defensiva de LVBP-Meridiano, para que el controlador le mande a las dos
 // la misma data: jugador<posición> el nombre, <posición> el rótulo y <SIGLAS>_opacidad el equipo.
@@ -236,34 +330,8 @@ const DEF_POSICIONES = [
     ['.centerfield', 'CF', 'centerfield', 101.9],
     ['.rightfield', 'RF', 'rightfield', 115.3]
 ];
-// Las compuertas llegan abreviadas distinto que las barras. La de Águilas no vino en el export del
-// 2026-10-15: llegó aparte, como PNG (ver abajo).
+// La compuerta de Águilas no vino en el export del 2026-10-15: llegó aparte, como PNG (ver abajo).
 const AGUI_PUERTA = 'images/compuerta_aguilas.png';
-const PUERTA = {
-    AGUI: 'AGUI', AGUIL: 'AGUI', AGUILAS: 'AGUI', ANZ: 'ANZ', BRAV: 'BRAVOS', CARD: 'CARD', LEO: 'LEO',
-    MAG: 'MAGA', TIB: 'TIBUS', TIG: 'TIGRES'
-};
-const OPACIDAD_PUERTA = 49;            // la del diseño: pasa al CSS de defensiva/index.html
-// El escudo de las compuertas lleva en AE un Emboss (y un Hue/Saturation) que Lottie no pinta. El
-// Emboss deja lo liso en 50 % de gris y lo mezcla 45 % con el original (blanco): 0.55 × 0.5 +
-// 0.45 = 0.725. Sin eso el escudo es blanco puro, el color dodge lo quema casi a blanco y se ve
-// mucho más fuerte que en el diseño. El gris va como efecto Fill, que Lottie sí pinta (con un
-// filtro SVG, como las sombras). Si el diseñador manda los PNG con los efectos ya aplicados,
-// sacarlo (GRIS_PUERTA = null).
-const GRIS_PUERTA = 0.725;
-const ENTRADA_DEF = 53;                // la entrada termina en el 52 (el título)
-// Un efecto Fill de AE tal como lo exporta bodymovin. Lottie lee el color (3.º) y la opacidad (7.º).
-const relleno = (gris, ix) => ({
-    ty: 21, nm: 'Fill', np: 9, mn: 'ADBE Fill', ix, en: 1, ef: [
-        { ty: 10, nm: 'Fill Mask', mn: 'ADBE Fill-0001', ix: 1, v: { a: 0, k: 0, ix: 1 } },
-        { ty: 7, nm: 'All Masks', mn: 'ADBE Fill-0007', ix: 2, v: { a: 0, k: 0, ix: 2 } },
-        { ty: 2, nm: 'Color', mn: 'ADBE Fill-0002', ix: 3, v: { a: 0, k: [gris, gris, gris, 1], ix: 3 } },
-        { ty: 7, nm: 'Invert', mn: 'ADBE Fill-0006', ix: 4, v: { a: 0, k: 0, ix: 4 } },
-        { ty: 0, nm: 'Horizontal Feather', mn: 'ADBE Fill-0003', ix: 5, v: { a: 0, k: 0, ix: 5 } },
-        { ty: 0, nm: 'Vertical Feather', mn: 'ADBE Fill-0004', ix: 6, v: { a: 0, k: 0, ix: 6 } },
-        { ty: 0, nm: 'Opacity', mn: 'ADBE Fill-0005', ix: 7, v: { a: 0, k: 1, ix: 7 } }
-    ]
-});
 if (hay('DEFENSIVA')) {
     const d = load(path.join(SRC, 'DEFENSIVA/data.json'));
 
@@ -282,8 +350,7 @@ if (hay('DEFENSIVA')) {
     // máscara corrida lo que se corre el centro, para que el corte entre las puertas caiga igual.
     const aguiPng = path.join(REPO, 'defensiva', AGUI_PUERTA);
     if (!d.layers.some(l => /^\.COMPUERTAAGUI/.test(l.nm)) && fs.existsSync(aguiPng)) {
-        const png = fs.readFileSync(aguiPng);
-        const w = png.readUInt32BE(16), h = png.readUInt32BE(20); // IHDR
+        const [w, h] = medidasPng(aguiPng);
         d.assets.push({ id: 'image_compuerta_aguilas', w, h, u: 'images/', p: path.basename(AGUI_PUERTA), e: 0 });
         let ind = Math.max(...d.layers.map(l => l.ind));
         for (const lado of ['IZQ', 'DER']) {
@@ -303,41 +370,46 @@ if (hay('DEFENSIVA')) {
         }
     }
 
-    // ---- el equipo: una clave prende su barra y las dos mitades del escudo de las compuertas.
-    const lado = { [layer(d, 'puertaizq').ind]: 'izq', [layer(d, 'puertader').ind]: 'der' };
-    const vistos = {};
-    for (const l of d.layers) {
-        let m = l.nm.match(/^\.BARRA_([A-Z]+)_VISITA(?:_1)?\.png$/);
-        if (m) {
-            if (!SIGLAS[m[1]]) throw new Error(`barra de equipo desconocido ${m[1]}`);
-            rename(d, l.nm, SIGLAS[m[1]] + '_opacidad');
-            continue;
+    // ---- la puerta derecha llega con una máscara invertida: una franja azul tapaba el campo.
+    complementaria(layer(d, 'puertader'));
+
+    // ---- las puertas, del color de cada equipo y con la textura, como en la ofensiva (Leon,
+    // 2026-10-15). El azul de la defensiva es justo el de Magallanes en la ofensiva, que salió de
+    // ésta: la defensiva es la versión anterior de la idea. Los degradados y la textura se toman de
+    // la ofensiva preparada (ofensiva/data.json), así que si allá cambian, la defensiva los toma la
+    // próxima vez (si llegan los dos exports juntos, correr prep.js dos veces). Encima de cada
+    // puerta van su textura y sus 8 pantallas de color: hijas de la puerta, con su forma y su
+    // máscara. Sin equipo queda el azul de la puerta.
+    const of = load(path.join(REPO, 'ofensiva/data.json'));
+    const ofLado = { [of.layers.find(l => l.nm === 'movimientopuertaizq').ind]: 'izq', [of.layers.find(l => l.nm === 'movimientopuertader').ind]: 'der' };
+    const degradado = l => l.shapes[0].it.find(s => s.ty === 'gf');
+    const texPng = path.join(REPO, 'defensiva/images/texturapuertas.png');
+    if (!fs.existsSync(texPng)) throw new Error('falta defensiva/images/texturapuertas.png (la textura de las puertas de la ofensiva)');
+    const [tw, th] = medidasPng(texPng);
+    d.assets.push({ id: 'image_texturapuertas', w: tw, h: th, u: 'images/', p: 'texturapuertas.png', e: 0 });
+    let indPuerta = Math.max(...d.layers.map(l => l.ind));
+    for (const lado of ['der', 'izq']) {
+        const base = layer(d, 'puerta' + lado);
+        const tex = clone(of.layers.find(l => l.cl === 'texturapuerta' + lado));
+        Object.assign(tex, { ind: ++indPuerta, parent: base.ind, ip: 0, op: base.op, st: 0, refId: 'image_texturapuertas' });
+        const nuevas = [tex];
+        for (const sig of Object.values(SIGLAS)) {
+            const ref = of.layers.find(l => l.cl === sig + '_opacidad' && l.ty === 4 && ofLado[l.parent] === lado);
+            if (!ref) throw new Error(`ofensiva: sin pantalla ${lado} de ${sig}`);
+            const c = clone(base);
+            c.ind = ++indPuerta;
+            c.parent = base.ind;
+            c.ks = { o: { a: 0, k: 100 }, r: { a: 0, k: 0 }, p: { a: 0, k: [0, 0, 0] }, a: { a: 0, k: [0, 0, 0] }, s: { a: 0, k: [100, 100, 100] } };
+            degradado(c).g = clone(degradado(ref).g);
+            c.nm = `.${sig}_opacidad`;
+            c.cl = `${sig}_opacidad`;
+            nuevas.push(c);
         }
-        m = l.nm.match(/^\.COMPUERTA([A-Z]+?)(?:IZQ|DER)$/);
-        if (!m) continue;
-        const sig = PUERTA[m[1]];
-        if (!sig || !lado[l.parent]) throw new Error(`compuerta ${l.nm}: equipo o puerta desconocidos`);
-        // El escudo va al 49 %, pero el UPDATE escribe su _opacidad en la capa y pisaría ese
-        // 49 con un 1: la capa queda al 100 y el 49 % lo pone el CSS en su <image>, por el
-        // id (ln) que la distingue de la barra. Los nombres IZQ/DER del export no dicen en qué
-        // puerta va (MAG está al revés): el lado sale del parent.
-        if (l.ks.o.a || l.ks.o.k !== OPACIDAD_PUERTA) throw new Error(`compuerta ${l.nm}: opacidad ${JSON.stringify(l.ks.o.k)}`);
-        l.ks.o.k = 100;
-        if (GRIS_PUERTA !== null) {
-            if (l.ef.some(e => e.ty === 21)) throw new Error(`compuerta ${l.nm}: ya trae un Fill`);
-            l.ef.push(relleno(GRIS_PUERTA, l.ef.length + 1));
-        }
-        l.ln = `puerta${sig}${lado[l.parent]}`;
-        vistos[l.ln] = 1;
-        rename(d, l.nm, sig + '_opacidad');
+        d.layers.splice(d.layers.indexOf(base), 0, ...nuevas);
     }
-    const conPuerta = new Set(Object.keys(vistos).map(id => id.replace(/^puerta|izq$|der$/g, '')));
-    for (const s of conPuerta) if (!vistos[`puerta${s}izq`] || !vistos[`puerta${s}der`]) throw new Error(`compuerta ${s}: falta una mitad`);
-    for (const s of Object.values(SIGLAS)) {
-        const n = d.layers.filter(l => l.nm === `.${s}_opacidad`).length;
-        if (n !== (conPuerta.has(s) ? 3 : 1)) throw new Error(`${s}_opacidad: ${n} capas`);
-        if (!conPuerta.has(s)) console.warn(`· DEFENSIVA: sin compuerta de ${s}: con ese equipo las compuertas salen lisas`);
-    }
+
+    // ---- el equipo: una clave prende su barra, sus dos pantallas y las dos mitades del escudo.
+    equipoEnPuertas(d, { [layer(d, 'puertaizq').ind]: 'izq', [layer(d, 'puertader').ind]: 'der' }, 'DEFENSIVA', 2, GRIS_EQUIPO);
     // Las imágenes del fondo llegan con la clase "png" (la extensión del nombre) y nombres con
     // espacios y puntos, que el audit del editor marca como clases inválidas: nombres válidos,
     // como logomeridiano en Meridiano.
@@ -345,18 +417,6 @@ if (hay('DEFENSIVA')) {
     rename(d, 'BASE DE COLOR.png', 'basecolor');
     rename(d, 'LOGO FINAL ATRAPA LA EMOCION_1 bisel.png', 'logoatrapa');
     rename(d, 'TEXTURA.png', 'textura');
-
-    // ---- la puerta derecha llega con una máscara invertida. Lottie la invierte contra un
-    // rectángulo del tamaño de la composición desde el (0, 0) de la capa, no contra todo: al
-    // correrse la puerta, la parte de la máscara a la izquierda de ese (0, 0) aparece como una
-    // franja azul que tapa el campo. Va la máscara complementaria, sin invertir: la misma
-    // diagonal, cerrada por la derecha (el rectángulo de la puerta termina en el 957.6).
-    const mk = layer(d, 'puertader').masksProperties;
-    if (mk.length !== 1 || !mk[0].inv || mk[0].pt.a) throw new Error('puertader: máscara inesperada');
-    const v = mk[0].pt.k.v;
-    if (v.length !== 4 || v[1][0] !== -1016 || v[2][0] !== -1016) throw new Error('puertader: vértices inesperados');
-    v[1][0] = v[2][0] = 1016;
-    mk[0].inv = false;
 
     // ---- timeline: el frame 0 queda vacío (todas las capas desde el 1). El gráfico es de
     // pantalla completa desde su primer frame: así no se ve nada antes del play (un CG ADD sin
@@ -377,4 +437,124 @@ if (hay('DEFENSIVA')) {
     d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
     allCaps(d);
     save(path.join(REPO, 'defensiva/data.json'), d);
+}
+
+// ---------------------------------------------------------------- ofensiva
+// Las claves, las de la ofensiva de LVBP-Meridiano donde dicen lo mismo: posicion<N> y jugador<N>
+// (los turnos, 1 a 9 de arriba abajo), titulo y <SIGLAS>_opacidad. No tiene valor<N> (el average),
+// equipo ni informacion. Propias: manager (el nombre) y rotulomanager (el MGR, fijo).
+// Cajas de los nombres [ancho, alto]: las barras van en diagonal y la de la fila 1 es la más corta
+// (su caja pasaba 4 px el final de la barra): las nueve llegan hasta 8 px antes del final de esa
+// barra, para que un nombre encoja igual en cualquier fila. La del mánager, hasta 8 px antes de la
+// suya (pasaba 100). Medidos en el frame 89, a la altura de la parte de arriba del texto (la capa
+// va a escala 1). El alto deja una línea al cuerpo del diseño y no dos hasta un cuerpo de 17 (los
+// nombres) o 15 (el mánager): con el 50 del export, un nombre largo partía en dos líneas chicas.
+const OF_NOMBRE = [474, 34];
+const OF_MANAGER = [382, 31];
+// Los escudos de las compuertas que no vinieron en el export (sólo trae el de Águilas): los PNG
+// blancos de la defensiva, copiados a mano a ofensiva/images.
+const OF_ESCUDOS = {
+    ANZ: 'compuerta_caribes.png', BRAVOS: 'compuerta_bravos.png', CARD: 'compuerta_cardenales.png',
+    LEO: 'compuerta_leones.png', MAGA: 'compuerta_magallanes.png', TIBUS: 'compuerta_tiburones.png',
+    TIGRES: 'compuerta_tigres.png'
+};
+const ENTRADA_OF = 90;                 // la entrada termina en el 89 (el mánager)
+// Un escudo de compuerta para otro equipo, a partir de la capa de uno que vino en el export: la
+// misma puerta, lugar y escala, centrado en su imagen. La máscara corta por la misma diagonal (la
+// costura entre las puertas), alargada para cubrir una imagen de cualquier alto.
+function escudoClonado(ref, w, h, refId) {
+    const c = clone(ref);
+    const [ax, ay] = ref.ks.a.k;
+    const m = c.masksProperties;
+    if (m.length !== 1 || m[0].inv || m[0].pt.a || m[0].pt.k.v.length !== 4) throw new Error(`${ref.nm}: máscara inesperada`);
+    const v = m[0].pt.k.v.map(([x, y]) => [x + w / 2 - ax, y + h / 2 - ay]);
+    const porCentro = [...v].sort((a, b) => Math.abs(a[0] - w / 2) - Math.abs(b[0] - w / 2));
+    const [s1, s2] = porCentro.slice(0, 2).sort((a, b) => a[1] - b[1]); // la costura, de arriba abajo
+    const x = y => s1[0] + (y - s1[1]) * (s2[0] - s1[0]) / (s2[1] - s1[1]);
+    const lejos = porCentro[2][0] > w / 2 ? w + 200 : -200;
+    m[0].pt.k.v = [[lejos, -200], [x(-200), -200], [x(h + 200), h + 200], [lejos, h + 200]];
+    c.ks.a.k = [w / 2, h / 2, 0];
+    c.refId = refId;
+    return c;
+}
+if (hay('OFENSIVA')) {
+    const d = load(path.join(SRC, 'OFENSIVA/data.json'));
+
+    // ---- textos. Ya son de caja, con lh 52.
+    rename(d, 'POSICION', 'posicion1');
+    for (let n = 2; n <= 9; n++) rename(d, 'POSICION ' + n, 'posicion' + n);
+    for (let n = 1; n <= 9; n++) {
+        rename(d, '.NOMBREPOSICION' + n, 'jugador' + n); // el 1 llega con un espacio al final del nm
+        doc(d, '.jugador' + n).sz = [...OF_NOMBRE];
+    }
+    rename(d, 'MANAGER', 'rotulomanager');
+    rename(d, 'NOMBREMANAGER', 'manager');
+    doc(d, '.manager').sz = [...OF_MANAGER];
+    // El título llega como en la defensiva (la capa y el texto): DEFENSIVA.
+    rename(d, 'DEFENSIVA 2', 'titulo');
+    const titulo = doc(d, '.titulo');
+    if (!['DEFENSIVA', 'OFENSIVA'].includes(titulo.t)) throw new Error(`titulo: ${titulo.t}`);
+    titulo.t = 'OFENSIVA';
+
+    // ---- puertas. Cada equipo tiene sus dos pantallas de color (PANTALLAPUERTA<DER|IZQ><equipo>).
+    // La de Águilas llega dos veces: queda la de arriba, la que se ve en AE (la de abajo tiene la
+    // izquierda 4 px corrida). Las de la derecha llegan con la máscara invertida.
+    for (const p of ['DER', 'IZQ']) {
+        const dup = d.layers.filter(l => l.nm === 'PANTALLAPUERTA' + p + 'AGUI');
+        if (dup.length !== 2) throw new Error(`PANTALLAPUERTA${p}AGUI: ${dup.length}`);
+        d.layers.splice(d.layers.indexOf(dup[1]), 1);
+    }
+    for (const l of d.layers) {
+        const m = l.nm.match(/^PANTALLAPUERTA(DER|IZQ)([A-Z]+)$/);
+        if (!m) continue;
+        if (!PUERTA[m[2]]) throw new Error(`pantalla de equipo desconocido ${l.nm}`);
+        if (m[1] === 'DER') complementaria(l);
+        rename(d, l.nm, PUERTA[m[2]] + '_opacidad');
+    }
+    // Los escudos que faltan, con las capas del de Águilas (el único del export).
+    let ind = Math.max(...d.layers.map(l => l.ind));
+    for (const [sig, png] of Object.entries(OF_ESCUDOS)) {
+        if (d.layers.some(l => { const m = l.nm.match(/^\.COMPUERTA([A-Z]+?)(?:IZQ|DER)$/); return m && PUERTA[m[1]] === sig; })) continue;
+        const file = path.join(REPO, 'ofensiva/images', png);
+        if (!fs.existsSync(file)) continue;    // equipoEnPuertas avisa
+        const [w, h] = medidasPng(file);
+        const id = 'image_' + png.replace(/\.png$/, '');
+        d.assets.push({ id, w, h, u: 'images/', p: png, e: 0 });
+        for (const p of ['IZQ', 'DER']) {
+            const ref = layer(d, '.COMPUERTAAGUI' + p);
+            const c = escudoClonado(ref, w, h, id);
+            c.nm = `.COMPUERTA${sig}${p}`;
+            c.cl = `COMPUERTA${sig}${p}`;
+            c.ind = ++ind;
+            d.layers.splice(d.layers.indexOf(ref), 0, c);
+        }
+    }
+    equipoEnPuertas(d, { [layer(d, 'movimientopuertaizq').ind]: 'izq', [layer(d, 'movimientopuertader').ind]: 'der' }, 'OFENSIVA', 2, GRIS_EQUIPO);
+
+    // ---- imágenes con la clase "png" y nombres inválidos (como en la defensiva)
+    rename(d, 'CAMPO OFENSIVA.png', 'campo');
+    rename(d, 'BASE DE COLOR.png', 'basecolor');
+    rename(d, 'LOGO FINAL ATRAPA LA EMOCION_1 bisel.png', 'logoatrapa');
+    rename(d, 'TEXTURA.png', 'textura');
+    const texturas = d.layers.filter(l => l.nm === 'TEXTURA PUERTAS.png');
+    if (texturas.length !== 2) throw new Error(`TEXTURA PUERTAS: ${texturas.length}`);
+    const ladoTextura = { [layer(d, 'movimientopuertaizq').ind]: 'izq', [layer(d, 'movimientopuertader').ind]: 'der' };
+    for (const l of texturas) { l.nm = '.texturapuerta' + ladoTextura[l.parent]; l.cl = 'texturapuerta' + ladoTextura[l.parent]; }
+
+    // ---- timeline: como la defensiva, el frame 0 vacío (es de pantalla completa)
+    const ultimo = Math.max(...propiedadesAnimadas(d.layers).flatMap(p => p.k.map(k => k.t)));
+    if (ultimo > ENTRADA_OF - 0.5) throw new Error(`la entrada termina en el ${ultimo}: mover ENTRADA_OF`);
+    for (const l of d.layers) {
+        l.ip = Math.max(l.ip, 1);
+        l.op = ENTRADA_OF + 1;
+    }
+    d.op = ENTRADA_OF + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: ENTRADA_OF, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: ENTRADA_OF, cm: 'salida', dr: -ENTRADA_OF }
+    ];
+    d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
+    allCaps(d);
+    save(path.join(REPO, 'ofensiva/data.json'), d);
 }

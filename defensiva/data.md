@@ -19,8 +19,8 @@ A control client sends a flat JSON object. Any subset of these keys is valid —
 
 **Team:** all 8 teams start hidden (`opacity: 0` in `index.html`). Send `1` for the team on
 defense and `0` for the others. Each key turns on the team's bar (top left, with its crest and
-name) and its crest on the two doors. The teams overlap, so if you switch teams you have to turn
-off the previous one.
+name), the two doors in the team's colors and its crest on them. Without a team the doors are
+blue. The teams overlap, so if you switch teams you have to turn off the previous one.
 
 ```json
 {
@@ -93,14 +93,14 @@ doesn't need to send them.
 
 | Class | Team | Layers | Default opacity |
 |-------|------|--------|----------------|
-| `AGUI_opacidad` | Águilas del Zulia | bar + 2 door halves | 0 |
-| `ANZ_opacidad` | Caribes de Anzoátegui | bar + 2 door halves | 0 |
-| `BRAVOS_opacidad` | Bravos de Margarita | bar + 2 door halves | 0 |
-| `CARD_opacidad` | Cardenales de Lara | bar + 2 door halves | 0 |
-| `LEO_opacidad` | Leones del Caracas | bar + 2 door halves | 0 |
-| `MAGA_opacidad` | Navegantes del Magallanes | bar + 2 door halves | 0 |
-| `TIBUS_opacidad` | Tiburones de La Guaira | bar + 2 door halves | 0 |
-| `TIGRES_opacidad` | Tigres de Aragua | bar + 2 door halves | 0 |
+| `AGUI_opacidad` | Águilas del Zulia | bar + 2 doors + 2 crest halves | 0 |
+| `ANZ_opacidad` | Caribes de Anzoátegui | bar + 2 doors + 2 crest halves | 0 |
+| `BRAVOS_opacidad` | Bravos de Margarita | bar + 2 doors + 2 crest halves | 0 |
+| `CARD_opacidad` | Cardenales de Lara | bar + 2 doors + 2 crest halves | 0 |
+| `LEO_opacidad` | Leones del Caracas | bar + 2 doors + 2 crest halves | 0 |
+| `MAGA_opacidad` | Navegantes del Magallanes | bar + 2 doors + 2 crest halves | 0 |
+| `TIBUS_opacidad` | Tiburones de La Guaira | bar + 2 doors + 2 crest halves | 0 |
+| `TIGRES_opacidad` | Tigres de Aragua | bar + 2 doors + 2 crest halves | 0 |
 
 `1` shows the crest on the doors at the design's 49 % (`index.html` applies it to the image).
 
@@ -114,6 +114,8 @@ Fixed images of the design. They can be swapped by path, but a controller doesn'
 | `basecolor` | `.basecolor` | `image_16` |
 | `logoatrapa` | `.logoatrapa` | `image_17` |
 | `textura` | `.textura` | `image_18` |
+| `texturapuertader` | `.texturapuertader` | `image_texturapuertas` |
+| `texturapuertaizq` | `.texturapuertaizq` | `image_texturapuertas` |
 
 ## Markers
 

@@ -6,25 +6,27 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Dos gráficos, en LT Energy: el score con `font/LTEnergyVFVF.ttf` (fuente variable con
-un solo eje, `ital`, que por defecto es la Regular) y la defensiva con `font/LTEnergy-Regular.ttf`,
-la estática que mandó el diseñador con su export. Las keys del UPDATE están en su `data.md`.
+proyecto*). Tres gráficos, en LT Energy: el score con `font/LTEnergyVFVF.ttf` (fuente variable
+con un solo eje, `ital`, que por defecto es la Regular) y la defensiva y la ofensiva con
+`font/LTEnergy-Regular.ttf`, la estática que mandó el diseñador con sus exports. Las keys del
+UPDATE están en su `data.md`.
 
 | Carpeta | Qué es | Flujo | Salida |
 |---|---|---|---|
 | `score/` | Pizarra arriba a la izquierda: logo de Venevisión, barras de visita y local (escudo y siglas), carreras, inning con sus flechas, bases, conteo y outs; abajo, la barra de bateador (apellido, average, actuación) y lanzador (apellido, lanzamientos, velocidad) | `play` (0–54) → stages `marcador` → `jugadores` (la barra sube, 65–90) → `sinjugadores` (la barra baja, 100–125), los tres `pause` | `salida`: la entrada al revés (1,8 s); desde `jugadores`, `salida_jugadores` baja antes la barra (3 s) |
-| `defensiva/` | Pantalla completa: dos compuertas con el escudo del equipo se abren sobre el campo con las 9 posiciones (rótulo y apellido); arriba a la izquierda, la barra del equipo y DEFENSIVA. El frame 0 está vacío | stage `play` pause (0–53) | `salida`: la entrada al revés (1,8 s): las compuertas se cierran y termina en el frame vacío |
+| `defensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el campo con las 9 posiciones (rótulo y apellido); arriba a la izquierda, la barra del equipo y DEFENSIVA. El frame 0 está vacío | stage `play` pause (0–53) | `salida`: la entrada al revés (1,8 s): las compuertas se cierran y termina en el frame vacío |
+| `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA. El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces `visita_vs_local`),
-del 2026-10-13; `defensiva.png` (Leones, con apellidos de ejemplo) y `defensiva_equipos.png` (los 8
-equipos), del 2026-10-15. Si un gráfico cambia, hay que regenerarlas. No entran al zip
-(`.gitattributes`).
+del 2026-10-13; `defensiva.png` / `ofensiva.png` (Leones, con nombres de ejemplo) y
+`defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), del 2026-10-15. Si un gráfico
+cambia, hay que regenerarlas. No entran al zip (`.gitattributes`).
 
-No hay video de referencia del diseñador, y ningún export trae salida (el marker `stop` del score,
-90–120, y el de la defensiva, 60–90, no animan nada) ni la bajada de la barra de jugadores del
-score: son la animación de entrada al revés, como en todos los gráficos de Meridiano. Si el
-diseñador manda una salida propia, reemplaza a ésta.
+No hay video de referencia del diseñador, y ningún export trae salida (los markers `stop` del score,
+90–120, de la defensiva, 60–90, y de la ofensiva, 90–120, no animan nada) ni la bajada de la barra
+de jugadores del score: son la animación de entrada al revés, como en todos los gráficos de
+Meridiano. Si el diseñador manda una salida propia, reemplaza a ésta.
 
 **Score.** Claves: las del score de LVBP-Meridiano donde dicen lo mismo, para que el controlador le mande a
 los dos la misma data: `conteobolasystrikes`, `outs`, `inning`, `INNINGarriba_opacidad` /
@@ -57,10 +59,20 @@ es la C…; fijos en el diseño, y `lanzador` dice P, no L como en Meridiano), `
 está en la imagen de su barra. `campo`, `basecolor`, `logoatrapa` y `textura` son las imágenes
 fijas del fondo.
 
-Equipo: cada clave prende tres capas, la barra de arriba (imagen con escudo y nombre) y las dos
-mitades del escudo de las compuertas. Por eso la clase se repite **a propósito**: el audit del
-editor lo marca como error y el lint lo deja pasar sólo acá. Empiezan ocultas (CSS de `index.html`,
-como la defensiva de Meridiano): el controlador manda `1` al que defiende y `0` a los otros siete.
+Equipo: cada clave prende cinco capas, la barra de arriba (imagen con escudo y nombre), las dos
+pantallas de color de las puertas y las dos mitades del escudo de las compuertas. Por eso la clase
+se repite **a propósito**: el audit del editor lo marca como error y el lint lo deja pasar sólo en
+la defensiva y la ofensiva. Empiezan ocultas (CSS de `index.html`, como la defensiva de Meridiano):
+el controlador manda `1` al que defiende y `0` a los otros siete. Sin equipo, las puertas quedan
+azules.
+
+Puertas: el export las trae azules para todos, y ese azul es justo el de Magallanes en la ofensiva,
+que salió de esta defensiva: la ofensiva es la versión nueva de la idea, con una puerta de color por
+equipo y una textura de líneas encima. Para que las dos queden iguales (Leon, 2026-10-15), `prep.js`
+le pone a cada puerta, encima, la textura (`images/texturapuertas.png`, en *multiply*) y las ocho
+pantallas de color, hijas de la puerta, con su forma y su máscara. Los degradados y la textura salen
+de la ofensiva preparada (`ofensiva/data.json`): si cambian allá, la defensiva los toma la próxima
+vez que se prepare.
 El escudo de las compuertas va al 49 % del diseño (con fusión *color dodge*), pero ese 49 % no está
 en la capa sino en el CSS de su `<image>` (`g[id^="puerta"] > image`, por el `ln`
 `puerta<SIGLAS><izq|der>` de la capa): el UPDATE escribe su `opacity` en la capa y lo pisaría con
@@ -71,7 +83,8 @@ gris vuelve con un efecto **Fill** al 72,5 % (lo liso del Emboss, 50 % de gris m
 blanco), que Lottie sí pinta con un filtro SVG, como las sombras: el escudo da el brillo azul del
 diseño, pero sin relieve. Lo eligió Leon el 2026-10-15 entre el blanco al 49 % y al 30 %; si el
 diseñador manda los PNG con los efectos aplicados, se saca (`GRIS_PUERTA = null` en `prep.js` y el
-chequeo del Fill en el lint). La compuerta de Águilas no vino en el export: llegó aparte, como PNG
+chequeo del Fill en el lint). Con las puertas de color, el de Tigres va al 95 %, como en la ofensiva
+(ver ahí). La compuerta de Águilas no vino en el export: llegó aparte, como PNG
 (`images/compuerta_aguilas.png`, 2026-10-15), y `prep.js` le arma las dos capas con las de Caribes.
 
 Textos: en mayúsculas, como en el score. Los apellidos van como se los manda el controlador a
@@ -81,12 +94,34 @@ su primer frame, así que el frame 0 queda vacío: no se ve nada antes del `play
 autoplay) y la salida termina en vacío. Un `stop` a mitad de la entrada salta al gráfico completo
 y sale desde ahí, como en Meridiano.
 
+**Ofensiva.** La misma familia que la defensiva (compuertas, barra de equipo arriba, frame 0 vacío,
+el escudo con el mismo 49 % por CSS y el mismo Fill gris), y de acá salen las puertas de **color**:
+cada equipo tiene sus dos pantallas (`PANTALLAPUERTA<DER|IZQ><equipo>`, con su degradado).
+Claves: las de la ofensiva de LVBP-Meridiano donde dicen lo mismo, `posicion1`…`posicion9` y
+`jugador1`…`jugador9` (los turnos, de arriba abajo), `titulo` y `<SIGLAS>_opacidad`; no tiene
+`valorN` (no hay columna de average), `equipo` ni `informacion`. Propias: `manager` (el nombre) y
+`rotulomanager` (el MGR, fijo). El controlador todavía no tiene el dato del mánager: tiene que
+mandarlo siempre, o queda al aire el `NOMBRE APELLIDO` del diseño.
+
+Equipo: cada clave prende cinco capas, la barra, las dos pantallas de las puertas y las dos mitades
+del escudo; sin equipo, las puertas no se ven. El export sólo trae el escudo de Águilas: los otros
+siete son los PNG blancos de la defensiva (`images/compuerta_<equipo>.png`), con las capas del de
+Águilas (decidido con Leon, 2026-10-15). Las puertas de Tigres son de un azul casi negro, que el
+*color dodge* casi no puede aclarar: con el gris de los demás (72,5 %) su escudo casi no se veía
+(en AE pasaría lo mismo). Su escudo va al 95 % (`GRIS_EQUIPO` en `prep.js`) y se ve como el de
+Tiburones o Magallanes; lo eligió Leon el 2026-10-15 entre 72,5, 85, 90 y 95.
+
+Textos: nombre y apellido, como en el diseño y en Meridiano (`ALÍ CASTILLO`). Al tamaño del diseño
+entran unas 21 letras en las filas (`ALEXANDER MONASTERIOS` entra) y 19 en el mánager; más largos
+encogen dentro de su barra, igual en todas las filas. El título llega diciendo DEFENSIVA (copiado de
+la defensiva): `prep.js` lo pasa a OFENSIVA.
+
 ### Cuando llega un export nuevo del diseñador
 
-El score llega como `SCOREBUG.zip` (carpeta `SCOREBUG/` con `data.json`, `images/` y `FONT/`) y la
-defensiva como `DEFENSIVA.rar` (carpeta `DEFENSIVA/`, igual). La receta de los dos es
-`herramientas/prep.js`, que prepara los que encuentre: buscar las capas por `nm` (los índices
-cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
+El score llega como `SCOREBUG.zip` (carpeta `SCOREBUG/` con `data.json`, `images/` y `FONT/`), la
+defensiva como `DEFENSIVA.rar` y la ofensiva como `OFENSIVA.rar` (carpetas `DEFENSIVA/` y
+`OFENSIVA/`, igual). La receta de los tres es `herramientas/prep.js`, que prepara los que encuentre:
+buscar las capas por `nm` (los índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
 
 **Score**
 
@@ -150,11 +185,43 @@ cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
 - **Markers y timeline:** `start` / `stop` del diseñador → `play`, `salida` y `stop` de la tabla de
   arriba. La entrada termina en el 52 (el título): si cambia, mover `ENTRADA_DEF` (`prep.js` falla
   si algún keyframe pasa de ahí). Todas las capas arrancan en el frame 1.
-- **Imágenes:** las 19 del export van tal cual a `defensiva/images/`, más `compuerta_aguilas.png`.
+- **Puertas de color:** encima de cada puerta, la textura y las 8 pantallas de color de la
+  ofensiva (ver arriba). Necesita la ofensiva preparada: si llegan los dos exports juntos, correr
+  `prep.js` dos veces.
+- **Imágenes:** las 19 del export van tal cual a `defensiva/images/`, más `compuerta_aguilas.png` y
+  `texturapuertas.png` (copia de `ofensiva/images/img_1.png`).
 
 Comparado frame a frame contra el export (con sólo la máscara arreglada y el mismo equipo), antes
 del Fill gris: igual salvo 1 o 2 niveles de 255 dentro del escudo de las compuertas, por el 49 % en
 el `<image>`. El Fill sólo cambia el escudo, sin costo de frames medible en la entrada.
+
+**Ofensiva**
+
+- **Clases:** `POSICION` y `POSICION 2`…`9` (sin clase) → `posicion1`…`9`; `.NOMBREPOSICION1`…`9`
+  (el 1 con un espacio al final del `nm`) → `jugador1`…`9`; `MANAGER` / `NOMBREMANAGER` (sin clase)
+  → `rotulomanager` / `manager`; `DEFENSIVA 2` → `titulo`, con el texto pasado a OFENSIVA; las
+  pantallas `PANTALLAPUERTA<DER|IZQ><AGUI|ANZ|BRA|CARD|LEO|MAG|TIB|TIG>`, las compuertas y las barras
+  → `<SIGLAS>_opacidad`; las imágenes del fondo como en la defensiva (`CAMPO OFENSIVA.png` → `campo`)
+  y las dos `TEXTURA PUERTAS.png` (mismo `nm`) → `texturapuertaizq` / `texturapuertader`, por parent.
+- **Pantallas repetidas:** las de Águilas llegan dos veces; queda la de arriba (la que se ve en AE;
+  la de abajo tiene la izquierda 4 px corrida).
+- **Máscaras invertidas:** las 9 pantallas de la derecha, como la puerta de la defensiva
+  (`complementaria()`, compartida): tapaban el centro con una franja del color del equipo.
+- **Escudos:** el de Águilas viene en el export (`images/img_0.png`, con sus máscaras); los otros
+  siete los arma `escudoClonado()` con sus capas: centrado en su imagen y la máscara por la misma
+  diagonal, alargada para cubrir cualquier alto. 49 % al CSS y Fill gris, como en la defensiva
+  (Tigres al 95 %, `GRIS_EQUIPO`).
+- **Textos de caja:** ya llegan de caja, con `lh` 52, pero la caja de la fila 1 pasaba 4 px el
+  final de su barra (van en diagonal) y la del mánager, 100. Los nueve nombres van a 474 (8 px antes
+  del final de la barra más corta) y el mánager a 382; el alto, a 34 y 31: con el 50 del export un
+  nombre muy largo partía en dos líneas chicas en vez de encoger.
+- **Markers y timeline:** `play` / `salida` en el 90, `stop` en el 0 vacío. La entrada termina en
+  el 89 (el mánager): si cambia, mover `ENTRADA_OF`. Las capas que arrancan en el 0 pasan al 1.
+- **Imágenes:** las 14 del export van tal cual a `ofensiva/images/`, más los 7
+  `compuerta_<equipo>.png` (copias de `defensiva/images/img_0–6`).
+
+Comparado frame a frame contra el export (con las máscaras arregladas, Águilas, sin el Fill y con
+el título del export): igual salvo 1 o 2 niveles de 255 en el escudo.
 
 ### QA
 
@@ -162,7 +229,7 @@ el `<image>`. El Fill sólo cambia el escudo, sin costo de frames medible en la 
   Playwright). `lottie_render` del editor usa una fuente de reemplazo: no sirve para revisar textos.
 - Score: los 56 cruces visita × local, entrada frame a frame, data al aire con el gráfico pausado,
   `next` y `stop` desde cada stage, y que el layer se suelte.
-- Defensiva: los 8 equipos (barra y compuertas), entrada frame a frame, cambio de equipo al aire,
+- Defensiva y ofensiva: los 8 equipos (barra, color de las puertas y escudo), y sin equipo; entrada frame a frame, cambio de equipo al aire,
   `stop` en la pausa y a mitad de la entrada, y que el layer se suelte.
 - Textos: apellidos largos (que encojan dentro de su lugar), números de más cifras (`P.100`, `100`
   de velocidad, `10-4`, `1.000`, inning `10`) y textos en minúsculas (que salgan en mayúsculas).
