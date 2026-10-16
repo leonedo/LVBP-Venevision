@@ -1,10 +1,32 @@
 #!/bin/bash
+# Publica una versión: calcula el tag semver siguiente, lo crea sobre main y lo pushea. El release
+# (título, notas y el zip que se copia al playout) lo crea GitHub Actions al recibir el tag
+# (.github/workflows/release.yml). Así funciona igual desde una computadora y desde una sesión de
+# Claude Code en la nube, que puede pushear tags pero no crear releases.
+#
+# Uso: ./release.sh [major|minor|patch] [pre]
 
 set -e
 
 # Tipo de incremento (default: patch) y modo pre-release
 type=${1:-patch}
 pre=${2:-}
+
+# El tag va sobre main tal como está en GitHub, y la versión se calcula con los tags de GitHub
+# (si no, repite una que ya existe).
+git fetch --quiet --tags origin main
+if [ "$(git rev-parse --abbrev-ref HEAD)" != "main" ]; then
+  echo "❌ Hay que estar en main"
+  exit 1
+fi
+if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+  echo "❌ Hay cambios sin commitear"
+  exit 1
+fi
+if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+  echo "❌ main no coincide con origin/main: falta un pull o un push"
+  exit 1
+fi
 
 # Obtener último tag estable (sin -pre) para calcular base de versión
 last_stable=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
@@ -47,18 +69,25 @@ if [ "$pre" = "pre" ]; then
     pre_num=$((pre_num+1))
   fi
   new_version="${base_version}-pre.${pre_num}"
-  prerelease_flag="--prerelease"
 else
   new_version="$base_version"
-  prerelease_flag=""
 fi
 
 echo "Última versión estable: $last_stable"
 echo "Nueva versión:          $new_version"
 
-gh release create "$new_version" \
-  --title "$new_version" \
-  --generate-notes \
-  $prerelease_flag
+git tag "$new_version"
+git push --quiet origin "$new_version"
+echo "✅ Tag $new_version pusheado: GitHub Actions crea el release"
 
-echo "✅ Release creado: $new_version"
+# Esperar a que el release aparezca (si hay gh para mirarlo)
+if command -v gh > /dev/null 2>&1; then
+  for i in $(seq 1 36); do
+    if gh release view "$new_version" > /dev/null 2>&1; then
+      echo "✅ Release creado: $(gh release view "$new_version" --json url -q .url)"
+      exit 0
+    fi
+    sleep 5
+  done
+  echo "⚠️  El release todavía no aparece: mirar la pestaña Actions del repo en GitHub"
+fi

@@ -614,17 +614,27 @@ Cada `<gráfico>/index.html` carga `../webcg-devtools.umd.js` —una UI de contr
 
 ## Releases
 
-Tags semver gestionados con [release.sh](release.sh) + `gh release create`:
+Tags semver gestionados con [release.sh](release.sh):
 - `./release.sh` → patch estable
 - `./release.sh minor` / `major`
 - `./release.sh patch pre` → pre-release `vX.Y.Z-pre.N`
 
 Tasks de VSCode en [.vscode/tasks.json](.vscode/tasks.json) cubren Mac y Windows (Git Bash).
 
-**No correr `release.sh` sin pedir confirmación** — crea release público en GitHub.
+**No correr `release.sh` sin pedir confirmación** — pushear el tag crea un release público en GitHub.
 
-Antes de `release.sh`, `git fetch --tags`: `gh release create` crea el tag sólo en GitHub y
-`release.sh` calcula la versión con los tags locales, así que sin traerlos repite una que ya existe.
+`release.sh` trae los tags de GitHub (`git fetch --tags`, para no repetir una versión), calcula la
+siguiente, crea el tag sobre `main` y lo pushea; exige estar en `main`, sin cambios sin commitear y
+con `main` igual a `origin/main`. El release lo crea GitHub Actions al recibir el tag
+([.github/workflows/release.yml](.github/workflows/release.yml)): título el tag, notas generadas y
+pre-release si es `-pre.N`. Después `release.sh` espera a que aparezca (con `gh release view`, si
+hay `gh`). Si el release ya existe (creado a mano en la web o con `gh release create`), el workflow
+no hace nada.
+
+Es así para poder publicar desde una sesión de Claude Code en la nube: su proxy de GitHub deja
+pushear tags pero rechaza crear releases (`HTTP 403: Creating, editing, or deleting releases is not
+permitted for this session type`) y no deja leer la API de Actions; el release se comprueba con
+`gh release view`, que sí pasa. El workflow (`/.github`) no entra al zip.
 
 ## Deploy: qué entra al zip del release
 

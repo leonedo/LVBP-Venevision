@@ -42,3 +42,6 @@
 
 # Scripts para preparar los exports del diseñador y para el QA (herramientas internas)
 /herramientas             export-ignore
+
+# El workflow de GitHub Actions que crea el release al llegar un tag (lo usa GitHub, no el playout)
+/.github                  export-ignore

@@ -1,0 +1,33 @@
+# Crea el release de GitHub cuando llega un tag de versión (lo pushea release.sh). El zip del
+# release ("Source code (zip)") es el artefacto que se copia al playout: lo genera GitHub desde el
+# tag, recortado por .gitattributes.
+#
+# Así se puede publicar desde una sesión de Claude Code en la nube, que puede pushear tags pero no
+# crear releases. Si el release ya existe (creado a mano, en la web o con gh), no hace nada.
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Crear el release del tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "El release $TAG ya existe: no hay nada que hacer"
+            exit 0
+          fi
+          pre=""
+          case "$TAG" in *-pre.*) pre="--prerelease" ;; esac
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --title "$TAG" --generate-notes $pre
