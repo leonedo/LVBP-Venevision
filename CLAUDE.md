@@ -615,8 +615,10 @@ Cada `<gráfico>/index.html` carga `../webcg-devtools.umd.js` —una UI de contr
 ## Cómo llegan los cambios a `main`
 
 Por pull request (Leon, 2026-10-16). Cada sesión trabaja en una rama `claude/<tema>`, la pushea y
-abre un PR hacia `main`; lo mergea Leon en GitHub y GitHub borra la rama al mergear (*Automatically
-delete head branches*, en Settings → General). No pushear directo a `main`. Para publicar, después
+abre un PR hacia `main`; lo mergea Leon en GitHub, o la sesión cuando Leon se lo pide (con
+*rebase*, para que `main` siga lineal: desde la nube, mergear un PR sí se puede). GitHub borra la
+rama al mergear (*Automatically delete head branches*, en Settings → General). No pushear directo
+a `main`. Para publicar, después
 del merge: volver a `main`, `git pull` y `release.sh` (ver *Releases*).
 
 ## Releases
