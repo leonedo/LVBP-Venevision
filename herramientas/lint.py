@@ -7,9 +7,9 @@ problems = []
 def p(g, msg): problems.append(f'{g}: {msg}')
 GRAFICOS = sorted(g for g in os.listdir(REPO) if os.path.isfile(REPO + g + '/data.json') and os.path.isfile(REPO + g + '/index.html'))
 # Clases repetidas a propósito. En la defensiva y la ofensiva, la clave del equipo prende su barra,
-# las dos mitades del escudo de las compuertas y (en la ofensiva) las dos pantallas de color de las
-# puertas (prep.js): la misma clase en todas.
-REPETIDAS = {g: re.compile(r'[A-Z]+_opacidad') for g in ('defensiva', 'ofensiva')}
+# las dos mitades del escudo de las compuertas y las dos pantallas de color de las puertas; en el
+# bateador, su barra, el fondo de color y el escudo (prep.js): la misma clase en todas.
+REPETIDAS = {g: re.compile(r'[A-Z]+_opacidad') for g in ('defensiva', 'ofensiva', 'bateador')}
 # Las compuertas: su 49 % va en el CSS (prep.js), no en la capa.
 PUERTAS = {g: 'g[id^="puerta"] > image' for g in ('defensiva', 'ofensiva')}
 for g in GRAFICOS:

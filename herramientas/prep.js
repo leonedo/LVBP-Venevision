@@ -1,11 +1,11 @@
 // Prepara los exports del diseñador para CasparCG: la receta de "Cuando llega un export nuevo"
-// de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13) y de la
-// defensiva (DEFENSIVA, 2026-10-15): si el diseñador cambia nombres de capas, falla diciendo cuál
-// no encuentra (no adivina).
+// de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13), de la
+// defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15) y del bateador (LOWBAR BATEADOR,
+// 2026-10-16): si el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
-//   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/. Los que
-//      no estén se saltean: alcanza con el zip que llegó.
+//   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
+//      OFENSIVA/, LOWBAR BATEADOR/. Los que no estén se saltean: alcanza con el zip que llegó.
 //   2. node herramientas/prep.js $EXPORTS .
 //   3. git diff, herramientas/lint.py y QA con el runtime real (CLAUDE.md).
 // Las fuentes, las imágenes y los index.html no los toca: se copian a mano la primera vez.
@@ -557,4 +557,109 @@ if (hay('OFENSIVA')) {
     d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
     allCaps(d);
     save(path.join(REPO, 'ofensiva/data.json'), d);
+}
+
+// ---------------------------------------------------------------- bateador
+// La barra baja del bateador. Las claves, las de la barra de bateador de LVBP-Meridiano donde dicen
+// lo mismo, para que el controlador le mande a las dos la misma data: nombrejugador, numerouniforme,
+// posicion, etiquetaN / valorN (casilleros genéricos, 1 a 4 de izquierda a derecha) y
+// <SIGLAS>_opacidad. No tiene titulo ni informacionbarranegra.
+// Cajas medidas en el frame 87 con la fuente cargada. El nombre, hasta 8 px antes del negro del
+// número (la caja del export cruzaba el número y la posición); el número y la posición, 8 px
+// adentro de su placa, que va en diagonal (las cajas del export medían 594 px de pantalla).
+const BAT_NOMBRE = 459;                // 418 px / 0.9099 de escala; NOMBRE  APELLIDO mide 418.3
+const BAT_NUMERO = 117;                // 92 px / 0.7877; 100 mide 94.9
+const BAT_POSICION = 150;              // 118 px / 0.7877; DH mide 76.9
+// Estadísticas: el valor (cuerpo 70) va antes de su rótulo (40), y el diseño dejó los dos alineados
+// a la izquierda: un valor de una cifra quedaba lejos de su rótulo y uno más largo se le metía
+// encima. El valor pasa a la derecha, terminando donde termina el del diseño (Lw: .000 125.6719,
+// 00 72.9531), y crece hacia la izquierda hasta 8 px después de la caja del rótulo anterior (el
+// primero, hasta 8 px después del borde de la barra gris, x 527 de pantalla). Los rótulos, cajas
+// de 70 px (AVG mide 67.5). Capas a escala 1 y sin parent: 1 unidad, 1 px.
+const BAT_STATS = [['AVE', '.AVERAGE'], ['HR', '.JONRONES'], ['CI', '.CARRERASIMPULSADAS'], ['OPS', '.OPSNUMERO']];
+const BAT_LW = { '.000': 125.6719, '00': 72.9531 };
+const BAT_ETIQUETA = 70;
+const BAT_BORDE = 527;
+const ENTRADA_BAT = 87;                // la entrada termina en el 86 (OPS)
+if (hay('LOWBAR BATEADOR')) {
+    const d = load(path.join(SRC, 'LOWBAR BATEADOR/data.json'));
+
+    // ---- textos
+    rename(d, '.BATEADOR', 'nombrejugador');
+    doc(d, '.nombrejugador').sz[0] = BAT_NOMBRE;
+    rename(d, '.NUMEROJUGADOR', 'numerouniforme');
+    anchoCentrado(doc(d, '.numerouniforme'), BAT_NUMERO);
+    rename(d, '.POSICIONDEJUGADOR', 'posicion');
+    anchoCentrado(doc(d, '.posicion'), BAT_POSICION);
+    // x de pantalla del (0, 0) de una capa a escala 1 y sin parent
+    const origen = l => {
+        const { p, a, s } = l.ks;
+        if (l.parent || p.a || a.a || s.a || s.k[0] !== 100) throw new Error(`${l.nm}: transform inesperado`);
+        return p.k[0] - a.k[0];
+    };
+    let libre = BAT_BORDE + 8;         // dónde puede empezar el próximo valor
+    BAT_STATS.forEach(([rotulo, valor], i) => {
+        const v = doc(d, valor);
+        v.t = v.t.trim();              // ".000 ": el espacio del final
+        if (v.j !== 0 || !BAT_LW[v.t]) throw new Error(`${valor}: j ${v.j}, texto "${v.t}"`);
+        const fin = v.ps[0] + BAT_LW[v.t];
+        v.sz[0] = origen(layer(d, valor)) + fin - libre;
+        v.ps[0] = fin - v.sz[0];
+        v.j = 1;
+        rename(d, valor, 'valor' + (i + 1));
+        const e = doc(d, rotulo);
+        if (e.j !== 0) throw new Error(`${rotulo}: j ${e.j}`);
+        e.sz[0] = BAT_ETIQUETA;
+        libre = origen(layer(d, rotulo)) + e.ps[0] + BAT_ETIQUETA + 8;
+        rename(d, rotulo, 'etiqueta' + (i + 1));
+    });
+    // El alto: entra una línea al cuerpo del diseño (su ascent, más 2) y no dos hasta un 40–50 %
+    // del cuerpo. Con el alto del export (hasta 90), un texto que tenía que encoger mucho partía
+    // en dos líneas chicas.
+    for (const l of d.layers) if (l.ty === 5) for (const k of l.t.d.k) {
+        if (!k.s.sz) throw new Error(`${l.nm}: no es de caja`);
+        k.s.sz[1] = +(d.fonts.list[0].ascent * k.s.s / 100 + 2).toFixed(2);
+    }
+
+    // ---- el equipo: cada clave prende su barra (la imagen del nombre, con el escudo de marca de
+    // agua), el fondo de color de la izquierda y el escudo grande encima (en overlay, mateado). La
+    // barra de Bravos llega sin el _1 de las otras.
+    for (const l of d.layers) {
+        const barra = l.nm.match(/^\.BARRA_([A-Z]+)_BATEO(?:_1)?\.png$/);
+        const m = barra || l.nm.match(/^\.FONDO([A-Z]+)$/) || l.nm.match(/^\.([A-Z]+)LOGO$/);
+        if (!m) continue;
+        if (!SIGLAS[m[1]]) throw new Error(`${l.nm}: equipo desconocido`);
+        // Hasta que empieza a moverse (frame 11), la punta de la barra asomaba 5 px en el borde
+        // izquierdo: en la entrada y al final de la salida. Aparece cuando se mueve.
+        if (barra) {
+            if (!l.ks.p.a) throw new Error(`${l.nm}: sin animación`);
+            l.ip = l.ks.p.k[0].t;
+        }
+        rename(d, l.nm, SIGLAS[m[1]] + '_opacidad');
+    }
+    for (const s of Object.values(SIGLAS)) {
+        const n = d.layers.filter(l => l.nm === `.${s}_opacidad`).length;
+        if (n !== 3) throw new Error(`${s}_opacidad: ${n} capas`);
+    }
+    // la textura de la barra de estadísticas llega con la clase "png" (como en la defensiva)
+    rename(d, 'TEXTURA BASE_1.png', 'textura');
+
+    // ---- timeline: el frame 0 vacío, como en la defensiva (el diseño ya casi lo estaba). Los
+    // markers del diseñador (START 0–30, STOP 90–120) no sirven: la entrada dura hasta el 86 y el
+    // STOP no anima nada.
+    const ultimo = Math.max(...propiedadesAnimadas(d.layers).flatMap(p => p.k.map(k => k.t)));
+    if (ultimo > ENTRADA_BAT - 0.5) throw new Error(`la entrada termina en el ${ultimo}: mover ENTRADA_BAT`);
+    for (const l of d.layers) {
+        l.ip = Math.max(l.ip, 1);
+        l.op = ENTRADA_BAT + 1;
+    }
+    d.op = ENTRADA_BAT + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: ENTRADA_BAT, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: ENTRADA_BAT, cm: 'salida', dr: -ENTRADA_BAT }
+    ];
+    d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
+    allCaps(d);
+    save(path.join(REPO, 'bateador/data.json'), d);
 }

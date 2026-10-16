@@ -6,9 +6,9 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Tres gráficos, en LT Energy: el score con `font/LTEnergyVFVF.ttf` (fuente variable
-con un solo eje, `ital`, que por defecto es la Regular) y la defensiva y la ofensiva con
-`font/LTEnergy-Regular.ttf`, la estática que mandó el diseñador con sus exports. Las keys del
+proyecto*). Cuatro gráficos, en LT Energy: el score con `font/LTEnergyVFVF.ttf` (fuente variable
+con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva y el bateador
+con `font/LTEnergy-Regular.ttf`, la estática que mandó el diseñador con sus exports. Las keys del
 UPDATE están en su `data.md`.
 
 | Carpeta | Qué es | Flujo | Salida |
@@ -16,15 +16,17 @@ UPDATE están en su `data.md`.
 | `score/` | Pizarra arriba a la izquierda: logo de Venevisión, barras de visita y local (escudo y siglas), carreras, inning con sus flechas, bases, conteo y outs; abajo, la barra de bateador (apellido, average, actuación) y lanzador (apellido, lanzamientos, velocidad) | `play` (0–54) → stages `marcador` → `jugadores` (la barra sube, 65–90) → `sinjugadores` (la barra baja, 100–125), los tres `pause` | `salida`: la entrada al revés (1,8 s); desde `jugadores`, `salida_jugadores` baja antes la barra (3 s) |
 | `defensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el campo con las 9 posiciones (rótulo y apellido); arriba a la izquierda, la barra del equipo y DEFENSIVA. El frame 0 está vacío | stage `play` pause (0–53) | `salida`: la entrada al revés (1,8 s): las compuertas se cierran y termina en el frame vacío |
 | `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA. El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
+| `bateador/` | Barra baja del bateador: a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87) | `salida`: la entrada al revés (2,9 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces `visita_vs_local`),
 del 2026-10-13; `defensiva.png` / `ofensiva.png` (Leones, con nombres de ejemplo) y
-`defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), del 2026-10-15. Si un gráfico
-cambia, hay que regenerarlas. No entran al zip (`.gitattributes`).
+`defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), del 2026-10-15; `bateador.png`
+(Leones, con data de ejemplo) y `bateador_equipos.png` (los 8 equipos, recortado a la barra), del
+2026-10-16. Si un gráfico cambia, hay que regenerarlas. No entran al zip (`.gitattributes`).
 
 No hay video de referencia del diseñador, y ningún export trae salida (los markers `stop` del score,
-90–120, de la defensiva, 60–90, y de la ofensiva, 90–120, no animan nada) ni la bajada de la barra
+90–120, de la defensiva, 60–90, y de la ofensiva y el bateador, 90–120, no animan nada) ni la bajada de la barra
 de jugadores del score: son la animación de entrada al revés, como en todos los gráficos de
 Meridiano. Si el diseñador manda una salida propia, reemplaza a ésta.
 
@@ -62,7 +64,7 @@ fijas del fondo.
 Equipo: cada clave prende cinco capas, la barra de arriba (imagen con escudo y nombre), las dos
 pantallas de color de las puertas y las dos mitades del escudo de las compuertas. Por eso la clase
 se repite **a propósito**: el audit del editor lo marca como error y el lint lo deja pasar sólo en
-la defensiva y la ofensiva. Empiezan ocultas (CSS de `index.html`, como la defensiva de Meridiano):
+la defensiva, la ofensiva y el bateador. Empiezan ocultas (CSS de `index.html`, como la defensiva de Meridiano):
 el controlador manda `1` al que defiende y `0` a los otros siete. Sin equipo, las puertas quedan
 azules.
 
@@ -116,11 +118,34 @@ entran unas 21 letras en las filas (`ALEXANDER MONASTERIOS` entra) y 19 en el m�
 encogen dentro de su barra, igual en todas las filas. El título llega diciendo DEFENSIVA (copiado de
 la defensiva): `prep.js` lo pasa a OFENSIVA.
 
+**Bateador.** La barra baja. Claves: las de la barra de bateador de LVBP-Meridiano (`bateador/`),
+para que el controlador le mande a las dos la misma data: `nombrejugador` (nombre y apellido),
+`numerouniforme`, `posicion`, `valor1`…`valor4` / `etiqueta1`…`etiqueta4` (casilleros genéricos, de
+izquierda a derecha: el AVE / HR / CI / OPS del diseño es sólo el texto por defecto) y
+`<SIGLAS>_opacidad`. No tiene `titulo` ni `informacionbarranegra`.
+
+Equipo: cada clave prende tres capas, la barra del nombre (imagen, con el escudo de marca de agua),
+el fondo de color de la izquierda (forma con degradado) y el escudo grande encima (imagen en
+*overlay*, mateada con su `MASK`). Por eso la clase se repite a propósito, como en la defensiva.
+Empiezan ocultas (CSS de `index.html`, como el bateador de Meridiano): el controlador manda `1` al
+que batea y `0` a los otros siete. Sin equipo no se ven la barra ni el fondo: el nombre queda sobre
+la textura gris y la placa negra del número, entera. ⚠ El export trae el fondo de siete equipos con
+el mismo naranja (el de Bravos): sólo Tigres tiene el suyo, un azul casi negro sobre el que su escudo
+casi no se ve (como en la ofensiva). Así quedó, igual al export: pendiente con el diseñador.
+
+Textos: en mayúsculas. El nombre, como en Meridiano (`ISAIAS TEJEDA`): al tamaño del diseño entran
+unas 17 letras (`AEVERSON ARTEAGA` entra; `ALEXANDER MONASTERIOS` baja de 55 a 42); más largos
+encogen dentro de la barra. El número entra con 3 cifras y la posición con 3 letras. Cada valor va
+alineado a la derecha contra su rótulo y crece hacia la izquierda (un `8` queda junto a su HR, como
+el `00` del diseño): `1.000` entra al tamaño del diseño en los casilleros 1, 2 y 4, y en el 3, el
+más angosto, encoge un poco. Los rótulos, unas 3 letras.
+
 ### Cuando llega un export nuevo del diseñador
 
 El score llega como `SCOREBUG.zip` (carpeta `SCOREBUG/` con `data.json`, `images/` y `FONT/`), la
-defensiva como `DEFENSIVA.rar` y la ofensiva como `OFENSIVA.rar` (carpetas `DEFENSIVA/` y
-`OFENSIVA/`, igual). La receta de los tres es `herramientas/prep.js`, que prepara los que encuentre:
+defensiva como `DEFENSIVA.rar`, la ofensiva como `OFENSIVA.rar` y el bateador como
+`LOWBAR_BATEADOR.rar` (carpetas `DEFENSIVA/`, `OFENSIVA/` y `LOWBAR BATEADOR/`, con espacio, igual; el
+`.rar` se abre con `unar`). La receta de los cuatro es `herramientas/prep.js`, que prepara los que encuentre:
 buscar las capas por `nm` (los índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
 
 **Score**
@@ -223,16 +248,49 @@ el `<image>`. El Fill sólo cambia el escudo, sin costo de frames medible en la 
 Comparado frame a frame contra el export (con las máscaras arregladas, Águilas, sin el Fill y con
 el título del export): igual salvo 1 o 2 niveles de 255 en el escudo.
 
+**Bateador**
+
+- **Clases:** `.BATEADOR` → `nombrejugador`, `.NUMEROJUGADOR` → `numerouniforme`,
+  `.POSICIONDEJUGADOR` → `posicion`; los rótulos `AVE`, `HR`, `CI`, `OPS` (sin clase) →
+  `etiqueta1`…`4` y los valores `.AVERAGE`, `.JONRONES`, `.CARRERASIMPULSADAS`, `.OPSNUMERO` →
+  `valor1`…`4`; las barras `.BARRA_<EQUIPO>_BATEO_1.png` (la de Bravos sin el `_1`; clase `… png`,
+  dos clases), los fondos `.FONDO<EQUIPO>` y los escudos `.<EQUIPO>LOGO` → `<SIGLAS>_opacidad`;
+  `TEXTURA BASE_1.png` (clase `png`) → `textura`. Las `MASK…` (los mattes de los escudos) y las
+  `Capa de formas` (la franja plateada, hija del fondo de Tigres, y las placas del número y la
+  posición) quedan como vienen, sin clase.
+- **Fuente:** `fPath` llega como `FONT/LT Energy`: pasa a `font/LTEnergy-Regular.ttf`.
+- **All Caps:** llega apagado en todas las capas de texto: `prep.js` lo prende.
+- **Textos de caja:** ya llegan de caja, pero el nombre cruzaba el número y la posición (708 px de
+  pantalla) y el número y la posición medían 594. El nombre va hasta 8 px antes del negro del número
+  (459, a escala 0.91); número y posición, hasta 8 px adentro de su placa, que va en diagonal (117 y
+  150, a 0.79). Los valores llegaban alineados a la izquierda, con el rótulo a continuación: pasan a
+  la derecha, terminando donde termina el del diseño (Lw `.000` 125.6719, `00` 72.9531), con la caja
+  hasta 8 px después de la del rótulo anterior (el primero, del borde de la barra gris, x 527); el
+  `.000 ` pierde el espacio final. Los rótulos, cajas de 70. El alto de todas, el ascent del cuerpo
+  más 2: con el del export (hasta 90) un texto que encogía mucho partía en dos líneas chicas.
+- **Barras:** aparecen cuando empiezan a moverse (frame 11, su primer keyframe): antes, su punta
+  asomaba quieta 5 px en el borde izquierdo, del frame 0 al 10 (y al final de la salida).
+- **Markers y timeline:** `START` (0–30) y `STOP` (90–120) del diseñador → `play`, `salida` y `stop`
+  como en la defensiva. La entrada termina en el 86 (el OPS): si cambia, mover `ENTRADA_BAT`. Las
+  capas que arrancan en el 0 pasan al 1: el frame 0 queda vacío.
+- **Imágenes:** las 17 del export van tal cual a `bateador/images/`.
+
+Comparado frame a frame contra el export (Bravos, con el texto del diseño): idéntico al píxel del 13
+al 87; del 0 al 10 sólo falta la punta de la barra. En el 11 y el 12, la sombra de la franja difiere
+hasta 18/255 en la esquina según el frame que el browser pintó antes: renderizados cada uno en una
+página recién cargada, son idénticos.
+
 ### QA
 
 - Juzgar con el runtime real y la fuente cargada (`<gráfico>/index.html` en el browser o con
   Playwright). `lottie_render` del editor usa una fuente de reemplazo: no sirve para revisar textos.
 - Score: los 56 cruces visita × local, entrada frame a frame, data al aire con el gráfico pausado,
   `next` y `stop` desde cada stage, y que el layer se suelte.
-- Defensiva y ofensiva: los 8 equipos (barra, color de las puertas y escudo), y sin equipo; entrada frame a frame, cambio de equipo al aire,
+- Defensiva, ofensiva y bateador: los 8 equipos (barra, color de las puertas o del fondo y escudo), y sin equipo; entrada frame a frame, cambio de equipo al aire,
   `stop` en la pausa y a mitad de la entrada, y que el layer se suelte.
 - Textos: apellidos largos (que encojan dentro de su lugar), números de más cifras (`P.100`, `100`
-  de velocidad, `10-4`, `1.000`, inning `10`) y textos en minúsculas (que salgan en mayúsculas).
+  de velocidad, `10-4`, `1.000`, inning `10`, `1.000` en cada casillero del bateador) y textos en
+  minúsculas (que salgan en mayúsculas).
 - Por `file://`, como lo abre CasparCG: Chromium con `--allow-file-access-from-files`.
 
 ### Herramientas
@@ -274,7 +332,8 @@ equipo: si el editor lo regenera, reponerlas desde *Este repo*. El de la defensi
 editor (audit y guardado, 2026-10-15), pero se reescribió a mano en el mismo formato: el generador
 del MCP pone las capas de imagen con clase `_opacidad` también entre las imágenes, con una ruta de
 ejemplo en el payload, y `index.js` no les reemplaza la imagen (ver *claves sólo CSS*). Si el editor
-lo regenera, reponerlo desde git.
+lo regenera, reponerlo desde git. El del bateador se escribió a mano en ese formato, sin pasar por
+el editor.
 
 ## Convenciones del Lottie
 
