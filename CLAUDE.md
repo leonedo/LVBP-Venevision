@@ -131,8 +131,11 @@ Empiezan ocultas (CSS de `index.html`, como el bateador de Meridiano): el contro
 que batea y `0` a los otros siete. Sin equipo no se ven la barra ni el fondo: el nombre queda sobre
 la textura gris y la placa negra del número, entera. El export trae el fondo de siete equipos con
 el mismo naranja (el de Bravos) y sólo Tigres con el suyo: van con el color de cada equipo de la
-ofensiva, como las puertas de la defensiva (Leon, 2026-10-16). Sobre los de Tiburones y Tigres, casi
-negros, el escudo (en *overlay*) casi no se ve.
+ofensiva, como las puertas de la defensiva (Leon, 2026-10-16). El escudo va en *overlay*, que a lo
+sumo duplica el brillo del fondo: sobre el de Tigres, casi negro, no se veía. Lleva lo mismo que su
+escudo en las puertas de la ofensiva, *color dodge* con el Fill gris (`BAT_DODGE` en `prep.js`), al
+85 %: se ve como el de Tiburones o Magallanes (el 95 % de la ofensiva, acá, con el escudo al 100 % y
+no al 49 %, queda mucho más fuerte). Comparado el 2026-10-16 con 80, 90 y 95.
 
 Textos: en mayúsculas. El nombre, como en Meridiano (`ISAIAS TEJEDA`): al tamaño del diseño entran
 unas 17 letras (`AEVERSON ARTEAGA` entra; `ALEXANDER MONASTERIOS` baja de 55 a 42); más largos
@@ -273,6 +276,8 @@ el título del export): igual salvo 1 o 2 niveles de 255 en el escudo.
   (`ofensiva/data.json`), con los stops dados vuelta (la puerta va de oscuro en 0, arriba, a claro
   en 1; el fondo, claro en 0, abajo). Las posiciones del degradado (`s`, `e`) quedan las del export.
   `prep.js` prepara la ofensiva antes que el bateador: si llegan los dos juntos, alcanza con una vez.
+- **Escudo de Tigres:** de *overlay* (`bm` 3) a *color dodge* (6), con el Fill gris al 85 % (ver
+  arriba).
 - **Barras:** aparecen cuando empiezan a moverse (frame 11, su primer keyframe): antes, su punta
   asomaba quieta 5 px en el borde izquierdo, del frame 0 al 10 (y al final de la salida).
 - **Markers y timeline:** `START` (0–30) y `STOP` (90–120) del diseñador → `play`, `salida` y `stop`

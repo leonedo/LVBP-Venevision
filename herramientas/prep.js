@@ -581,6 +581,12 @@ const BAT_LW = { '.000': 125.6719, '00': 72.9531 };
 const BAT_ETIQUETA = 70;
 const BAT_BORDE = 527;
 const ENTRADA_BAT = 87;                // la entrada termina en el 86 (OPS)
+// El escudo grande va en overlay sobre el fondo, que a lo sumo duplica el brillo de lo que tiene
+// abajo: sobre el fondo de Tigres, casi negro, no se veía. Lleva lo mismo que su escudo en las
+// puertas de la ofensiva: color dodge con el Fill gris. Acá el escudo va al 100 % (en las puertas,
+// al 49 %): al 85 % se ve como el de Tiburones o Magallanes (comparado el 2026-10-16 con 80, 90 y
+// 95; el 95 de la ofensiva, acá, queda mucho más fuerte que los demás).
+const BAT_DODGE = { TIGRES: 0.85 };
 if (hay('LOWBAR BATEADOR')) {
     const d = load(path.join(SRC, 'LOWBAR BATEADOR/data.json'));
 
@@ -634,7 +640,8 @@ if (hay('LOWBAR BATEADOR')) {
     for (const l of d.layers) {
         const barra = l.nm.match(/^\.BARRA_([A-Z]+)_BATEO(?:_1)?\.png$/);
         const fondo = l.nm.match(/^\.FONDO([A-Z]+)$/);
-        const m = barra || fondo || l.nm.match(/^\.([A-Z]+)LOGO$/);
+        const escudo = l.nm.match(/^\.([A-Z]+)LOGO$/);
+        const m = barra || fondo || escudo;
         if (!m) continue;
         const sig = SIGLAS[m[1]];
         if (!sig) throw new Error(`${l.nm}: equipo desconocido`);
@@ -652,6 +659,11 @@ if (hay('LOWBAR BATEADOR')) {
             const stops = [];
             for (let i = 8; i >= 0; i -= 4) stops.push(+(1 - k[i]).toFixed(3), k[i + 1], k[i + 2], k[i + 3]);
             gf.g.k.k = stops;
+        }
+        if (escudo && BAT_DODGE[sig]) {
+            if (l.bm !== 3 || l.ef) throw new Error(`${l.nm}: bm ${l.bm}, efectos inesperados`);
+            l.bm = 6;                  // color dodge
+            l.ef = [relleno(BAT_DODGE[sig], 1)];
         }
         rename(d, l.nm, sig + '_opacidad');
     }
