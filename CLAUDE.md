@@ -639,9 +639,13 @@ repos/{owner}/{repo}/releases/tags/<versión>`), que sí pasa. Así salió `v0.0
 falla, la rama `release/<versión>` queda en GitHub y el próximo `release.sh` no puede pushearla:
 ver la pestaña Actions y borrar la rama. El workflow (`/.github`) no entra al zip.
 
+Desde una sesión en la nube tampoco se pueden borrar ramas en GitHub (ni por `git push --delete` ni
+por la API): una rama de trabajo ya integrada a `main` la borra Leon (en GitHub, *Branches*). Las
+`release/<versión>` no, porque las borra el workflow.
+
 ## Deploy: qué entra al zip del release
 
-El artefacto que se copia al server de playout es el **"Source code (zip)"** que GitHub genera del tag — `release.sh` no empaqueta nada, sólo taggea. Lo único que controla el contenido de ese zip es [.gitattributes](.gitattributes) con `export-ignore`. El porqué de cada línea, las cinco trampas del mecanismo y los ejemplos están en el README, sección "Qué entra al zip de un Release". Acá van las reglas de uso.
+El artefacto que se copia al server de playout es el **"Source code (zip)"** que GitHub genera del tag — `release.sh` no empaqueta nada: el tag y el release los crea el workflow (ver *Releases*). Lo único que controla el contenido de ese zip es [.gitattributes](.gitattributes) con `export-ignore`. El porqué de cada línea, las cinco trampas del mecanismo y los ejemplos están en el README, sección "Qué entra al zip de un Release". Acá van las reglas de uso.
 
 ### Este repo es la plantilla: el `.gitattributes` viaja a cada paquete derivado
 

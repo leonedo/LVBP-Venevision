@@ -1,8 +1,9 @@
 # Qué NO entra al zip que GitHub genera para un Release ("Source code (zip)").
 #
 # Ese zip es el artefacto de deploy: se baja del release y se descomprime en el server de playout.
-# `release.sh` no arma el zip, sólo taggea y llama `gh release create` — el zip lo genera GitHub
-# desde el tag, así que este archivo es el único control sobre qué contiene.
+# `release.sh` no arma el zip: el tag y el release los crea GitHub Actions
+# (.github/workflows/release.yml) y el zip lo genera GitHub desde el tag, así que este archivo es el
+# único control sobre qué contiene.
 #
 # Este repo es la plantilla base. Todo lo de acá abajo es genérico: es interno en CUALQUIER repo de
 # gráficos. Las exclusiones propias de un proyecto van en la sección del final, no acá arriba.
