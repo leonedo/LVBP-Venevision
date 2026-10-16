@@ -612,6 +612,13 @@ Cada clip se dispara una vez al cruzar su `inframe`; todos los flags se resetean
 
 Cada `<gráfico>/index.html` carga `../webcg-devtools.umd.js` —una UI de control en el browser— cuando se abre en el puerto 5500, el de Live Server de VSCode, o en cualquier puerto con `?debug=true` en la URL (ej. `python3 -m http.server 5510` y `http://localhost:5510/score/index.html?debug=true`). El panel acepta el payload en modo JSON. Sin panel, desde la consola: `play()`, `update('{"clave":"valor"}')`, `next()`, `stop()`.
 
+## Cómo llegan los cambios a `main`
+
+Por pull request (Leon, 2026-10-16). Cada sesión trabaja en una rama `claude/<tema>`, la pushea y
+abre un PR hacia `main`; lo mergea Leon en GitHub y GitHub borra la rama al mergear (*Automatically
+delete head branches*, en Settings → General). No pushear directo a `main`. Para publicar, después
+del merge: volver a `main`, `git pull` y `release.sh` (ver *Releases*).
+
 ## Releases
 
 Tags semver gestionados con [release.sh](release.sh):
@@ -640,8 +647,9 @@ falla, la rama `release/<versión>` queda en GitHub y el próximo `release.sh` n
 ver la pestaña Actions y borrar la rama. El workflow (`/.github`) no entra al zip.
 
 Desde una sesión en la nube tampoco se pueden borrar ramas en GitHub (ni por `git push --delete` ni
-por la API): una rama de trabajo ya integrada a `main` la borra Leon (en GitHub, *Branches*). Las
-`release/<versión>` no, porque las borra el workflow.
+por la API): las ramas de trabajo las borra GitHub al mergear su PR (ver *Cómo llegan los cambios a
+`main`*), y las `release/<versión>`, el workflow. Una que llegó a `main` sin PR hay que borrarla a
+mano, en GitHub, *Branches*.
 
 ## Deploy: qué entra al zip del release
 
