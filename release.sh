@@ -1,8 +1,9 @@
 #!/bin/bash
-# Publica una versión: calcula el tag semver siguiente, lo crea sobre main y lo pushea. El release
-# (título, notas y el zip que se copia al playout) lo crea GitHub Actions al recibir el tag
-# (.github/workflows/release.yml). Así funciona igual desde una computadora y desde una sesión de
-# Claude Code en la nube, que puede pushear tags pero no crear releases.
+# Publica una versión: calcula la versión semver siguiente y pushea main a la rama
+# release/<versión>. GitHub Actions (.github/workflows/release.yml) crea ahí el tag y el release
+# (título, notas y el zip que se copia al playout) y borra la rama. Así funciona igual desde una
+# computadora y desde una sesión de Claude Code en la nube, que puede pushear ramas pero no tags
+# ni releases.
 #
 # Uso: ./release.sh [major|minor|patch] [pre]
 
@@ -76,9 +77,8 @@ fi
 echo "Última versión estable: $last_stable"
 echo "Nueva versión:          $new_version"
 
-git tag "$new_version"
-git push --quiet origin "$new_version"
-echo "✅ Tag $new_version pusheado: GitHub Actions crea el release"
+git push --quiet origin "HEAD:refs/heads/release/$new_version"
+echo "✅ Rama release/$new_version pusheada: GitHub Actions crea el tag y el release"
 
 # Esperar a que el release aparezca (si hay gh para mirarlo)
 if command -v gh > /dev/null 2>&1; then

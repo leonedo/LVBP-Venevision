@@ -621,20 +621,22 @@ Tags semver gestionados con [release.sh](release.sh):
 
 Tasks de VSCode en [.vscode/tasks.json](.vscode/tasks.json) cubren Mac y Windows (Git Bash).
 
-**No correr `release.sh` sin pedir confirmación** — pushear el tag crea un release público en GitHub.
+**No correr `release.sh` sin pedir confirmación** — crea un release público en GitHub.
 
 `release.sh` trae los tags de GitHub (`git fetch --tags`, para no repetir una versión), calcula la
-siguiente, crea el tag sobre `main` y lo pushea; exige estar en `main`, sin cambios sin commitear y
-con `main` igual a `origin/main`. El release lo crea GitHub Actions al recibir el tag
-([.github/workflows/release.yml](.github/workflows/release.yml)): título el tag, notas generadas y
-pre-release si es `-pre.N`. Después `release.sh` espera a que aparezca (con `gh release view`, si
-hay `gh`). Si el release ya existe (creado a mano en la web o con `gh release create`), el workflow
-no hace nada.
+siguiente y pushea `main` a la rama `release/<versión>`; exige estar en `main`, sin cambios sin
+commitear y con `main` igual a `origin/main`. GitHub Actions
+([.github/workflows/release.yml](.github/workflows/release.yml)) crea en ese commit el tag y el
+release (título el tag, notas generadas, pre-release si es `-pre.N`) y borra la rama. Después
+`release.sh` espera a que el release aparezca (con `gh release view`, si hay `gh`). El workflow
+también corre con un tag `v*` pusheado a mano, y si el release ya existe no lo toca.
 
-Es así para poder publicar desde una sesión de Claude Code en la nube: su proxy de GitHub deja
-pushear tags pero rechaza crear releases (`HTTP 403: Creating, editing, or deleting releases is not
-permitted for this session type`) y no deja leer la API de Actions; el release se comprueba con
-`gh release view`, que sí pasa. El workflow (`/.github`) no entra al zip.
+Va por una rama para poder publicar desde una sesión de Claude Code en la nube: su proxy de GitHub
+deja pushear ramas, pero rechaza pushear tags (`HTTP 403` en el `git push`) y crear releases
+(`Creating, editing, or deleting releases is not permitted for this session type`), y no deja leer
+la API de Actions; el release se comprueba con `gh release view`, que sí pasa. Si el workflow
+falla, la rama `release/<versión>` queda en GitHub y el próximo `release.sh` no puede pushearla:
+ver la pestaña Actions y borrar la rama. El workflow (`/.github`) no entra al zip.
 
 ## Deploy: qué entra al zip del release
 

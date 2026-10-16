@@ -241,15 +241,16 @@ Tags semver con [release.sh](release.sh):
 - `./release.sh minor` / `major`
 - `./release.sh patch pre` → pre-release
 
-`release.sh` calcula la versión siguiente, crea el tag sobre `main` y lo pushea; el release lo crea
-GitHub Actions al recibir el tag ([.github/workflows/release.yml](.github/workflows/release.yml)).
+`release.sh` calcula la versión siguiente y pushea `main` a la rama `release/<versión>`; GitHub
+Actions ([.github/workflows/release.yml](.github/workflows/release.yml)) crea ahí el tag y el
+release, y borra la rama.
 Tasks de VSCode en `.vscode/tasks.json` cubren Mac y Windows (Git Bash).
 
 ---
 
 ## Qué entra al zip de un Release
 
-`release.sh` no arma el zip: taggea, y el release lo crea GitHub Actions. El **"Source code (zip)"** lo genera
+`release.sh` no arma el zip: el tag y el release los crea GitHub Actions. El **"Source code (zip)"** lo genera
 GitHub desde el tag, y ese zip es el artefacto de deploy que se descomprime en el server de playout.
 Lo único que controla su contenido es [.gitattributes](.gitattributes) con `export-ignore`.
 
