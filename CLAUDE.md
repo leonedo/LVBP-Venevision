@@ -74,7 +74,7 @@ equipo y una textura de líneas encima. Para que las dos queden iguales (Leon, 2
 le pone a cada puerta, encima, la textura (`images/texturapuertas.png`, en *multiply*) y las ocho
 pantallas de color, hijas de la puerta, con su forma y su máscara. Los degradados y la textura salen
 de la ofensiva preparada (`ofensiva/data.json`): si cambian allá, la defensiva los toma la próxima
-vez que se prepare.
+vez que se prepare (y el bateador, los colores de sus fondos).
 El escudo de las compuertas va al 49 % del diseño (con fusión *color dodge*), pero ese 49 % no está
 en la capa sino en el CSS de su `<image>` (`g[id^="puerta"] > image`, por el `ln`
 `puerta<SIGLAS><izq|der>` de la capa): el UPDATE escribe su `opacity` en la capa y lo pisaría con
@@ -129,9 +129,10 @@ el fondo de color de la izquierda (forma con degradado) y el escudo grande encim
 *overlay*, mateada con su `MASK`). Por eso la clase se repite a propósito, como en la defensiva.
 Empiezan ocultas (CSS de `index.html`, como el bateador de Meridiano): el controlador manda `1` al
 que batea y `0` a los otros siete. Sin equipo no se ven la barra ni el fondo: el nombre queda sobre
-la textura gris y la placa negra del número, entera. ⚠ El export trae el fondo de siete equipos con
-el mismo naranja (el de Bravos): sólo Tigres tiene el suyo, un azul casi negro sobre el que su escudo
-casi no se ve (como en la ofensiva). Así quedó, igual al export: pendiente con el diseñador.
+la textura gris y la placa negra del número, entera. El export trae el fondo de siete equipos con
+el mismo naranja (el de Bravos) y sólo Tigres con el suyo: van con el color de cada equipo de la
+ofensiva, como las puertas de la defensiva (Leon, 2026-10-16). Sobre los de Tiburones y Tigres, casi
+negros, el escudo (en *overlay*) casi no se ve.
 
 Textos: en mayúsculas. El nombre, como en Meridiano (`ISAIAS TEJEDA`): al tamaño del diseño entran
 unas 17 letras (`AEVERSON ARTEAGA` entra; `ALEXANDER MONASTERIOS` baja de 55 a 42); más largos
@@ -268,6 +269,10 @@ el título del export): igual salvo 1 o 2 niveles de 255 en el escudo.
   hasta 8 px después de la del rótulo anterior (el primero, del borde de la barra gris, x 527); el
   `.000 ` pierde el espacio final. Los rótulos, cajas de 70. El alto de todas, el ascent del cuerpo
   más 2: con el del export (hasta 90) un texto que encogía mucho partía en dos líneas chicas.
+- **Fondos:** el degradado de cada equipo sale de las puertas de la ofensiva preparada
+  (`ofensiva/data.json`), con los stops dados vuelta (la puerta va de oscuro en 0, arriba, a claro
+  en 1; el fondo, claro en 0, abajo). Las posiciones del degradado (`s`, `e`) quedan las del export.
+  `prep.js` prepara la ofensiva antes que el bateador: si llegan los dos juntos, alcanza con una vez.
 - **Barras:** aparecen cuando empiezan a moverse (frame 11, su primer keyframe): antes, su punta
   asomaba quieta 5 px en el borde izquierdo, del frame 0 al 10 (y al final de la salida).
 - **Markers y timeline:** `START` (0–30) y `STOP` (90–120) del diseñador → `play`, `salida` y `stop`
@@ -275,10 +280,10 @@ el título del export): igual salvo 1 o 2 niveles de 255 en el escudo.
   capas que arrancan en el 0 pasan al 1: el frame 0 queda vacío.
 - **Imágenes:** las 17 del export van tal cual a `bateador/images/`.
 
-Comparado frame a frame contra el export (Bravos, con el texto del diseño): idéntico al píxel del 13
-al 87; del 0 al 10 sólo falta la punta de la barra. En el 11 y el 12, la sombra de la franja difiere
-hasta 18/255 en la esquina según el frame que el browser pintó antes: renderizados cada uno en una
-página recién cargada, son idénticos.
+Comparado frame a frame contra el export (Bravos, con el texto del diseño, antes de los colores de
+la ofensiva): idéntico al píxel del 13 al 87; del 0 al 10 sólo falta la punta de la barra. En el 11
+y el 12, la sombra de la franja difiere hasta 18/255 en la esquina según el frame que el browser
+pintó antes: renderizados cada uno en una página recién cargada, son idénticos.
 
 ### QA
 

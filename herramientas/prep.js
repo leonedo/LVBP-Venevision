@@ -624,18 +624,36 @@ if (hay('LOWBAR BATEADOR')) {
     // ---- el equipo: cada clave prende su barra (la imagen del nombre, con el escudo de marca de
     // agua), el fondo de color de la izquierda y el escudo grande encima (en overlay, mateado). La
     // barra de Bravos llega sin el _1 de las otras.
+    // Los fondos llegan con el mismo naranja (el de Bravos) en siete equipos: sólo Tigres trae el
+    // suyo. Van con el color de cada equipo de la ofensiva, como las puertas de la defensiva (Leon,
+    // 2026-10-16): el degradado de sus puertas, tomado de la ofensiva preparada (si cambia allá, el
+    // bateador lo toma la próxima vez que se prepare). La puerta va de oscuro (arriba, en 0) a claro
+    // (abajo, en 1) y el fondo al revés, claro en 0 (abajo): los stops se dan vuelta.
+    const of = load(path.join(REPO, 'ofensiva/data.json'));
+    const degradado = l => l.shapes[0].it.find(s => s.ty === 'gf');
     for (const l of d.layers) {
         const barra = l.nm.match(/^\.BARRA_([A-Z]+)_BATEO(?:_1)?\.png$/);
-        const m = barra || l.nm.match(/^\.FONDO([A-Z]+)$/) || l.nm.match(/^\.([A-Z]+)LOGO$/);
+        const fondo = l.nm.match(/^\.FONDO([A-Z]+)$/);
+        const m = barra || fondo || l.nm.match(/^\.([A-Z]+)LOGO$/);
         if (!m) continue;
-        if (!SIGLAS[m[1]]) throw new Error(`${l.nm}: equipo desconocido`);
+        const sig = SIGLAS[m[1]];
+        if (!sig) throw new Error(`${l.nm}: equipo desconocido`);
         // Hasta que empieza a moverse (frame 11), la punta de la barra asomaba 5 px en el borde
         // izquierdo: en la entrada y al final de la salida. Aparece cuando se mueve.
         if (barra) {
             if (!l.ks.p.a) throw new Error(`${l.nm}: sin animación`);
             l.ip = l.ks.p.k[0].t;
         }
-        rename(d, l.nm, SIGLAS[m[1]] + '_opacidad');
+        if (fondo) {
+            const ref = of.layers.find(o => o.cl === sig + '_opacidad' && o.ty === 4);
+            if (!ref) throw new Error(`ofensiva: sin puerta de ${sig}`);
+            const g = degradado(ref).g, k = g.k.k, gf = degradado(l);
+            if (g.p !== 3 || k.length !== 12 || gf.g.p !== 3 || gf.g.k.a) throw new Error(`${l.nm}: degradado inesperado`);
+            const stops = [];
+            for (let i = 8; i >= 0; i -= 4) stops.push(+(1 - k[i]).toFixed(3), k[i + 1], k[i + 2], k[i + 3]);
+            gf.g.k.k = stops;
+        }
+        rename(d, l.nm, sig + '_opacidad');
     }
     for (const s of Object.values(SIGLAS)) {
         const n = d.layers.filter(l => l.nm === `.${s}_opacidad`).length;
