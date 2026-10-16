@@ -80,11 +80,12 @@ echo "Nueva versión:          $new_version"
 git push --quiet origin "HEAD:refs/heads/release/$new_version"
 echo "✅ Rama release/$new_version pusheada: GitHub Actions crea el tag y el release"
 
-# Esperar a que el release aparezca (si hay gh para mirarlo)
+# Esperar a que el release aparezca (si hay gh para mirarlo). Por la API REST: gh release view usa
+# GraphQL, que una sesión de Claude Code en la nube no puede usar.
 if command -v gh > /dev/null 2>&1; then
   for i in $(seq 1 36); do
-    if gh release view "$new_version" > /dev/null 2>&1; then
-      echo "✅ Release creado: $(gh release view "$new_version" --json url -q .url)"
+    if url=$(gh api "repos/{owner}/{repo}/releases/tags/$new_version" -q .html_url 2> /dev/null); then
+      echo "✅ Release creado: $url"
       exit 0
     fi
     sleep 5

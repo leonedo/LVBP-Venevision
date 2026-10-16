@@ -627,14 +627,15 @@ Tasks de VSCode en [.vscode/tasks.json](.vscode/tasks.json) cubren Mac y Windows
 siguiente y pushea `main` a la rama `release/<versión>`; exige estar en `main`, sin cambios sin
 commitear y con `main` igual a `origin/main`. GitHub Actions
 ([.github/workflows/release.yml](.github/workflows/release.yml)) crea en ese commit el tag y el
-release (título el tag, notas generadas, pre-release si es `-pre.N`) y borra la rama. Después
-`release.sh` espera a que el release aparezca (con `gh release view`, si hay `gh`). El workflow
+release (título el tag, notas generadas, pre-release si es `-pre.N`) y borra la rama, en unos
+segundos. Después `release.sh` espera a que el release aparezca (si hay `gh`). El workflow
 también corre con un tag `v*` pusheado a mano, y si el release ya existe no lo toca.
 
 Va por una rama para poder publicar desde una sesión de Claude Code en la nube: su proxy de GitHub
 deja pushear ramas, pero rechaza pushear tags (`HTTP 403` en el `git push`) y crear releases
 (`Creating, editing, or deleting releases is not permitted for this session type`), y no deja leer
-la API de Actions; el release se comprueba con `gh release view`, que sí pasa. Si el workflow
+la API de Actions ni GraphQL (`gh release view`): el release se comprueba por REST (`gh api
+repos/{owner}/{repo}/releases/tags/<versión>`), que sí pasa. Así salió `v0.0.5` (2026-10-16). Si el workflow
 falla, la rama `release/<versión>` queda en GitHub y el próximo `release.sh` no puede pushearla:
 ver la pestaña Actions y borrar la rama. El workflow (`/.github`) no entra al zip.
 
