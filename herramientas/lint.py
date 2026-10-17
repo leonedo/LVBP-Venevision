@@ -83,6 +83,11 @@ for g in GRAFICOS:
             if l['ks']['o'].get('k') != 100: p(g, f'compuerta {l["ln"]}: opacidad en la capa (va en el CSS)')
             # el gris del Emboss de AE, que Lottie no pinta (prep.js, GRIS_PUERTA)
             if not any(e.get('ty') == 21 for e in l.get('ef', [])): p(g, f'compuerta {l["ln"]}: sin el Fill gris (sale blanca)')
+    # las letras grandes de PEPSI, mateadas con el recuadro gris: en AE las recorta la T de "preservar
+    # transparencia", que Lottie no exporta, y sin el mate se ven antes que el recuadro (prep.js)
+    if g == 'parcial':
+        letras = [l for l in d['layers'] if l['nm'].startswith('pepsi letra')]
+        if len(letras) != 5 or any(l.get('tt') != 1 for l in letras): p(g, 'letras de PEPSI sin su mate: se ven antes que el recuadro')
     # el Hue/Saturation de la V de Venevisión, que Lottie no pinta (prep.js, horneaClaridad)
     if g == 'score':
         for l in d['layers']:
