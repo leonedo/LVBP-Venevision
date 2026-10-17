@@ -19,7 +19,7 @@ takes no data).
 
 **Same keys as the LVBP-Meridiano `parcial`**, which in turn are the ones of `score` for what both
 show: the team bars, `inning`, the two arrows and the runs (`CARRERASVISITA`, `CARRERASLOCAL`). A
-client can send the same values to the three. Hits and errors follow the style of the runs:
+client can send the same values to the three, plus the team names. Hits and errors follow the style of the runs:
 `HITSVISITA`, `ERRORESVISITA`, `HITSLOCAL`, `ERRORESLOCAL`. Meridiano's `titulo` and `publicidad`
 don't exist here: they are ignored.
 
@@ -28,8 +28,10 @@ that play and `0` for the other fourteen. The visitor's row takes `<TEAM>VISITA_
 row `<TEAM>LOCAL_opacidad`. Each bar carries its team's crest as a watermark.
 
 **Team names:** `NOMBREVISITA` / `NOMBRELOCAL`, the name written on each bar (`AGUILAS`, `LEONES`
-in the design). They are not the abbreviations of the score's `EQUIPOVISITA` / `EQUIPOLOCAL`. Up to
-about 10 letters keep the design size (`MAGALLANES`, `CARDENALES` fit); longer ones shrink.
+in the design). They are not the abbreviations of the score's `EQUIPOVISITA` / `EQUIPOLOCAL`, and
+Meridiano's `parcial` doesn't have them: **always send them**, or the design's AGUILAS and LEONES
+stay on air over other teams' bars. Up to about 10 letters keep the design size (`MAGALLANES`,
+`CARDENALES` fit); longer ones shrink.
 
 **Inning:** the number (`inning`) and the arrows. Both arrows start visible: turn off the one that
 doesn't apply (`INNINGarriba_opacidad` ▲ is the top of the inning, `INNINGabajo_opacidad` ▼ the

@@ -774,10 +774,13 @@ const PAR_TITULO = 274;                // 8 px adentro de la columna de los bate
 const PAR_JUGADORES = [['3B TOVAR 2', 121.3922, 169.39], ['CF CASTRO 2', 133.4531, 167.62], ['LF RONDON 2', 132.5813, 167.74]];
 // Las barras de los equipos que no vinieron (el export trae Águilas y Leones, en PNG de 512 × 512 con
 // la barra en x 0, y 192): las BARRA_<EQUIPO>_VISITA de la ofensiva, del mismo diseño, copiadas a mano
-// a parcial/images. [archivo, columnas transparentes a la izquierda del PNG].
+// a parcial/images. [archivo, el de ofensiva/images del que es copia, columnas transparentes a la
+// izquierda del PNG]. Si la ofensiva cambia sus barras, prep.js falla: copiarlas de nuevo y medir
+// esas columnas.
 const PAR_BARRAS = {
-    BRAVOS: ['barra_bravos.png', 2], CARD: ['barra_cardenales.png', 0], ANZ: ['barra_caribes.png', 0],
-    MAGA: ['barra_magallanes.png', 0], TIBUS: ['barra_tiburones.png', 0], TIGRES: ['barra_tigres.png', 4]
+    BRAVOS: ['barra_bravos.png', 'img_3.png', 2], CARD: ['barra_cardenales.png', 'img_4.png', 0],
+    ANZ: ['barra_caribes.png', 'img_5.png', 0], MAGA: ['barra_magallanes.png', 'img_7.png', 0],
+    TIBUS: ['barra_tiburones.png', 'img_9.png', 0], TIGRES: ['barra_tigres.png', 'img_8.png', 4]
 };
 const PAR_ENTRADA = 116;               // la entrada termina en el 115 (el logo de Pepsi se achica)
 const PAR_DESCARTE = 282;              // del 282 al 372, el final a medio hacer del cuadro de Pepsi
@@ -841,9 +844,11 @@ if (hay('FINAL DE INNING')) {
             c.nm = `.${sig}${lado}_opacidad`;
             c.cl = `${sig}${lado}_opacidad`;
             if (del512[sig]) { c.refId = del512[sig]; nuevas.push(c); continue; } // la otra del export
-            const [png, izq] = PAR_BARRAS[sig];
+            const [png, deOfensiva, izq] = PAR_BARRAS[sig];
             const file = path.join(REPO, 'parcial/images', png);
             if (!fs.existsSync(file)) throw new Error(`falta parcial/images/${png} (la barra de la ofensiva)`);
+            if (!fs.readFileSync(file).equals(fs.readFileSync(path.join(REPO, 'ofensiva/images', deOfensiva))))
+                throw new Error(`parcial/images/${png} no es ofensiva/images/${deOfensiva}: copiarla de nuevo y medir sus columnas transparentes`);
             const [w, h] = medidasPng(file);
             const id = 'image_' + png.replace(/\.png$/, '');
             if (!d.assets.some(a => a.id === id)) d.assets.push({ id, w, h, u: 'images/', p: png, e: 0 });
@@ -900,7 +905,9 @@ if (hay('FINAL DE INNING')) {
     if (letras.length !== 5) throw new Error(`letras de PEPSI: ${letras.length}`);
     letras.forEach((l, i) => {
         if (l.tt || l.ef?.length !== 1 || l.ef[0].mn !== 'ADBE HUE SATURATION') throw new Error(`letra ${i + 1}: matte o efectos inesperados`);
-        if (l.ef[0].ef.some(x => /^(Master|Colorize$)/.test(x.nm) && x.v.k)) throw new Error(`letra ${i + 1}: el Hue/Saturation cambia algo`);
+        const hs = nm => l.ef[0].ef.find(x => x.nm === nm).v.k;
+        if (hs('Channel Control') !== 1 || hs('Master Hue') || hs('Master Saturation') || hs('Master Lightness') || hs('Colorize'))
+            throw new Error(`letra ${i + 1}: el Hue/Saturation cambia algo`);
         delete l.ef;
         const m = clone(gris);
         Object.assign(m, { ind: ++ind, nm: 'pepsi mascara ' + (i + 1), td: 1 });
@@ -924,11 +931,15 @@ if (hay('FINAL DE INNING')) {
     // entrada y ese final no se mueve nada. El frame 0 vacío, como en la defensiva.
     for (const p of propiedadesAnimadas(d.layers)) {
         if (p.k.some(k => k.t > PAR_ENTRADA - 0.5 && k.t < PAR_DESCARTE - 0.5)) throw new Error('hay animación entre la entrada y el final: mover PAR_ENTRADA');
+        // ni un tramo que cruce la pausa: el último keyframe de la entrada y el primero del final, iguales
+        const corte = p.k.findIndex(k => k.t >= PAR_DESCARTE - 0.5);
+        if (corte > 0 && !p.k[corte - 1].h && JSON.stringify(p.k[corte - 1].s) !== JSON.stringify(p.k[corte].s))
+            throw new Error('hay animación entre la entrada y el final: mover PAR_ENTRADA');
         p.k = p.k.filter(k => k.t < PAR_DESCARTE - 0.5);
         if (p.k.length < 2) throw new Error('una propiedad queda con un solo keyframe');
     }
     for (const l of d.layers) {
-        if (l.ip > PAR_ENTRADA) throw new Error(`${l.nm}: ip ${l.ip}`);
+        if (l.ip > PAR_ENTRADA || l.op < PAR_ENTRADA + 1) throw new Error(`${l.nm}: ip ${l.ip}, op ${l.op}`);
         l.ip = Math.max(l.ip, 1);
         l.op = PAR_ENTRADA + 1;
     }

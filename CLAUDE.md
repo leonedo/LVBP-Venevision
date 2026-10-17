@@ -188,7 +188,9 @@ misma data: `<SIGLAS>VISITA_opacidad` / `<SIGLAS>LOCAL_opacidad`, `inning`,
 (y `LOCAL`), `jugador1`…`jugador3` y `titulo_jugadores` (el AL BATE). No tiene `titulo` ni
 `publicidad`. Propias: `NOMBREVISITA` / `NOMBRELOCAL`, el nombre escrito sobre la barra (`AGUILAS`;
 en el score, `EQUIPOVISITA` son las siglas, y por eso no se reusa), y los rótulos fijos
-`rotulocarreras`, `rotulohits`, `rotuloerrores` (la C, la H y la E).
+`rotulocarreras`, `rotulohits`, `rotuloerrores` (la C, la H y la E). El payload del parcial de
+Meridiano no trae los nombres: el controlador tiene que mandarlos siempre, o quedan al aire los del
+diseño (AGUILAS y LEONES) sobre las barras de otros equipos.
 
 Barras de equipo: imágenes apiladas, todas visibles al arrancar, como en el score: el controlador
 manda `1` a la que va en cada fila y `0` a las otras siete. Sin data quedan arriba las del diseño,
@@ -225,8 +227,9 @@ el nombre y los números, los números y los bateadores, y los bateadores y la r
 línea finita de video al aire. Los números y los bateadores crecen 1 px sobre el vecino y el key
 queda lleno (las barras, 1 px más cortas debajo del nombre).
 
-Colores en NTSC compuesto (2026-10-17, con setup de 7,5 IRE): las 16 barras como en el score (la más
-alta, Leones, 106 IRE; la más baja, Cardenales, −7,1); el cian de los números y los bateadores y el
+Colores en NTSC compuesto (2026-10-17, con setup de 7,5 IRE): las barras de los 8 equipos, medidas
+en los 56 cruces, quedan legales (la más alta, Leones, 106 IRE; la más baja, Cardenales, −7,1: son
+otros PNG que los del score, del mismo diseño); el cian de los números y los bateadores y el
 amarillo del AL BATE son los del score (113,5 y 114,4 IRE): quedan así, como allá. El azul de Pepsi
 (`#0125FF`) baja a −14 IRE, legal hasta −20; si hiciera falta subirlo a −7, `#1032FF`. En HD
 (Rec.709) todo es legal.
@@ -429,7 +432,8 @@ pintó antes: renderizados cada uno en una página recién cargada, son idéntic
   `prep.js` falla si algo se mueve entre los dos. Las capas que arrancan en el 0 pasan al 1: el frame
   0 queda vacío.
 - **Imágenes:** del export, `img_0`, `img_1`, `img_3` e `img_4` tal cual a `parcial/images/`; las
-  seis barras, copias de `ofensiva/images/img_3–5, 7–9`.
+  seis barras, copias de `ofensiva/images/img_3–5, 7–9` (`prep.js` falla si dejan de ser iguales:
+  copiarlas de nuevo y medir sus columnas transparentes de la izquierda, `PAR_BARRAS`).
 
 Comparado frame a frame contra el export (Águilas y Leones, con el texto del diseño): igual del 0
 al 115, salvo las letras de PEPSI antes del recuadro (15–49), el círculo sacado, la base de la S de
