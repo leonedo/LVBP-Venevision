@@ -90,9 +90,11 @@ for g in GRAFICOS:
     if g == 'parcial':
         letras = [l for l in d['layers'] if l['nm'].startswith('pepsi letra')]
         if len(letras) != 5 or any(l.get('tt') != 1 for l in letras): p(g, 'letras de PEPSI sin su mate: se ven antes que el recuadro')
-        if any(not any(e.get('ty') == 21 for e in l.get('ef', [])) for l in letras): p(g, 'letras de PEPSI sin el Fill blanco: salen negras')
+        blanco = lambda e: e.get('ty') == 21 and e['ef'][2]['v']['k'][:3] == [1, 1, 1]
+        if any(not any(blanco(e) for e in l.get('ef', [])) for l in letras): p(g, 'letras de PEPSI sin el Fill blanco: salen negras')
+        apellido = lambda a: a['a'].get('fc', {}).get('k') == [1, 1, 1, 1] and a['s'].get('b') == 3 and a['s']['s']['k'] == 1 and a['s'].get('r') == 2
         for n in (1, 2, 3):
-            if not any(l.get('cl') == f'jugador{n}' and l['t'].get('a') for l in d['layers']): p(g, f'jugador{n} sin el animador del apellido en blanco')
+            if not any(l.get('cl') == f'jugador{n}' and any(apellido(a) for a in l['t'].get('a', [])) for l in d['layers']): p(g, f'jugador{n} sin el animador del apellido en blanco')
     # el Hue/Saturation de la V de Venevisión, que Lottie no pinta (prep.js, horneaClaridad)
     if g == 'score':
         for l in d['layers']:

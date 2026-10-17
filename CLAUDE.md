@@ -429,7 +429,8 @@ pintó antes: renderizados cada uno en una página recién cargada, son idéntic
   verse alineados a la izquierda: pasan a la izquierda desde donde empieza el texto del diseño (Lw
   `3B TOVAR` 121.3922, `CF CASTRO` 133.4531, `LF RONDON` 132.5813), hasta 8 px antes del final de la
   columna (x 1307), con un animador de texto (`apellido en blanco`: por palabras, `b` 3, desde el
-  índice 1, `r` 2) que pinta de blanco todo menos la primera palabra. Los números quedan con su caja
+  índice 1 al 100, `r` 2; Lottie no recalcula ese 100 al cambiar el texto) que pinta de blanco todo
+  menos la primera palabra. Los números quedan con su caja
   (72, entran dos cifras). El alto de todas, el ascent del cuerpo más 2, como en el bateador.
 - **Key:** `Capa de formas 1` (los números) crece 1 px a cada lado y `Capa de formas 4` (los
   bateadores) 1 px a la derecha (ver *Key* arriba).
