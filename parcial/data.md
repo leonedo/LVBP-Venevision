@@ -38,7 +38,8 @@ doesn't apply (`INNINGarriba_opacidad` ▲ is the top of the inning, `INNINGabaj
 bottom). Extra innings (two digits) fit.
 
 **Batters:** `jugador1` to `jugador3`, top to bottom, under `titulo_jugadores` (`AL BATE`). The
-design writes the position and the surname (`3B TOVAR`), left-aligned. Up to about 11 characters
+design writes the position and the surname (`3B TOVAR`), left-aligned: the first word shows in cyan
+and the rest in white, whatever you send (send the position first). Up to about 11 characters
 keep the design size (`CF CASTILLO`); longer ones shrink within the column (`SS MONASTERIOS` about
 20 % smaller, `3B A. MONASTERIOS` a third). An empty string leaves the row empty.
 

@@ -810,13 +810,23 @@ if (hay('FINAL DE INNING')) {
     rename(d, 'E', 'rotuloerrores');
     rename(d, 'AL BATE', 'titulo_jugadores');
     anchoCentrado(doc(d, '.titulo_jugadores'), PAR_TITULO);
+    // En AE la posición (la primera palabra) va en cian y el apellido en blanco (captura del diseñador,
+    // 2026-10-17): un estilo por carácter que Bodymovin no exporta, y llega todo en cian. Lo pone un
+    // animador de texto: blanco desde la segunda palabra (por palabras, b 3, desde el índice 1, r 2:
+    // al cambiar el texto Lottie estira el final del rango hasta el último carácter).
+    const apellidoBlanco = {
+        nm: 'apellido en blanco',
+        s: { t: 0, xe: { a: 0, k: 0 }, ne: { a: 0, k: 0 }, a: { a: 0, k: 100 }, b: 3, rn: 0, sh: 1, s: { a: 0, k: 1 }, e: { a: 0, k: 100 }, o: { a: 0, k: 0 }, r: 2 },
+        a: { fc: { a: 0, k: [1, 1, 1, 1] } }
+    };
     PAR_JUGADORES.forEach(([nm, Lw, W], i) => {
-        rename(d, nm, 'jugador' + (i + 1));
+        const l = rename(d, nm, 'jugador' + (i + 1));
         const s = doc(d, '.jugador' + (i + 1));
-        if (s.j !== 2) throw new Error(`${nm}: j ${s.j}`);
+        if (s.j !== 2 || l.t.a.length) throw new Error(`${nm}: j ${s.j}, ${l.t.a.length} animadores`);
         s.ps[0] += (s.sz[0] - Lw) / 2;
         s.sz[0] = W;
         s.j = 0;
+        l.t.a = [clone(apellidoBlanco)];
     });
     // Las cajas vienen de AE con lh 0.01, como en el score: lh a 1.2 del cuerpo. El alto, como en el
     // bateador: entra una línea al cuerpo del diseño (su ascent, más 2) y no dos hasta un 40 % del
@@ -894,30 +904,34 @@ if (hay('FINAL DE INNING')) {
     quitar('Capa de formas 13');
     // Las letras grandes de PEPSI aparecen del 15 al 30, antes que el recuadro: en AE no se ven hasta que
     // el recuadro gris crece debajo (37–50), por la T de "preservar transparencia", que Lottie no
-    // exporta. Cada letra va mateada con una copia del recuadro gris, que hace lo mismo. Su Hue/Saturation
-    // está en cero (no hace nada) y se saca. La copia es 0.7 px más alta por lado: abajo llega hasta el
-    // borde del recuadro azul (y 946), que en la pausa es el que está debajo, y la base de la S y la I
-    // (945.9) se ve entera, como en AE.
+    // exporta. Cada letra va mateada con una copia del recuadro gris, que hace lo mismo.
+    // Cómo tiene que quedar, según la captura de AE del diseñador (2026-10-17): el PEPSI en blanco, a la
+    // derecha del logo chico del final y centrado en alto con él. Los dos exports las traen negras y 79 px
+    // más abajo, contra el borde de abajo del recuadro, con un Hue/Saturation en cero: suben hasta el
+    // centro del logo al final de la entrada y van blancas con un efecto Fill, que Lottie sí pinta (como
+    // el gris de las compuertas de la defensiva). El Hue/Saturation se saca.
     const gris = layer(d, 'Capa de formas 11');
-    const rectGris = gris.shapes[0].it.find(s => s.ty === 'rc');
-    if (rectGris.s.a || rectGris.s.k[1] !== 199.362) throw new Error('Capa de formas 11: recuadro inesperado');
+    const logo = layer(d, 'pepsi-seeklogo-3.ai');
+    const n24 = layer(d, 'Nulo 24');
+    if (logo.parent !== n24.ind || n24.ks.p.a || !n24.ks.s.a || logo.ks.p.a || logo.ks.a.k[1] !== 260.5) throw new Error('logo de Pepsi: transform inesperado');
+    const yLogo = n24.ks.p.k[1] + n24.ks.s.k.at(-1).s[1] / 100 * (logo.ks.p.k[1] - n24.ks.a.k[1]); // su centro, en el 115
     const letras = d.layers.filter(l => l.nm === 'pepsi-type-3.ai' && !l.parent);
     if (letras.length !== 5) throw new Error(`letras de PEPSI: ${letras.length}`);
+    const subir = yLogo - letras[0].ks.p.k[1];
     letras.forEach((l, i) => {
-        if (l.tt || l.ef?.length !== 1 || l.ef[0].mn !== 'ADBE HUE SATURATION') throw new Error(`letra ${i + 1}: matte o efectos inesperados`);
+        if (l.tt || l.ks.p.a || l.ef?.length !== 1 || l.ef[0].mn !== 'ADBE HUE SATURATION') throw new Error(`letra ${i + 1}: matte, posición o efectos inesperados`);
         const hs = nm => l.ef[0].ef.find(x => x.nm === nm).v.k;
         if (hs('Channel Control') !== 1 || hs('Master Hue') || hs('Master Saturation') || hs('Master Lightness') || hs('Colorize'))
             throw new Error(`letra ${i + 1}: el Hue/Saturation cambia algo`);
-        delete l.ef;
+        l.ef = [relleno(1, 1)];        // blanco
+        l.ks.p.k[1] += subir;
         const m = clone(gris);
         Object.assign(m, { ind: ++ind, nm: 'pepsi mascara ' + (i + 1), td: 1 });
-        m.shapes[0].it.find(s => s.ty === 'rc').s.k[1] += 1.4;
         l.tt = 1;
         l.nm = 'pepsi letra ' + (i + 1);
         delete l.cl;                   // la clase "ai" (la extensión del archivo de AE), repetida
         d.layers.splice(d.layers.indexOf(l), 0, m);
     });
-    const logo = layer(d, 'pepsi-seeklogo-3.ai');
     logo.nm = 'pepsi logo';
     delete logo.cl;
     d.layers.filter(l => l.nm === 'pepsi-type-3.ai').forEach((l, i) => {
