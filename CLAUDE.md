@@ -20,10 +20,11 @@ UPDATE están en su `data.md`.
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces `visita_vs_local`),
-del 2026-10-17; `defensiva.png` / `ofensiva.png` (Leones, con nombres de ejemplo), del 2026-10-15, y
+del 2026-10-17; `defensiva.png` / `ofensiva.png` (Leones, con nombres de ejemplo) y
 `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), del 2026-10-17; `bateador.png`
-(Leones, con data de ejemplo), del 2026-10-16, y `bateador_equipos.png` (los 8 equipos, recortado a
-la barra), del 2026-10-17. Si un gráfico cambia, hay que regenerarlas. No entran al zip (`.gitattributes`).
+(Leones, con data de ejemplo) y `bateador_equipos.png` (los 8 equipos, recortado a la barra), del
+2026-10-17. Si un gráfico cambia, hay que regenerarlas (las de Leones, con el ejemplo de su `data.md`,
+en el último frame de la entrada). No entran al zip (`.gitattributes`).
 
 No hay video de referencia del diseñador, y ningún export trae salida (los markers `stop` del score,
 90–120, de la defensiva, 60–90, y de la ofensiva y el bateador, 90–120, no animan nada) ni la bajada de la barra
@@ -131,13 +132,18 @@ siete son los PNG blancos de la defensiva (`images/compuerta_<equipo>.png`), con
 (en AE pasaría lo mismo). Su escudo va al 95 % (`GRIS_EQUIPO` en `prep.js`) y se ve como el de
 Tiburones o Magallanes; lo eligió Leon el 2026-10-15 entre 72,5, 85, 90 y 95.
 
-Color de Águilas: la barra es el mismo naranja rojizo en los cuatro gráficos (`#F64D25`, tono 12°),
-pero las puertas llegaban ámbar (`#FF8400`, 31°), y con ellas las de la defensiva y el fondo del
-bateador; en los otros equipos la puerta es del tono de su barra. Van con el tono de la barra y el
-brillo que el diseñador le dio a Águilas: el claro, `#FF5026` (la barra llevada a 255), y los otros
-dos stops en la proporción del export (`AGUI_COLOR` en `prep.js`). Lo eligió Leon el 2026-10-17 entre
-ése y uno más oscuro, como Caribes, que quedaba casi igual a Caribes. Leones también se corre un
-poco (barra ámbar `#FDAD36`, puerta amarilla `#FFD200`): quedó como está.
+Color de Águilas y Leones: cada barra es del mismo color en los cuatro gráficos, y en los otros seis
+equipos la puerta es del tono de su barra, pero en éstos dos no: Águilas tiene la barra naranja
+rojiza (`#F64D25`, tono 12°) y las puertas llegaban ámbar (`#FF8400`, 31°); Leones, la barra ámbar
+(`#FDAD36`, 36°) y las puertas amarillas (`#FFD200`, 49°). Con ellas, las de la defensiva y el fondo
+del bateador. Van con el tono de la barra y el brillo que el diseñador le dio a cada uno: el claro
+es la barra llevada a 255 (`#FF5026`, `#FFAE36`) y los otros dos stops, en la proporción del export
+(`COLOR_PUERTA` en `prep.js`). Los eligió Leon el 2026-10-17, cada uno entre ése y uno más oscuro (el
+de Águilas, como Caribes, quedaba casi igual a Caribes). En NTSC compuesto, lo más alto de las
+puertas de Leones (con el escudo) baja de 123 IRE a 106, lo de su barra. En el bateador, el escudo
+de Leones (en *overlay*) sigue pasando un poco de 120 en sus brillos (121, antes 131): el *overlay*
+lleva a 255 el rojo y el verde del amarillo debajo de lo blanco del escudo, y con el fondo más
+oscuro (al 80 %) pasaba en más lugares.
 
 Textos: nombre y apellido, como en el diseño y en Meridiano (`ALÍ CASTILLO`). Al tamaño del diseño
 entran unas 21 letras en las filas (`ALEXANDER MONASTERIOS` entra) y 19 en el mánager; más largos
@@ -271,9 +277,10 @@ el `<image>`. El Fill sólo cambia el escudo, sin costo de frames medible en la 
   la de abajo tiene la izquierda 4 px corrida).
 - **Máscaras invertidas:** las 9 pantallas de la derecha, como la puerta de la defensiva
   (`complementaria()`, compartida): tapaban el centro con una franja del color del equipo.
-- **Color de Águilas:** sus pantallas llegan ámbar: van con `AGUI_COLOR`, el tono de su barra (ver
-  arriba). `prep.js` falla si el degradado del export cambia (`AGUI_COLOR_EXPORT`): mirar el color
-  nuevo antes de volver a pisarlo. La defensiva y el bateador lo toman de la ofensiva preparada.
+- **Color de Águilas y Leones:** sus pantallas llegan de otro tono que su barra: van con
+  `COLOR_PUERTA` (`color`), el tono de la barra (ver arriba). `prep.js` falla si el degradado del
+  export cambia (`COLOR_PUERTA`, `export`): mirar el color nuevo antes de volver a pisarlo. Para otro
+  equipo, sumar sus siglas al mapa. La defensiva y el bateador lo toman de la ofensiva preparada.
 - **Escudos:** el de Águilas viene en el export (`images/img_0.png`, con sus máscaras); los otros
   siete los arma `escudoClonado()` con sus capas: centrado en su imagen y la máscara por la misma
   diagonal, alargada para cubrir cualquier alto. 49 % al CSS y Fill gris, como en la defensiva
@@ -314,8 +321,9 @@ el título del export): igual salvo 1 o 2 niveles de 255 en el escudo.
   (`ofensiva/data.json`), con los stops dados vuelta (la puerta va de oscuro en 0, arriba, a claro
   en 1; el fondo, claro en 0, abajo). Las posiciones del degradado (`s`, `e`) quedan las del export.
   `prep.js` prepara la ofensiva antes que el bateador: si llegan los dos juntos, alcanza con una vez.
-  El de Águilas es el `AGUI_COLOR` de la ofensiva (2026-10-17): sin el export del bateador a mano, se
-  le pasó al JSON preparado, igual que a la defensiva, con los stops dados vuelta como acá.
+  Los de Águilas y Leones son el `COLOR_PUERTA` de la ofensiva (2026-10-17): sin el export del
+  bateador a mano, se le pasaron al JSON preparado, igual que a la defensiva, con los stops dados
+  vuelta como acá.
 - **Escudo de Tigres:** de *overlay* (`bm` 3) a *color dodge* (6), con el Fill gris al 85 % (ver
   arriba).
 - **Barras:** aparecen cuando empiezan a moverse (frame 11, su primer keyframe): antes, su punta
