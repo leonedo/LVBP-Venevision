@@ -92,6 +92,26 @@ function alReves(prop, desde, hasta, inicio) {
     ks[ks.length - 1].h = 1;
     prop.k = ks.concat(rev);
 }
+// Hue/Saturation de AE que sólo mueve la Master Lightness (L): lo aplica a los rellenos y trazos
+// de la capa, que es lo que Lottie no hace, y lo saca. L > 0 va hacia el blanco, L < 0 al negro.
+function horneaClaridad(l) {
+    const i = (l.ef || []).findIndex(e => e.mn === 'ADBE HUE SATURATION');
+    if (i < 0) throw new Error(`${l.nm}: sin Hue/Saturation`);
+    const v = nm => l.ef[i].ef.find(x => x.nm === nm).v.k;
+    if (v('Master Hue') || v('Master Saturation') || v('Colorize')) throw new Error(`${l.nm}: Hue/Saturation con más que claridad`);
+    const L = v('Master Lightness') / 100;
+    const aclara = c => +(L > 0 ? c + (1 - c) * L : c * (1 + L)).toFixed(6);
+    const pinta = it => it.forEach(s => {
+        if (s.ty === 'fl' || s.ty === 'st') {
+            if (s.c.a) throw new Error(`${l.nm}: color animado`);
+            s.c.k = s.c.k.map((c, j) => j < 3 ? aclara(c) : c);
+        }
+        if (s.it) pinta(s.it);
+    });
+    pinta(l.shapes);
+    l.ef.splice(i, 1);
+    if (!l.ef.length) delete l.ef;
+}
 function propiedadesAnimadas(o, acc = []) {
     if (Array.isArray(o)) o.forEach(v => propiedadesAnimadas(v, acc));
     else if (o && typeof o === 'object') {
@@ -116,8 +136,19 @@ const BAJA = 100;                      // y baja (la subida al revés) del 100 a
 const OP = 130;
 const BARRA = ['BARRA PITCHER', 'BARRA BATEADOR', '.lanzador', '.lanzamientos', '.mph',
     '.velocidad', '.bateador', '.average', '.actuacion'];
+// El export del 2026-10-17 es el mismo diseño dentro de un nulo nuevo (Null 1) al 134 %: más grande,
+// con la esquina en (94, 51), 2 px a la izquierda y 3 arriba de la zona segura de títulos (90 %: 96,
+// 54). Va corrido hasta ahí (Leon, 2026-10-17). Si el nulo llega en otro lugar o a otra escala,
+// prep.js falla: medir de nuevo la esquina (bbox del render en el frame 90) y mover CORRE.
+const RAIZ = { nm: 'Null 1', p: [962, 537.2], s: 134 };
+const CORRE = [2, 3];
 if (hay('SCOREBUG')) {
     const d = load(path.join(SRC, 'SCOREBUG/data.json'));
+
+    const raiz = layer(d, RAIZ.nm), rp = raiz.ks.p, rs = raiz.ks.s;
+    if (rp.a || rs.a || rp.k[0] !== RAIZ.p[0] || rp.k[1] !== RAIZ.p[1] || rs.k[0] !== RAIZ.s || rs.k[1] !== RAIZ.s)
+        throw new Error(`${RAIZ.nm}: p ${JSON.stringify(rp.k)} s ${JSON.stringify(rs.k)}, no los del export del 2026-10-17: medir y mover CORRE`);
+    rp.k = [rp.k[0] + CORRE[0], rp.k[1] + CORRE[1], rp.k[2]];
 
     rename(d, '.BOLASYSTRIKES', 'conteobolasystrikes');
     rename(d, 'OUTS', 'outs');
@@ -153,9 +184,14 @@ if (hay('SCOREBUG')) {
     // arriba y la barra sólo se veía por adentro de las letras. Lleva la de las otras siete.
     const mascara = clone(layer(d, 'mascaralocal'));
     mascara.nm = 'mascaralocal 8';
-    mascara.ind = freeInd(d, 65);
+    mascara.ind = freeInd(d, Math.max(...d.layers.map(l => l.ind)) + 1);
     const agui = layer(d, '.AGUILOCAL_opacidad');
     d.layers.splice(d.layers.indexOf(agui), 0, mascara);
+
+    // El logo de Venevisión llega azul (#194771) con un Hue/Saturation de Lightness +100 encima,
+    // que en AE lo vuelve blanco. Lottie no pinta ese efecto: al aire salía azul sobre el azul
+    // oscuro de su caja y casi no se veía. La claridad pasa a los rellenos y el efecto se saca.
+    horneaClaridad(layer(d, 'VVLOGO'));
 
     // ---- textos de caja (textos-de-caja.md). Las cajas vienen de AE con lh 0.01: un texto que
     // no entra partía en líneas encimadas en vez de encoger. lh va a 1.2 del cuerpo, que no mueve
@@ -169,7 +205,8 @@ if (hay('SCOREBUG')) {
     centrar(doc(d, '.CARRERASLOCAL'), 26.0547);
     centrar(doc(d, '.EQUIPOVISITA'), 32.1412);
     centrar(doc(d, '.EQUIPOLOCAL'), 32.1412);
-    // Barra de jugadores (capas a escala 0.8: 1 px de pantalla = 1.25 unidades). Las cajas del
+    // Barra de jugadores (capas a escala 0.8: 1 px de pantalla = 1.25 unidades; los px de estos
+    // comentarios son del score al 100 %, antes del Null 1: al 134 %, × 1.34). Las cajas del
     // export cruzaban la barra entera (lanzador 193 px, lanzamientos 464): un nombre largo pisaba
     // los números en vez de encoger. H 18: entra una línea al cuerpo del diseño (ascent 15.48) y
     // no dos hasta un cuerpo de 9.
@@ -459,6 +496,14 @@ const OF_ESCUDOS = {
     TIGRES: 'compuerta_tigres.png'
 };
 const ENTRADA_OF = 90;                 // la entrada termina en el 89 (el mánager)
+// Las puertas de Águilas llegan ámbar (#FF8400, tono 31°), y no del naranja rojizo de su barra
+// (#F64D25, 12°), que es el mismo en los cuatro gráficos: en los otros equipos la puerta es del tono
+// de su barra. Van con el tono de la barra y el brillo que el diseñador le dio a Águilas (Leon,
+// 2026-10-17): el claro es la barra llevada a 255 (#FF5026), y los otros dos stops, en la misma
+// proporción que en el export (0.133 y 0.57 del claro). La defensiva y el bateador las toman de acá.
+// Los stops como en el JSON: posición, r, g, b (0–1).
+const AGUI_COLOR_EXPORT = [0, 0.133, 0.075, 0, 0.61, 0.567, 0.296, 0, 1, 1, 0.518, 0];
+const AGUI_COLOR = [0, 0.133, 0.043, 0.02, 0.61, 0.569, 0.176, 0.086, 1, 1, 0.314, 0.149];
 // Un escudo de compuerta para otro equipo, a partir de la capa de uno que vino en el export: la
 // misma puerta, lugar y escala, centrado en su imagen. La máscara corta por la misma diagonal (la
 // costura entre las puertas), alargada para cubrir una imagen de cualquier alto.
@@ -510,6 +555,12 @@ if (hay('OFENSIVA')) {
         if (!PUERTA[m[2]]) throw new Error(`pantalla de equipo desconocido ${l.nm}`);
         if (m[1] === 'DER') complementaria(l);
         rename(d, l.nm, PUERTA[m[2]] + '_opacidad');
+        if (PUERTA[m[2]] === 'AGUI') {
+            const g = l.shapes[0].it.find(s => s.ty === 'gf').g;
+            if (g.p !== 3 || g.k.a || JSON.stringify(g.k.k) !== JSON.stringify(AGUI_COLOR_EXPORT))
+                throw new Error(`${l.nm}: el degradado de Águilas no es el del export del 2026-10-15: revisar AGUI_COLOR`);
+            g.k.k = [...AGUI_COLOR];
+        }
     }
     // Los escudos que faltan, con las capas del de Águilas (el único del export).
     let ind = Math.max(...d.layers.map(l => l.ind));
