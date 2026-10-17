@@ -812,8 +812,8 @@ if (hay('FINAL DE INNING')) {
     anchoCentrado(doc(d, '.titulo_jugadores'), PAR_TITULO);
     // En AE la posición (la primera palabra) va en cian y el apellido en blanco (captura del diseñador,
     // 2026-10-17): un estilo por carácter que Bodymovin no exporta, y llega todo en cian. Lo pone un
-    // animador de texto: blanco desde la segunda palabra (por palabras, b 3, desde el índice 1, r 2:
-    // al cambiar el texto Lottie estira el final del rango hasta el último carácter).
+    // animador de texto: blanco desde la segunda palabra (por palabras, b 3, en índices, r 2: de la
+    // palabra 1 a la 100, e fijo; Lottie no lo recalcula al cambiar el texto).
     const apellidoBlanco = {
         nm: 'apellido en blanco',
         s: { t: 0, xe: { a: 0, k: 0 }, ne: { a: 0, k: 0 }, a: { a: 0, k: 100 }, b: 3, rn: 0, sh: 1, s: { a: 0, k: 1 }, e: { a: 0, k: 100 }, o: { a: 0, k: 0 }, r: 2 },
@@ -913,8 +913,13 @@ if (hay('FINAL DE INNING')) {
     const gris = layer(d, 'Capa de formas 11');
     const logo = layer(d, 'pepsi-seeklogo-3.ai');
     const n24 = layer(d, 'Nulo 24');
-    if (logo.parent !== n24.ind || n24.ks.p.a || !n24.ks.s.a || logo.ks.p.a || logo.ks.a.k[1] !== 260.5) throw new Error('logo de Pepsi: transform inesperado');
-    const yLogo = n24.ks.p.k[1] + n24.ks.s.k.at(-1).s[1] / 100 * (logo.ks.p.k[1] - n24.ks.a.k[1]); // su centro, en el 115
+    // El centro del logo en el 115, en coordenadas de la composición, como las letras (sin parent): Nulo 24
+    // sin parent ni rotación, y el ancla del logo en el centro de su PNG.
+    const altoLogo = d.assets.find(a => a.id === logo.refId).h;
+    if (logo.parent !== n24.ind || n24.parent || n24.ks.r.a || n24.ks.r.k || n24.ks.p.a || !n24.ks.s.a || logo.ks.p.a || logo.ks.a.k[1] !== altoLogo / 2)
+        throw new Error('logo de Pepsi: transform inesperado');
+    const escalaFin = n24.ks.s.k.filter(k => k.t < PAR_ENTRADA).at(-1).s[1] / 100;
+    const yLogo = n24.ks.p.k[1] + escalaFin * (logo.ks.p.k[1] - n24.ks.a.k[1]);
     const letras = d.layers.filter(l => l.nm === 'pepsi-type-3.ai' && !l.parent);
     if (letras.length !== 5) throw new Error(`letras de PEPSI: ${letras.length}`);
     const subir = yLogo - letras[0].ks.p.k[1];
