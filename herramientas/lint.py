@@ -83,4 +83,8 @@ for g in GRAFICOS:
             if l['ks']['o'].get('k') != 100: p(g, f'compuerta {l["ln"]}: opacidad en la capa (va en el CSS)')
             # el gris del Emboss de AE, que Lottie no pinta (prep.js, GRIS_PUERTA)
             if not any(e.get('ty') == 21 for e in l.get('ef', [])): p(g, f'compuerta {l["ln"]}: sin el Fill gris (sale blanca)')
+    # el Hue/Saturation de la V de Venevisión, que Lottie no pinta (prep.js, horneaClaridad)
+    if g == 'score':
+        for l in d['layers']:
+            if any(e.get('mn') == 'ADBE HUE SATURATION' for e in l.get('ef', [])): p(g, f'{l["nm"]!r}: Hue/Saturation sin aplicar (Lottie no lo pinta)')
 print('\n'.join(problems) if problems else f'lint: sin problemas ({", ".join(GRAFICOS)})')
