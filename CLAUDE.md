@@ -201,25 +201,34 @@ misma máscara de cada fila y la primera columna con color alineada a la de las 
 Bravos y la de Tigres traen 2 y 4 columnas transparentes a la izquierda).
 
 Textos: en mayúsculas. Los bateadores van con la posición y el apellido, como el diseño (`3B
-TOVAR`), alineados a la izquierda: entran unas 11 letras (`CF CASTILLO`); más largos encogen dentro
+TOVAR`), alineados a la izquierda, la primera palabra en cian y el resto en blanco (en AE es un
+estilo por carácter, que Bodymovin no exporta: lo pone un animador de texto por palabras, que sigue
+funcionando con el texto del UPDATE): entran unas 11 letras (`CF CASTILLO`); más largos encogen dentro
 de la columna (`SS MONASTERIOS` baja de 30 a 24, `3B A. MONASTERIOS` a 20). El parcial de Meridiano
 los lleva con la inicial y el apellido (`A. MONASTERIOS`): qué manda el controlador lo decide su
 armador de VV. Los nombres de equipo, unas 10 letras (`MAGALLANES`, `CARDENALES`); los números, dos
 cifras; el inning, dos. Todo en una línea: un texto muy largo encoge, no parte.
 
 Cuadro de Pepsi: fijo, sin claves (Leon, 2026-10-17, entre arreglarlo, una publicidad genérica como
-la de Meridiano o sacarlo). En el export tenía cuatro problemas, y la entrada se arregló sin cambiar
-el diseño: la imagen `Pepsi Insert (1).png` faltaba en el proyecto del diseñador y llegaba como las
-barras de color de AE en el centro de la pantalla (se saca); las letras grandes de PEPSI aparecían
-del 15 al 30, antes que el recuadro, sobre el video (en AE las recorta la T de *preservar
-transparencia*, que Lottie no exporta: van mateadas con una copia del recuadro gris, que crece del
-37 al 50 y las destapa); un círculo negro (`Capa de formas 13`), el aro del logo dibujado 170 px
+la de Meridiano o sacarlo). Cómo tiene que quedar lo dice una captura de AE del diseñador
+(2026-10-17): en la pausa, el logo chico a la izquierda y PEPSI grande en blanco a su derecha,
+centrado en alto con él. Los dos exports del 2026-10-17 traen la misma animación (el segundo, el
+"arreglado", es igual al primero salvo el `ascent` de la fuente: lo que cambió en AE no llegó al
+JSON), con estos problemas: la imagen `Pepsi Insert (1).png` faltaba en el proyecto del diseñador y
+llegaba como las barras de color de AE en el centro de la pantalla (se saca); las letras grandes de
+PEPSI aparecían del 15 al 30, antes que el recuadro, sobre el video (en AE las recorta la T de
+*preservar transparencia*, que Lottie no exporta: van mateadas con una copia del recuadro gris, que
+crece del 37 al 50 y las destapa); esas letras llegan negras y 79 px más abajo que en la captura,
+contra el borde de abajo del recuadro (suben al centro del logo del final y van blancas con un efecto
+Fill, que Lottie sí pinta); un círculo negro (`Capa de formas 13`), el aro del logo dibujado 170 px
 más arriba del logo, que ya trae el suyo (se saca); y un final a medio hacer, del 282 al 372 (el
 logo se vuelve un PEPSI chico, el recuadro se corta y quedan letras sueltas sobre el video), que no
-se usa: la pausa es el 116, con el logo chico a la izquierda y PEPSI grande abajo. Las rayas grises
-de los costados traen un *CC Light Sweep*, un brillo que Lottie no pinta (su sombra sí); el
-Hue/Saturation de las letras está en cero y se saca. Si el diseñador lo corrige, vuelve a pasar por
-`prep.js`.
+se usa: la pausa es el 116. Mientras el logo crece en el centro (62–95) pasa por encima de las
+letras, y al achicarse hacia la izquierda (95–115) las destapa. Las rayas grises de los costados
+traen un *CC Light Sweep*, un brillo que Lottie no pinta (su sombra sí); el Hue/Saturation de las
+letras está en cero y se saca. Si el diseñador manda un export con el PEPSI ya blanco (otro efecto,
+o el Hue/Saturation con claridad), `prep.js` falla: mirarlo y sacar el Fill; si las letras ya vienen
+a la altura del logo, no se mueven (las sube hasta el logo, no una distancia fija).
 
 Key: los recuadros de la pizarra se tocan borde con borde, y dos bordes suavizados que caen en el
 mismo píxel no suman 100 %: en el key de CasparCG quedaban tres columnas de 1 px al 86–94 % (entre
@@ -410,7 +419,8 @@ pintó antes: renderizados cada uno en una página recién cargada, son idéntic
   Las imágenes de Pepsi llegan con la clase `ai` repetida: se les saca y se renombran (`pepsi
   logo`, `pepsi letra N`, `pepsi logo letra N`).
 - **Fuente:** `fPath` llega como la carpeta (`FINAL DE INNING/FONT`): pasa a `font/LTEnergyVFVF.ttf`,
-  el mismo archivo que el del score.
+  el mismo archivo que el del score. El `ascent` queda el del export (el segundo trae 72.9996, el de
+  la estática; el primero, 73.6996, el de la variable): mueve los textos menos de medio píxel.
 - **All Caps:** llega apagado en todas las capas de texto: `prep.js` lo prende.
 - **Textos de caja:** ya llegan de caja, con `lh` 0.01 (va 1.2 del cuerpo) y cajas que cruzaban su
   lugar. Medidos en el frame 115 con la fuente cargada: `inning` a 38, centrado, 4 px antes de cada
@@ -418,14 +428,16 @@ pintó antes: renderizados cada uno en una página recién cargada, son idéntic
   centrado, 8 px adentro de la columna. Los bateadores llegaban centrados pero corridos a mano para
   verse alineados a la izquierda: pasan a la izquierda desde donde empieza el texto del diseño (Lw
   `3B TOVAR` 121.3922, `CF CASTRO` 133.4531, `LF RONDON` 132.5813), hasta 8 px antes del final de la
-  columna (x 1307). Los números quedan con su caja (72, entran dos cifras). El alto de todas, el
-  ascent del cuerpo más 2, como en el bateador.
+  columna (x 1307), con un animador de texto (`apellido en blanco`: por palabras, `b` 3, desde el
+  índice 1, `r` 2) que pinta de blanco todo menos la primera palabra. Los números quedan con su caja
+  (72, entran dos cifras). El alto de todas, el ascent del cuerpo más 2, como en el bateador.
 - **Key:** `Capa de formas 1` (los números) crece 1 px a cada lado y `Capa de formas 4` (los
   bateadores) 1 px a la derecha (ver *Key* arriba).
 - **Pepsi:** se sacan `Pepsi Insert (1).png` (y su asset, `img_2.jpg`) y `Capa de formas 13`; las 5
   letras grandes van con `tt` 1 y, encima de cada una, una copia del recuadro gris (`Capa de formas
-  11`) con `td` 1, 0,7 px más alta por lado para que la base de la S y la I llegue al borde del
-  recuadro azul; su Hue/Saturation, en cero, se saca (`prep.js` falla si cambia algo).
+  11`) con `td` 1; suben hasta el centro del logo en el 115 (sale de `Nulo 24` y del logo: y 841.5)
+  y su Hue/Saturation, en cero, se cambia por un Fill blanco (`prep.js` falla si el Hue/Saturation
+  cambia algo).
 - **Markers y timeline:** el export no trae markers y dura 900 frames. `play`, `salida` y `stop`
   como en la defensiva, con la entrada hasta el 115 (el logo se achica, 95–115): si cambia, mover
   `PAR_ENTRADA`. Los keyframes del final descartado (282 en adelante, `PAR_DESCARTE`) se borran, y
@@ -435,9 +447,10 @@ pintó antes: renderizados cada uno en una página recién cargada, son idéntic
   seis barras, copias de `ofensiva/images/img_3–5, 7–9` (`prep.js` falla si dejan de ser iguales:
   copiarlas de nuevo y medir sus columnas transparentes de la izquierda, `PAR_BARRAS`).
 
-Comparado frame a frame contra el export (Águilas y Leones, con el texto del diseño): igual del 0
-al 115, salvo las letras de PEPSI antes del recuadro (15–49), el círculo sacado, la base de la S de
-PEPSI fuera del recuadro (y 946) y 1 o 2 niveles de 255 en los textos. Antes del arreglo del key.
+Comparado frame a frame contra el segundo export (Águilas y Leones, con el texto del diseño):
+idéntico del 0 al 115 fuera del cuadro de Pepsi y de los apellidos de los bateadores, salvo las dos
+columnas de 1 px del arreglo del key (x 806 y 1090). El preparado contra la captura de AE, en la
+pausa: igual, a la escala de la captura.
 
 ### QA
 

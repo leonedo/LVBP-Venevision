@@ -85,9 +85,14 @@ for g in GRAFICOS:
             if not any(e.get('ty') == 21 for e in l.get('ef', [])): p(g, f'compuerta {l["ln"]}: sin el Fill gris (sale blanca)')
     # las letras grandes de PEPSI, mateadas con el recuadro gris: en AE las recorta la T de "preservar
     # transparencia", que Lottie no exporta, y sin el mate se ven antes que el recuadro (prep.js)
+    # y blancas con un Fill, y los bateadores con el apellido en blanco (un animador de texto): lo que
+    # en AE es estilo y Bodymovin no exporta (prep.js)
     if g == 'parcial':
         letras = [l for l in d['layers'] if l['nm'].startswith('pepsi letra')]
         if len(letras) != 5 or any(l.get('tt') != 1 for l in letras): p(g, 'letras de PEPSI sin su mate: se ven antes que el recuadro')
+        if any(not any(e.get('ty') == 21 for e in l.get('ef', [])) for l in letras): p(g, 'letras de PEPSI sin el Fill blanco: salen negras')
+        for n in (1, 2, 3):
+            if not any(l.get('cl') == f'jugador{n}' and l['t'].get('a') for l in d['layers']): p(g, f'jugador{n} sin el animador del apellido en blanco')
     # el Hue/Saturation de la V de Venevisión, que Lottie no pinta (prep.js, horneaClaridad)
     if g == 'score':
         for l in d['layers']:
