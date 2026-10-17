@@ -496,14 +496,23 @@ const OF_ESCUDOS = {
     TIGRES: 'compuerta_tigres.png'
 };
 const ENTRADA_OF = 90;                 // la entrada termina en el 89 (el mánager)
-// Las puertas de Águilas llegan ámbar (#FF8400, tono 31°), y no del naranja rojizo de su barra
-// (#F64D25, 12°), que es el mismo en los cuatro gráficos: en los otros equipos la puerta es del tono
-// de su barra. Van con el tono de la barra y el brillo que el diseñador le dio a Águilas (Leon,
-// 2026-10-17): el claro es la barra llevada a 255 (#FF5026), y los otros dos stops, en la misma
-// proporción que en el export (0.133 y 0.57 del claro). La defensiva y el bateador las toman de acá.
-// Los stops como en el JSON: posición, r, g, b (0–1).
-const AGUI_COLOR_EXPORT = [0, 0.133, 0.075, 0, 0.61, 0.567, 0.296, 0, 1, 1, 0.518, 0];
-const AGUI_COLOR = [0, 0.133, 0.043, 0.02, 0.61, 0.569, 0.176, 0.086, 1, 1, 0.314, 0.149];
+// Las puertas que no llegan del tono de su barra, que es el mismo en los cuatro gráficos: las de
+// Águilas, ámbar (#FF8400, tono 31°) y no del naranja rojizo de la barra (#F64D25, 12°), y las de
+// Leones, amarillas (#FFD200, 49°) y no del ámbar de la barra (#FDAD36, 36°). Van con el tono de la
+// barra y el brillo que el diseñador le dio a cada equipo (Leon, 2026-10-17): el claro es la barra
+// llevada a 255 (#FF5026, #FFAE36), y los otros dos stops, en la misma proporción que en el export
+// (Águilas, 0.133 y 0.57 del claro; Leones, 0.384 y 0.69). La defensiva y el bateador las toman de
+// acá. Los stops como en el JSON: posición, r, g, b (0–1); `export`, el degradado que llega.
+const COLOR_PUERTA = {
+    AGUI: {
+        export: [0, 0.133, 0.075, 0, 0.61, 0.567, 0.296, 0, 1, 1, 0.518, 0],
+        color: [0, 0.133, 0.043, 0.02, 0.61, 0.569, 0.176, 0.086, 1, 1, 0.314, 0.149]
+    },
+    LEO: {
+        export: [0, 0.384, 0.253, 0, 0.5, 0.692, 0.538, 0, 1, 1, 0.824, 0],
+        color: [0, 0.384, 0.263, 0.082, 0.5, 0.69, 0.471, 0.145, 1, 1, 0.682, 0.212]
+    }
+};
 // Un escudo de compuerta para otro equipo, a partir de la capa de uno que vino en el export: la
 // misma puerta, lugar y escala, centrado en su imagen. La máscara corta por la misma diagonal (la
 // costura entre las puertas), alargada para cubrir una imagen de cualquier alto.
@@ -555,11 +564,12 @@ if (hay('OFENSIVA')) {
         if (!PUERTA[m[2]]) throw new Error(`pantalla de equipo desconocido ${l.nm}`);
         if (m[1] === 'DER') complementaria(l);
         rename(d, l.nm, PUERTA[m[2]] + '_opacidad');
-        if (PUERTA[m[2]] === 'AGUI') {
+        const color = COLOR_PUERTA[PUERTA[m[2]]];
+        if (color) {
             const g = l.shapes[0].it.find(s => s.ty === 'gf').g;
-            if (g.p !== 3 || g.k.a || JSON.stringify(g.k.k) !== JSON.stringify(AGUI_COLOR_EXPORT))
-                throw new Error(`${l.nm}: el degradado de Águilas no es el del export del 2026-10-15: revisar AGUI_COLOR`);
-            g.k.k = [...AGUI_COLOR];
+            if (g.p !== 3 || g.k.a || JSON.stringify(g.k.k) !== JSON.stringify(color.export))
+                throw new Error(`${l.nm}: el degradado no es el del export del 2026-10-15: revisar COLOR_PUERTA`);
+            g.k.k = [...color.color];
         }
     }
     // Los escudos que faltan, con las capas del de Águilas (el único del export).
