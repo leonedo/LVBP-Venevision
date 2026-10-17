@@ -6,10 +6,10 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Cuatro gráficos, en LT Energy: el score con `font/LTEnergyVFVF.ttf` (fuente variable
-con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva y el bateador
-con `font/LTEnergy-Regular.ttf`, la estática que mandó el diseñador con sus exports. Las keys del
-UPDATE están en su `data.md`.
+proyecto*). Cinco gráficos, en LT Energy: el score y el parcial con `font/LTEnergyVFVF.ttf` (fuente
+variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva y el
+bateador con `font/LTEnergy-Regular.ttf`, la estática que mandó el diseñador con sus exports. Las
+keys del UPDATE están en su `data.md`.
 
 | Carpeta | Qué es | Flujo | Salida |
 |---|---|---|---|
@@ -17,17 +17,21 @@ UPDATE están en su `data.md`.
 | `defensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el campo con las 9 posiciones (rótulo y apellido); arriba a la izquierda, la barra del equipo y DEFENSIVA. El frame 0 está vacío | stage `play` pause (0–53) | `salida`: la entrada al revés (1,8 s): las compuertas se cierran y termina en el frame vacío |
 | `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA. El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
 | `bateador/` | Barra baja del bateador: a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87) | `salida`: la entrada al revés (2,9 s) |
+| `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo a la derecha del centro: barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE y el cuadro de Pepsi (fijo, animado). El frame 0 está vacío | stage `play` pause (0–116): la pizarra entra hasta el 50 y el cuadro de Pepsi hasta el 115 | `salida`: la entrada al revés (3,9 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces `visita_vs_local`),
 del 2026-10-17; `defensiva.png` / `ofensiva.png` (Leones, con nombres de ejemplo) y
 `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), del 2026-10-17; `bateador.png`
 (Leones, con data de ejemplo) y `bateador_equipos.png` (los 8 equipos, recortado a la barra), del
-2026-10-17. Si un gráfico cambia, hay que regenerarlas (las de Leones, con el ejemplo de su `data.md`,
-en el último frame de la entrada). No entran al zip (`.gitattributes`).
+2026-10-17; `parcial.png` (pantalla completa con el ejemplo de su `data.md`, Magallanes y Cardenales)
+y `parcial_equipos.png` (los 56 cruces `visita_vs_local`, recortado a la pizarra), del 2026-10-17. Si
+un gráfico cambia, hay que regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último
+frame de la entrada). No entran al zip (`.gitattributes`).
 
 No hay video de referencia del diseñador, y ningún export trae salida (los markers `stop` del score,
-90–120, de la defensiva, 60–90, y de la ofensiva y el bateador, 90–120, no animan nada) ni la bajada de la barra
+90–120, de la defensiva, 60–90, y de la ofensiva y el bateador, 90–120, no animan nada; el parcial
+no trae markers) ni la bajada de la barra
 de jugadores del score: son la animación de entrada al revés, como en todos los gráficos de
 Meridiano. Si el diseñador manda una salida propia, reemplaza a ésta.
 
@@ -176,12 +180,64 @@ alineado a la derecha contra su rótulo y crece hacia la izquierda (un `8` queda
 el `00` del diseño): `1.000` entra al tamaño del diseño en los casilleros 1, 2 y 4, y en el 3, el
 más angosto, encoge un poco. Los rótulos, unas 3 letras.
 
+**Parcial.** El score de fin de inning; el diseñador lo llama FINAL DE INNING, y la carpeta se llama
+como su equivalente de Meridiano (Leon, 2026-10-17). Claves: las del parcial de LVBP-Meridiano, que
+a su vez son las del score donde dicen lo mismo, para que el controlador les mande a los tres la
+misma data: `<SIGLAS>VISITA_opacidad` / `<SIGLAS>LOCAL_opacidad`, `inning`,
+`INNINGarriba_opacidad` / `INNINGabajo_opacidad`, `CARRERASVISITA`, `HITSVISITA`, `ERRORESVISITA`
+(y `LOCAL`), `jugador1`…`jugador3` y `titulo_jugadores` (el AL BATE). No tiene `titulo` ni
+`publicidad`. Propias: `NOMBREVISITA` / `NOMBRELOCAL`, el nombre escrito sobre la barra (`AGUILAS`;
+en el score, `EQUIPOVISITA` son las siglas, y por eso no se reusa), y los rótulos fijos
+`rotulocarreras`, `rotulohits`, `rotuloerrores` (la C, la H y la E).
+
+Barras de equipo: imágenes apiladas, todas visibles al arrancar, como en el score: el controlador
+manda `1` a la que va en cada fila y `0` a las otras siete. Sin data quedan arriba las del diseño,
+Águilas de visita y Leones de local. El export sólo trae esas dos (PNG de 512 × 512 con la barra en
+x 0, y 192): las otras seis son las `BARRA_<EQUIPO>_VISITA` de la ofensiva (las más parecidas a las
+del export: 2 niveles de 255 de diferencia media), copiadas a `images/barra_<equipo>.png`, con la
+misma máscara de cada fila y la primera columna con color alineada a la de las del export (la de
+Bravos y la de Tigres traen 2 y 4 columnas transparentes a la izquierda).
+
+Textos: en mayúsculas. Los bateadores van con la posición y el apellido, como el diseño (`3B
+TOVAR`), alineados a la izquierda: entran unas 11 letras (`CF CASTILLO`); más largos encogen dentro
+de la columna (`SS MONASTERIOS` baja de 30 a 24, `3B A. MONASTERIOS` a 20). El parcial de Meridiano
+los lleva con la inicial y el apellido (`A. MONASTERIOS`): qué manda el controlador lo decide su
+armador de VV. Los nombres de equipo, unas 10 letras (`MAGALLANES`, `CARDENALES`); los números, dos
+cifras; el inning, dos. Todo en una línea: un texto muy largo encoge, no parte.
+
+Cuadro de Pepsi: fijo, sin claves (Leon, 2026-10-17, entre arreglarlo, una publicidad genérica como
+la de Meridiano o sacarlo). En el export tenía cuatro problemas, y la entrada se arregló sin cambiar
+el diseño: la imagen `Pepsi Insert (1).png` faltaba en el proyecto del diseñador y llegaba como las
+barras de color de AE en el centro de la pantalla (se saca); las letras grandes de PEPSI aparecían
+del 15 al 30, antes que el recuadro, sobre el video (en AE las recorta la T de *preservar
+transparencia*, que Lottie no exporta: van mateadas con una copia del recuadro gris, que crece del
+37 al 50 y las destapa); un círculo negro (`Capa de formas 13`), el aro del logo dibujado 170 px
+más arriba del logo, que ya trae el suyo (se saca); y un final a medio hacer, del 282 al 372 (el
+logo se vuelve un PEPSI chico, el recuadro se corta y quedan letras sueltas sobre el video), que no
+se usa: la pausa es el 116, con el logo chico a la izquierda y PEPSI grande abajo. Las rayas grises
+de los costados traen un *CC Light Sweep*, un brillo que Lottie no pinta (su sombra sí); el
+Hue/Saturation de las letras está en cero y se saca. Si el diseñador lo corrige, vuelve a pasar por
+`prep.js`.
+
+Key: los recuadros de la pizarra se tocan borde con borde, y dos bordes suavizados que caen en el
+mismo píxel no suman 100 %: en el key de CasparCG quedaban tres columnas de 1 px al 86–94 % (entre
+el nombre y los números, los números y los bateadores, y los bateadores y la raya de Pepsi), una
+línea finita de video al aire. Los números y los bateadores crecen 1 px sobre el vecino y el key
+queda lleno (las barras, 1 px más cortas debajo del nombre).
+
+Colores en NTSC compuesto (2026-10-17, con setup de 7,5 IRE): las 16 barras como en el score (la más
+alta, Leones, 106 IRE; la más baja, Cardenales, −7,1); el cian de los números y los bateadores y el
+amarillo del AL BATE son los del score (113,5 y 114,4 IRE): quedan así, como allá. El azul de Pepsi
+(`#0125FF`) baja a −14 IRE, legal hasta −20; si hiciera falta subirlo a −7, `#1032FF`. En HD
+(Rec.709) todo es legal.
+
 ### Cuando llega un export nuevo del diseñador
 
 El score llega como `SCOREBUG.zip` (carpeta `SCOREBUG/` con `data.json`, `images/` y `FONT/`), la
 defensiva como `DEFENSIVA.rar`, la ofensiva como `OFENSIVA.rar` y el bateador como
 `LOWBAR_BATEADOR.rar` (carpetas `DEFENSIVA/`, `OFENSIVA/` y `LOWBAR BATEADOR/`, con espacio, igual; el
-`.rar` se abre con `unar`). La receta de los cuatro es `herramientas/prep.js`, que prepara los que encuentre:
+`.rar` se abre con `unar`) y el parcial como `FINAL_DE_INNING.zip` (carpeta `FINAL DE INNING/`). La
+receta de los cinco es `herramientas/prep.js`, que prepara los que encuentre:
 buscar las capas por `nm` (los índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
 
 **Score**
@@ -338,12 +394,55 @@ la ofensiva): idéntico al píxel del 13 al 87; del 0 al 10 sólo falta la punta
 y el 12, la sombra de la franja difiere hasta 18/255 en la esquina según el frame que el browser
 pintó antes: renderizados cada uno en una página recién cargada, son idénticos.
 
+**Parcial**
+
+- **Clases:** todo llega sin clase. `10` → `inning`; las flechas `Capa de formas 10` (▲) y `Capa de
+  formas 9` (la misma, rotada 180°: ▼) → `INNINGarriba_opacidad` / `INNINGabajo_opacidad`;
+  `CARRERA ALTA`, `HITS ALTA`, `ERROR ALTA` (la fila de arriba, la visita) → `CARRERASVISITA`,
+  `HITSVISITA`, `ERRORESVISITA`, y las `BAJA` → `…LOCAL`; `NOMBRE EQUIPO VISITANTE` / `LOCAL` →
+  `NOMBREVISITA` / `NOMBRELOCAL`; `C`, `H`, `E` → `rotulocarreras`, `rotulohits`, `rotuloerrores`;
+  `AL BATE` → `titulo_jugadores`; `3B TOVAR 2`, `CF CASTRO 2`, `LF RONDON 2` → `jugador1`…`3`; las
+  barras `BARRA_AGUILAS_VISITA.ai` (fila de arriba) y `BARRA_LEONES_VISITA.ai` (abajo, aunque diga
+  VISITA; clase `ai`) → `AGUIVISITA_opacidad` / `LEOLOCAL_opacidad`, más las 14 copias (ver arriba).
+  Las imágenes de Pepsi llegan con la clase `ai` repetida: se les saca y se renombran (`pepsi
+  logo`, `pepsi letra N`, `pepsi logo letra N`).
+- **Fuente:** `fPath` llega como la carpeta (`FINAL DE INNING/FONT`): pasa a `font/LTEnergyVFVF.ttf`,
+  el mismo archivo que el del score.
+- **All Caps:** llega apagado en todas las capas de texto: `prep.js` lo prende.
+- **Textos de caja:** ya llegan de caja, con `lh` 0.01 (va 1.2 del cuerpo) y cajas que cruzaban su
+  lugar. Medidos en el frame 115 con la fuente cargada: `inning` a 38, centrado, 4 px antes de cada
+  flecha; los nombres a 203, centrados, 8 px adentro de la caja negra; `titulo_jugadores` a 274,
+  centrado, 8 px adentro de la columna. Los bateadores llegaban centrados pero corridos a mano para
+  verse alineados a la izquierda: pasan a la izquierda desde donde empieza el texto del diseño (Lw
+  `3B TOVAR` 121.3922, `CF CASTRO` 133.4531, `LF RONDON` 132.5813), hasta 8 px antes del final de la
+  columna (x 1307). Los números quedan con su caja (72, entran dos cifras). El alto de todas, el
+  ascent del cuerpo más 2, como en el bateador.
+- **Key:** `Capa de formas 1` (los números) crece 1 px a cada lado y `Capa de formas 4` (los
+  bateadores) 1 px a la derecha (ver *Key* arriba).
+- **Pepsi:** se sacan `Pepsi Insert (1).png` (y su asset, `img_2.jpg`) y `Capa de formas 13`; las 5
+  letras grandes van con `tt` 1 y, encima de cada una, una copia del recuadro gris (`Capa de formas
+  11`) con `td` 1, 0,7 px más alta por lado para que la base de la S y la I llegue al borde del
+  recuadro azul; su Hue/Saturation, en cero, se saca (`prep.js` falla si cambia algo).
+- **Markers y timeline:** el export no trae markers y dura 900 frames. `play`, `salida` y `stop`
+  como en la defensiva, con la entrada hasta el 115 (el logo se achica, 95–115): si cambia, mover
+  `PAR_ENTRADA`. Los keyframes del final descartado (282 en adelante, `PAR_DESCARTE`) se borran, y
+  `prep.js` falla si algo se mueve entre los dos. Las capas que arrancan en el 0 pasan al 1: el frame
+  0 queda vacío.
+- **Imágenes:** del export, `img_0`, `img_1`, `img_3` e `img_4` tal cual a `parcial/images/`; las
+  seis barras, copias de `ofensiva/images/img_3–5, 7–9`.
+
+Comparado frame a frame contra el export (Águilas y Leones, con el texto del diseño): igual del 0
+al 115, salvo las letras de PEPSI antes del recuadro (15–49), el círculo sacado, la base de la S de
+PEPSI fuera del recuadro (y 946) y 1 o 2 niveles de 255 en los textos. Antes del arreglo del key.
+
 ### QA
 
 - Juzgar con el runtime real y la fuente cargada (`<gráfico>/index.html` en el browser o con
   Playwright). `lottie_render` del editor usa una fuente de reemplazo: no sirve para revisar textos.
 - Score: los 56 cruces visita × local, entrada frame a frame, data al aire con el gráfico pausado,
   `next` y `stop` desde cada stage, y que el layer se suelte.
+- Parcial: lo mismo que el score con su único stage, y el key en CasparCG (`casparcg-ctl
+  snapshot`): sin columnas a menos de 255 entre los recuadros.
 - Defensiva, ofensiva y bateador: los 8 equipos (barra, color de las puertas o del fondo y escudo), y sin equipo; entrada frame a frame, cambio de equipo al aire,
   `stop` en la pausa y a mitad de la entrada, y que el layer se suelte.
 - Textos: apellidos largos (que encojan dentro de su lugar), números de más cifras (`P.100`, `100`
@@ -390,8 +489,8 @@ equipo: si el editor lo regenera, reponerlas desde *Este repo*. El de la defensi
 editor (audit y guardado, 2026-10-15), pero se reescribió a mano en el mismo formato: el generador
 del MCP pone las capas de imagen con clase `_opacidad` también entre las imágenes, con una ruta de
 ejemplo en el payload, y `index.js` no les reemplaza la imagen (ver *claves sólo CSS*). Si el editor
-lo regenera, reponerlo desde git. El del bateador se escribió a mano en ese formato, sin pasar por
-el editor.
+lo regenera, reponerlo desde git. El del bateador y el del parcial se escribieron a mano en ese
+formato, sin pasar por el editor.
 
 ## Convenciones del Lottie
 
