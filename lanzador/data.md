@@ -74,7 +74,7 @@ ignored.
 | Duration | 3.70 s |
 
 Left half of the screen: the team's color panel covers the left edge from top to bottom
-(x 0–540), and the name bar and the stats panel sit to its right (up to x 1125, y 100–960). Frame 0
+(x 0–540), and the name bar and the stats panel sit to its right (up to x 1127, y 100–960). Frame 0
 is empty: nothing shows before `play`.
 
 ## Text layers

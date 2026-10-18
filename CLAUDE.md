@@ -559,7 +559,8 @@ idéntico al píxel del 0 al 221, salvo las columnas de 1 px del arreglo del key
   snapshot`): sin columnas a menos de 255 entre los recuadros.
 - Defensiva, ofensiva, bateador y lanzador: los 8 equipos (barra, color de las puertas, del fondo o
   del panel, y escudo), y sin equipo; entrada frame a frame, cambio de equipo al aire, `stop` en la
-  pausa y a mitad de la entrada, y que el layer se suelte. El bateador, además, el key en CasparCG.
+  pausa y a mitad de la entrada, y que el layer se suelte. El bateador y el lanzador, además, el key
+  en CasparCG: sin filas ni columnas a menos de 255 donde se tocan los recuadros.
 - Colores: NTSC compuesto en cada equipo (lo más alto y lo más bajo, con setup de 7,5 IRE).
 - Textos: apellidos largos (que encojan dentro de su lugar), números de más cifras (`P.100`, `100`
   de velocidad, `10-4`, `1.000`, inning `10`, `1.000` en cada casillero del bateador) y textos en

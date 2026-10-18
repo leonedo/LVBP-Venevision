@@ -66,6 +66,7 @@ function centrar(s, Lw) {
 // Caja centrada a la que se le cambia el ancho sin mover el centro.
 function anchoCentrado(s, W) {
     if (s.j !== 2) throw new Error(`anchoCentrado: j ${s.j}`);
+    if (!(W > 0)) throw new Error(`anchoCentrado: ancho ${W} (¿se movió el texto? medir de nuevo)`);
     s.ps[0] += (s.sz[0] - W) / 2;
     s.sz[0] = W;
 }
@@ -902,7 +903,7 @@ if (hay('PITCHERS')) {
     // ---- la barra de Bravos
     const ref = layer(d, '.BARRAAGUILAS'), refA = d.assets.find(a => a.id === ref.refId);
     const [bw, bh] = medidasPng(path.join(REPO, 'lanzador', LAN_BARRA_BRAVOS));
-    if (d.layers.some(l => l.nm === '.BARRABRAVOS')) throw new Error('la barra de Bravos ya viene en el export: sacar LAN_BARRA_BRAVOS');
+    if (d.layers.some(l => (l.nm || '').trim() === '.BARRABRAVOS')) throw new Error('la barra de Bravos ya viene en el export: sacar LAN_BARRA_BRAVOS');
     if (refA.w !== 512 || refA.h !== bh) throw new Error('barras: medidas inesperadas');
     const k = bw / refA.w, bravos = clone(ref);
     bravos.nm = '.BARRABRAVOS';
@@ -922,17 +923,18 @@ if (hay('PITCHERS')) {
     // _opacidad y lo pisaría con un 1 (el escudo salía al 100 % y el panel, mucho más claro).
     const ALIAS = { BARAVOS: 'BRAVOS' };
     for (const l of [...d.layers]) {
-        const escudo = l.nm.match(/^\.?LOGO(?:GRANDE)?([A-Z]+)$/);
-        const m = escudo || l.nm.match(/^\.COLOR([A-Z]+)$/) || (l.ty === 2 && l.nm.match(/^\.BARRA([A-Z]+)$/));
+        const nm = (l.nm || '').trim();    // como layer(): el export trae nm con espacios al final
+        const escudo = nm.match(/^\.?LOGO(?:GRANDE)?([A-Z]+)$/);
+        const m = escudo || nm.match(/^\.COLOR([A-Z]+)$/) || (l.ty === 2 && nm.match(/^\.BARRA([A-Z]+)$/));
         if (!m) continue;
         const sig = SIGLAS[ALIAS[m[1]] || m[1]];
-        if (!sig) throw new Error(`${l.nm}: equipo desconocido`);
+        if (!sig) throw new Error(`${nm}: equipo desconocido`);
         if (escudo) {
-            if (l.ks.o.a || l.ks.o.k !== 49 || l.ty !== 2) throw new Error(`${l.nm}: opacidad inesperada`);
+            if (l.ks.o.a || l.ks.o.k !== 49 || l.ty !== 2) throw new Error(`${nm}: opacidad inesperada`);
             l.ks.o.k = 100;
             l.ln = 'escudo' + sig;
         }
-        rename(d, l.nm, sig + '_opacidad');
+        rename(d, nm, sig + '_opacidad');
     }
     for (const s of Object.values(SIGLAS)) {
         const n = d.layers.filter(l => l.nm === `.${s}_opacidad`).length;
