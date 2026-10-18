@@ -9,7 +9,7 @@ carpeta con su `index.html`, su `data.json` y su `data.md` (las claves del UPDAT
 | `defensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el campo con las 9 posiciones y sus jugadores; arriba, la barra del equipo y DEFENSIVA |
 | `ofensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 turnos con posición y nombre) y el mánager; arriba, la barra del equipo y OFENSIVA |
 | `bateador/` | Barra baja del bateador: escudo del equipo, nombre, número, posición y 4 estadísticas |
-| `parcial/` | Score de fin de inning: barras de los dos equipos, C H E, inning, los tres que vienen al bate y el cuadro de Pepsi |
+| `parcial/` | Score de fin de inning: barras de los dos equipos, C H E, inning, los tres que vienen al bate y el cuadro de Pepsi (una secuencia de PNG) |
 
 El resto de este README es el de la base, [HTML-templates](https://github.com/leonedo/HTML-templates):
 plantilla para gráficos Lottie en CasparCG usando webcg-framework, con un state machine **multi-etapa** que permite gráficos secuenciales (entrada → loop1 → pausa → loop2 → salida) controlados desde CasparCG.
