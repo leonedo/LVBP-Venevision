@@ -25,6 +25,10 @@ don't show. The teams overlap, so if you switch teams you have to turn off the p
 **Stats:** four generic slots, left to right. Each one is a value (`valorN`) followed by its label
 (`etiquetaN`): any stat can go in any slot, the design's AVE / HR / CI / OPS are only the default.
 
+**Split:** `informacionbarranegra`, the black bar above the name: what the stats are (the season,
+the split). It is always on air: **always send it**, or the design's `DE POR VIDA CON BASES
+LLENAS` stays there.
+
 ```json
 {
   "AGUI_opacidad": 0,
@@ -35,6 +39,7 @@ don't show. The teams overlap, so if you switch teams you have to turn off the p
   "MAGA_opacidad": 0,
   "TIBUS_opacidad": 0,
   "TIGRES_opacidad": 0,
+  "informacionbarranegra": "TEMPORADA 2026-27",
   "nombrejugador": "WILSON GARCÍA",
   "numerouniforme": "7",
   "posicion": "BD",
@@ -50,7 +55,7 @@ don't show. The teams overlap, so if you switch teams you have to turn off the p
 ```
 
 These are the keys of the LVBP-Meridiano `bateador`, so a controller can send both graphics the same
-payload. Meridiano's `titulo` and `informacionbarranegra` don't exist here: they are ignored.
+payload. Meridiano's `titulo` doesn't exist here: it is ignored.
 
 ## Animation
 
@@ -61,18 +66,22 @@ payload. Meridiano's `titulo` and `informacionbarranegra` don't exist here: they
 | Frames | 0 – 88 |
 | Duration | 2.94 s |
 
-Lower third. Frame 0 is empty: nothing shows before `play`.
+Lower third, at the bottom left (x 0–1058, y 752–1019), with the split's black bar on top. Frame 0
+is empty: nothing shows before `play`.
 
 ## Text layers
 
-All are box text: a longer string shrinks to fit instead of overflowing. The name, first name and
-surname as in the design: up to about 17 characters keep the design size (`AEVERSON ARTEAGA`
-fits); longer ones shrink within the bar. The number fits 3 digits, the position 2 or 3 letters.
+All are box text: a longer string shrinks to fit instead of overflowing, always on one line. The
+name, first name and surname as in the design: up to about 19 characters keep the design size
+(`AEVERSON ARTEAGA` fits); longer ones shrink within the bar (`ALEXANDER MONASTERIOS` to 87 %). The
+split, up to about 30 characters (`TEMPORADA 2026-27 · VS ZURDOS` fits). The number fits 3 digits,
+the position 2 or 3 letters.
 Each value is right-aligned against its label and grows to the left: `1.000` fits at the design
 size in slots 1, 2 and 4, and shrinks a little in slot 3. Labels fit about 3 letters.
 
 | Class | nm | Default text |
 |-------|----|-------------|
+| `informacionbarranegra` | `.informacionbarranegra` | DE POR VIDA CON BASES LLENAS |
 | `nombrejugador` | `.nombrejugador` | NOMBRE  APELLIDO |
 | `numerouniforme` | `.numerouniforme` | 99 |
 | `posicion` | `.posicion` | DH |

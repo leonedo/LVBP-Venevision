@@ -1,13 +1,13 @@
 // Prepara los exports del diseñador para CasparCG: la receta de "Cuando llega un export nuevo"
 // de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13), de la
 // defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15), del bateador (LOWBAR BATEADOR,
-// 2026-10-16) y del parcial (FINAL DE INNING, 2026-10-18): si el diseñador cambia nombres de
-// capas, falla diciendo cuál no encuentra (no adivina).
+// 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18) y del lanzador (PITCHERS, 2026-10-18): si
+// el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
-//      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/. Los que no estén se saltean: alcanza con el
-//      zip que llegó.
+//      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/. Los que no estén se saltean:
+//      alcanza con el zip que llegó.
 //   2. node herramientas/prep.js $EXPORTS .
 //   3. git diff, herramientas/lint.py y QA con el runtime real (CLAUDE.md).
 // Las fuentes, las imágenes y los index.html no los toca: se copian a mano la primera vez.
@@ -122,6 +122,18 @@ function propiedadesAnimadas(o, acc = []) {
     }
     return acc;
 }
+// Dónde cae en pantalla (x) el x local de una capa, al final de la entrada: compone la cadena de
+// parents con el último valor de cada transform. Sin rotaciones ni posiciones separadas.
+const ultimoValor = p => p.a ? p.k[p.k.length - 1].s : p.k;
+function enPantalla(d, l, x) {
+    for (let c = l; c; c = c.parent ? d.layers.find(o => o.ind === c.parent) : null) {
+        const { p, a, s, r } = c.ks;
+        if ((r && (r.a || r.k)) || p.s) throw new Error(`${c.nm}: rotada o con posición separada`);
+        x = ultimoValor(p)[0] + (x - ultimoValor(a)[0]) * ultimoValor(s)[0] / 100;
+    }
+    return x;
+}
+const escalaX = (d, l) => enPantalla(d, l, 1) - enPantalla(d, l, 0);
 
 // ---------------------------------------------------------------- score
 // Escudos: las siglas de los escudos del score de LVBP-Meridiano, para que el controlador mande
@@ -503,8 +515,9 @@ const ENTRADA_OF = 90;                 // la entrada termina en el 89 (el mánag
 // Leones, amarillas (#FFD200, 49°) y no del ámbar de la barra (#FDAD36, 36°). Van con el tono de la
 // barra y el brillo que el diseñador le dio a cada equipo (Leon, 2026-10-17): el claro es la barra
 // llevada a 255 (#FF5026, #FFAE36), y los otros dos stops, en la misma proporción que en el export
-// (Águilas, 0.133 y 0.57 del claro; Leones, 0.384 y 0.69). La defensiva y el bateador las toman de
-// acá. Los stops como en el JSON: posición, r, g, b (0–1); `export`, el degradado que llega.
+// (Águilas, 0.133 y 0.57 del claro; Leones, 0.384 y 0.69). La defensiva las toma de acá (el
+// bateador, hasta el export del 2026-10-18, que trae sus colores). Los stops como en el JSON:
+// posición, r, g, b (0–1); `export`, el degradado que llega.
 const COLOR_PUERTA = {
     AGUI: {
         export: [0, 0.133, 0.075, 0, 0.61, 0.567, 0.296, 0, 1, 1, 0.518, 0],
@@ -623,63 +636,81 @@ if (hay('OFENSIVA')) {
 }
 
 // ---------------------------------------------------------------- bateador
-// La barra baja del bateador. Las claves, las de la barra de bateador de LVBP-Meridiano donde dicen
-// lo mismo, para que el controlador le mande a las dos la misma data: nombrejugador, numerouniforme,
-// posicion, etiquetaN / valorN (casilleros genéricos, 1 a 4 de izquierda a derecha) y
-// <SIGLAS>_opacidad. No tiene titulo ni informacionbarranegra.
-// Cajas medidas en el frame 87 con la fuente cargada. El nombre, hasta 8 px antes del negro del
-// número (la caja del export cruzaba el número y la posición); el número y la posición, 8 px
-// adentro de su placa, que va en diagonal (las cajas del export medían 594 px de pantalla).
-const BAT_NOMBRE = 459;                // 418 px / 0.9099 de escala; NOMBRE  APELLIDO mide 418.3
-const BAT_NUMERO = 117;                // 92 px / 0.7877; 100 mide 94.9
-const BAT_POSICION = 150;              // 118 px / 0.7877; DH mide 76.9
+// La barra baja del bateador. El export del 2026-10-18 (Leon: reemplaza al del 2026-10-16) es el
+// mismo diseño al 64 %, más arriba, con una barra negra encima para el split, y todo cuelga de
+// `Null 5` (al 130 %). Las claves, las de la barra de bateador de LVBP-Meridiano donde dicen lo
+// mismo, para que el controlador le mande a las dos la misma data: nombrejugador, numerouniforme,
+// posicion, etiquetaN / valorN (casilleros genéricos, 1 a 4 de izquierda a derecha),
+// informacionbarranegra (el split, en la barra negra) y <SIGLAS>_opacidad. No tiene titulo.
+// Bordes medidos en px de pantalla en el frame 87, con la fuente cargada; las cajas quedan a 5 px de
+// ellos (los 8 px del bateador anterior, al 64 %). El nombre, hasta antes del negro del número (la
+// caja del export cruzaba el número y la posición); el split, hasta antes del final de su barra (la
+// cruzaba 29 px); el número y la posición, adentro de su placa, que va en diagonal (las cajas del
+// export medían 379 px).
+const BAT_MARGEN = 5;
+const BAT_NOMBRE_HASTA = 724;          // empieza el negro del número (724–733 en la franja de las letras)
+const BAT_SPLIT_HASTA = 706;           // termina la barra negra (706–712)
+const BAT_NUMERO = [733, 805];         // el negro del número
+const BAT_POSICION = [816, 901];       // el azul de la posición
 // Estadísticas: el valor (cuerpo 70) va antes de su rótulo (40), y el diseño dejó los dos alineados
 // a la izquierda: un valor de una cifra quedaba lejos de su rótulo y uno más largo se le metía
 // encima. El valor pasa a la derecha, terminando donde termina el del diseño (Lw: .000 125.6719,
-// 00 72.9531), y crece hacia la izquierda hasta 8 px después de la caja del rótulo anterior (el
-// primero, hasta 8 px después del borde de la barra gris, x 527 de pantalla). Los rótulos, cajas
-// de 70 px (AVG mide 67.5). Capas a escala 1 y sin parent: 1 unidad, 1 px.
+// 00 72.9531), y crece hacia la izquierda hasta 5 px después de la caja del rótulo anterior (el
+// primero, hasta 5 px después del borde de la barra gris, x 309 de pantalla). Los rótulos, cajas
+// de 70 unidades de su capa (AVG mide 67.5).
 const BAT_STATS = [['AVE', '.AVERAGE'], ['HR', '.JONRONES'], ['CI', '.CARRERASIMPULSADAS'], ['OPS', '.OPSNUMERO']];
 const BAT_LW = { '.000': 125.6719, '00': 72.9531 };
 const BAT_ETIQUETA = 70;
-const BAT_BORDE = 527;
+const BAT_BORDE = 309;
 const ENTRADA_BAT = 87;                // la entrada termina en el 86 (OPS)
+const BAT_COSTURA = 2;                 // px que crece hacia abajo la barra negra del split (ver key)
 // El escudo grande va en overlay sobre el fondo, que a lo sumo duplica el brillo de lo que tiene
-// abajo: sobre el fondo de Tigres, casi negro, no se veía. Lleva lo mismo que su escudo en las
+// abajo: sobre el fondo de Tigres, casi negro, apenas se ve. Lleva lo mismo que su escudo en las
 // puertas de la ofensiva: color dodge con el Fill gris. Acá el escudo va al 100 % (en las puertas,
-// al 49 %): al 85 % se ve como el de Tiburones o Magallanes (comparado el 2026-10-16 con 80, 90 y
-// 95; el 95 de la ofensiva, acá, queda mucho más fuerte que los demás).
-const BAT_DODGE = { TIGRES: 0.85 };
+// al 49 %). Con el fondo del export del 2026-10-18, más claro que el de la ofensiva, al 70 % se ve
+// como el de Tiburones, el criterio de Leon (2026-10-16, cuando fue al 85 %); comparado con el
+// overlay del diseño, 50, 60, 75, 80 y 85.
+const BAT_DODGE = { TIGRES: 0.7 };
 if (hay('LOWBAR BATEADOR')) {
     const d = load(path.join(SRC, 'LOWBAR BATEADOR/data.json'));
+    const nulo = layer(d, 'Null 5');
+    if (nulo.ks.s.a || nulo.ks.s.k[0] !== 130) throw new Error('Null 5: escala inesperada: medir de nuevo los bordes');
 
     // ---- textos
-    rename(d, '.BATEADOR', 'nombrejugador');
-    doc(d, '.nombrejugador').sz[0] = BAT_NOMBRE;
-    rename(d, '.NUMEROJUGADOR', 'numerouniforme');
-    anchoCentrado(doc(d, '.numerouniforme'), BAT_NUMERO);
-    rename(d, '.POSICIONDEJUGADOR', 'posicion');
-    anchoCentrado(doc(d, '.posicion'), BAT_POSICION);
-    // x de pantalla del (0, 0) de una capa a escala 1 y sin parent
-    const origen = l => {
-        const { p, a, s } = l.ks;
-        if (l.parent || p.a || a.a || s.a || s.k[0] !== 100) throw new Error(`${l.nm}: transform inesperado`);
-        return p.k[0] - a.k[0];
+    // una caja que empieza donde la puso el diseño y termina en x de pantalla
+    const hasta = (nm, x) => {
+        const l = layer(d, nm), s = doc(d, nm);
+        if (s.j !== 0) throw new Error(`${nm}: j ${s.j}`);
+        s.sz[0] = +((x - BAT_MARGEN - enPantalla(d, l, s.ps[0])) / escalaX(d, l)).toFixed(2);
     };
-    let libre = BAT_BORDE + 8;         // dónde puede empezar el próximo valor
+    // una caja centrada que entra en [izq, der] de pantalla, a lo ancho de su centro
+    const entre = (nm, [izq, der]) => {
+        const l = layer(d, nm), s = doc(d, nm);
+        const c = enPantalla(d, l, s.ps[0] + s.sz[0] / 2);
+        anchoCentrado(s, +(2 * (Math.min(c - izq, der - c) - BAT_MARGEN) / escalaX(d, l)).toFixed(2));
+    };
+    hasta('.BATEADOR', BAT_NOMBRE_HASTA);
+    rename(d, '.BATEADOR', 'nombrejugador');
+    hasta('.INFORNACIONBARRAARRIBA', BAT_SPLIT_HASTA);
+    rename(d, '.INFORNACIONBARRAARRIBA', 'informacionbarranegra');
+    entre('.NUMEROJUGADOR', BAT_NUMERO);
+    rename(d, '.NUMEROJUGADOR', 'numerouniforme');
+    entre('.POSICIONDEJUGADOR', BAT_POSICION);
+    rename(d, '.POSICIONDEJUGADOR', 'posicion');
+    let libre = BAT_BORDE + BAT_MARGEN; // dónde puede empezar el próximo valor
     BAT_STATS.forEach(([rotulo, valor], i) => {
-        const v = doc(d, valor);
+        const lv = layer(d, valor), v = doc(d, valor);
         v.t = v.t.trim();              // ".000 ": el espacio del final
         if (v.j !== 0 || !BAT_LW[v.t]) throw new Error(`${valor}: j ${v.j}, texto "${v.t}"`);
         const fin = v.ps[0] + BAT_LW[v.t];
-        v.sz[0] = origen(layer(d, valor)) + fin - libre;
+        v.sz[0] = +((enPantalla(d, lv, fin) - libre) / escalaX(d, lv)).toFixed(2);
         v.ps[0] = fin - v.sz[0];
         v.j = 1;
         rename(d, valor, 'valor' + (i + 1));
-        const e = doc(d, rotulo);
+        const le = layer(d, rotulo), e = doc(d, rotulo);
         if (e.j !== 0) throw new Error(`${rotulo}: j ${e.j}`);
         e.sz[0] = BAT_ETIQUETA;
-        libre = origen(layer(d, rotulo)) + e.ps[0] + BAT_ETIQUETA + 8;
+        libre = enPantalla(d, le, e.ps[0] + BAT_ETIQUETA) + BAT_MARGEN;
         rename(d, rotulo, 'etiqueta' + (i + 1));
     });
     // El alto: entra una línea al cuerpo del diseño (su ascent, más 2) y no dos hasta un 40–50 %
@@ -692,14 +723,9 @@ if (hay('LOWBAR BATEADOR')) {
 
     // ---- el equipo: cada clave prende su barra (la imagen del nombre, con el escudo de marca de
     // agua), el fondo de color de la izquierda y el escudo grande encima (en overlay, mateado). La
-    // barra de Bravos llega sin el _1 de las otras.
-    // Los fondos llegan con el mismo naranja (el de Bravos) en siete equipos: sólo Tigres trae el
-    // suyo. Van con el color de cada equipo de la ofensiva, como las puertas de la defensiva (Leon,
-    // 2026-10-16): el degradado de sus puertas, tomado de la ofensiva preparada (si cambia allá, el
-    // bateador lo toma la próxima vez que se prepare). La puerta va de oscuro (arriba, en 0) a claro
-    // (abajo, en 1) y el fondo al revés, claro en 0 (abajo): los stops se dan vuelta.
-    const of = load(path.join(REPO, 'ofensiva/data.json'));
-    const degradado = l => l.shapes[0].it.find(s => s.ty === 'gf');
+    // barra de Bravos llega sin el _1 de las otras. Los fondos, con los colores del diseñador (Leon,
+    // 2026-10-18: el export anterior traía el mismo naranja en siete equipos, y se les ponía el
+    // degradado de las puertas de la ofensiva).
     for (const l of d.layers) {
         const barra = l.nm.match(/^\.BARRA_([A-Z]+)_BATEO(?:_1)?\.png$/);
         const fondo = l.nm.match(/^\.FONDO([A-Z]+)$/);
@@ -708,20 +734,11 @@ if (hay('LOWBAR BATEADOR')) {
         if (!m) continue;
         const sig = SIGLAS[m[1]];
         if (!sig) throw new Error(`${l.nm}: equipo desconocido`);
-        // Hasta que empieza a moverse (frame 11), la punta de la barra asomaba 5 px en el borde
+        // Hasta que empieza a moverse (frame 11), la punta de la barra asomaba en el borde
         // izquierdo: en la entrada y al final de la salida. Aparece cuando se mueve.
         if (barra) {
             if (!l.ks.p.a) throw new Error(`${l.nm}: sin animación`);
             l.ip = l.ks.p.k[0].t;
-        }
-        if (fondo) {
-            const ref = of.layers.find(o => o.cl === sig + '_opacidad' && o.ty === 4);
-            if (!ref) throw new Error(`ofensiva: sin puerta de ${sig}`);
-            const g = degradado(ref).g, k = g.k.k, gf = degradado(l);
-            if (g.p !== 3 || k.length !== 12 || gf.g.p !== 3 || gf.g.k.a) throw new Error(`${l.nm}: degradado inesperado`);
-            const stops = [];
-            for (let i = 8; i >= 0; i -= 4) stops.push(+(1 - k[i]).toFixed(3), k[i + 1], k[i + 2], k[i + 3]);
-            gf.g.k.k = stops;
         }
         if (escudo && BAT_DODGE[sig]) {
             if (l.bm !== 3 || l.ef) throw new Error(`${l.nm}: bm ${l.bm}, efectos inesperados`);
@@ -736,6 +753,18 @@ if (hay('LOWBAR BATEADOR')) {
     }
     // la textura de la barra de estadísticas llega con la clase "png" (como en la defensiva)
     rename(d, 'TEXTURA BASE_1.png', 'textura');
+
+    // ---- key: la barra negra del split y lo de abajo (el fondo y la barra del nombre) se tocan borde
+    // con borde, y dos bordes suavizados que caen en el mismo píxel no suman 100 %: en el key de
+    // CasparCG quedaba una fila de 1 px al 58–69 % (y 813), una línea finita de video al aire. La
+    // barra negra crece hacia abajo, por debajo del fondo y por encima de la barra del nombre, que
+    // ahí arriba es casi negra (como en el parcial: BAT_COSTURA px).
+    const negra = layer(d, 'Capa de formas 4'), gn = negra.shapes[0].it;
+    const rc = gn.find(s => s.ty === 'rc'), tr = gn.find(s => s.ty === 'tr');
+    if (gn.length !== 4 || rc.s.a || rc.p.a || tr.s.a || negra.ks.s.a || negra.parent !== nulo.ind) throw new Error('Capa de formas 4: transform inesperado');
+    const py = negra.ks.s.k[1] / 100 * tr.s.k[1] / 100 * nulo.ks.s.k[1] / 100; // px de pantalla por unidad, en y
+    rc.s.k[1] = +(rc.s.k[1] + BAT_COSTURA / py).toFixed(3);
+    rc.p.k[1] = +(rc.p.k[1] + BAT_COSTURA / 2 / py).toFixed(3);
 
     // ---- timeline: el frame 0 vacío, como en la defensiva (el diseño ya casi lo estaba). Los
     // markers del diseñador (START 0–30, STOP 90–120) no sirven: la entrada dura hasta el 86 y el
@@ -755,6 +784,178 @@ if (hay('LOWBAR BATEADOR')) {
     d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
     allCaps(d);
     save(path.join(REPO, 'bateador/data.json'), d);
+}
+
+// ---------------------------------------------------------------- lanzador
+// El lanzador (el export es PITCHERS, 2026-10-18; la carpeta, como su equivalente de Meridiano):
+// a la izquierda, de arriba abajo, un panel del color del equipo con su escudo grande; la barra del
+// equipo con el nombre y el apellido, en dos líneas, y el número; la mano de lanzar, y seis
+// estadísticas (rótulo y valor) sobre una textura gris. Las claves, las del lanzador de
+// LVBP-Meridiano donde dicen lo mismo: manodelanzar, etiquetaN / valorN (casilleros genéricos, 1 a 6
+// de arriba abajo) y <SIGLAS>_opacidad. Propias: nombre y apellido (en Meridiano, nombrelanzador
+// es el nombre completo en una línea) y numerouniforme (la del bateador). No tiene titulo ni
+// informacionbarranegra.
+// Bordes medidos en px de pantalla en el frame 109 con la fuente cargada; las cajas quedan a 8 px.
+// El número, centrado donde lo puso el diseño (x 896), en 80 px (00 mide 66); el nombre y el
+// apellido, desde donde empiezan hasta 8 px antes del número (las cajas del export cruzaban el
+// número y el final de la barra). La mano, centrada en su placa azul (termina en x 635).
+const LAN_MARGEN = 8;
+const LAN_NUMERO = 80;
+const LAN_MANO_HASTA = 635;
+// Los rótulos de las estadísticas llegan centrados, cada uno en una caja distinta, y en pantalla
+// quedan alineados a la izquierda a ojo (empiezan entre x 596 y 601): pasan a la izquierda, todos
+// desde el x del primero (G-P, 599), hasta 4 px antes de la columna de los valores (x 720). Los
+// valores quedan centrados donde los puso el diseño (x 814), desde 4 px después de esa columna.
+const LAN_STATS = [['.GANADOSYPERDIDOS', 'NUMEROSDEGANADOSYPERDIDOS'], ['.EFECTIVIDAD', '.NNUMEROSEFECTIVIDAD'],
+    ['.BASEXBOLAS', '.NUMEROSBASESXBOLAS'], ['.PONCHES', '.NUMEROSPONCHE'], ['.WHIP', '.NUMEROSWHIP'],
+    ['.INNINIGSLANZADOS', '.NUMEROSINNINGLANZADOS']];
+const LAN_ROTULOS_DESDE = 599;
+const LAN_COLUMNA = 720;
+const ENTRADA_LAN = 110;               // la entrada termina en el 109 (el último rótulo)
+// La barra de Bravos no vino: es la del bateador (la misma serie de barras), con las medidas de
+// las otras, que escalan con el ancho de su imagen (el ancla y la máscara).
+const LAN_BARRA_BRAVOS = 'images/barra_bravos.png';
+if (hay('PITCHERS')) {
+    const d = load(path.join(SRC, 'PITCHERS/data.json'));
+    const local = (l, X) => (X - enPantalla(d, l, 0)) / escalaX(d, l);
+    const r2 = v => +v.toFixed(2);
+
+    // ---- textos
+    rename(d, '.NOMBRE', 'nombre');
+    rename(d, '.APELLIDO', 'apellido');
+    rename(d, ',NUMEROUNIFORME', 'numerouniforme');
+    rename(d, '.MANODELLANZADOR', 'manodelanzar');
+    const num = layer(d, '.numerouniforme'), sn = doc(d, '.numerouniforme');
+    anchoCentrado(sn, r2(LAN_NUMERO / escalaX(d, num)));
+    const desdeNumero = enPantalla(d, num, sn.ps[0]) - LAN_MARGEN;
+    for (const nm of ['.nombre', '.apellido']) {
+        const s = doc(d, nm);
+        s.t = s.t.trim();              // "NOMBRE \r": un salto de línea al final
+        if (s.j !== 0) throw new Error(`${nm}: j ${s.j}`);
+        s.sz[0] = r2(local(layer(d, nm), desdeNumero) - s.ps[0]);
+    }
+    const mano = layer(d, '.manodelanzar'), sm = doc(d, '.manodelanzar');
+    const cm = enPantalla(d, mano, sm.ps[0] + sm.sz[0] / 2);
+    anchoCentrado(sm, r2(2 * (LAN_MANO_HASTA - LAN_MARGEN - cm) / escalaX(d, mano)));
+    LAN_STATS.forEach(([rotulo, valor], i) => {
+        const le = layer(d, rotulo), e = doc(d, rotulo), lv = layer(d, valor), v = doc(d, valor);
+        if (e.j !== 2 || v.j !== 2) throw new Error(`${rotulo}: j ${e.j}, ${valor}: j ${v.j}`);
+        e.ps[0] = r2(local(le, LAN_ROTULOS_DESDE));
+        e.sz[0] = r2(local(le, LAN_COLUMNA - LAN_MARGEN / 2) - e.ps[0]);
+        e.j = 0;
+        const c = enPantalla(d, lv, v.ps[0] + v.sz[0] / 2);
+        anchoCentrado(v, r2(2 * (c - LAN_COLUMNA - LAN_MARGEN / 2) / escalaX(d, lv)));
+        rename(d, rotulo, 'etiqueta' + (i + 1));
+        rename(d, valor, 'valor' + (i + 1));
+    });
+    // El alto: una línea al cuerpo del diseño (su ascent, más 2), como en el bateador.
+    for (const l of d.layers) if (l.ty === 5) for (const k of l.t.d.k) {
+        if (!k.s.sz) throw new Error(`${l.nm}: no es de caja`);
+        k.s.sz[1] = r2(d.fonts.list[0].ascent * k.s.s / 100 + 2);
+    }
+
+    // ---- el panel de color: la textura con un Gradient Ramp, que Lottie no pinta (salía la textura
+    // blanca). En AE el Ramp tapa toda la capa (Blend With Original 0) y lo recorta la máscara: pasa a
+    // una capa de forma con la máscara como trazado y el degradado lineal del Ramp, con sus colores.
+    for (const l of d.layers) {
+        if (!/^\.COLOR[A-Z]+$/.test(l.nm)) continue;
+        const ef = l.ef || [];
+        if (l.ty !== 2 || ef.length !== 1 || ef[0].mn !== 'ADBE Ramp') throw new Error(`${l.nm}: sin Gradient Ramp`);
+        const v = nm => ef[0].ef.find(x => x.nm === nm).v.k;
+        if (v('Ramp Shape') !== 1 || v('Ramp Scatter') || v('Blend With Original')) throw new Error(`${l.nm}: Ramp inesperado`);
+        const m = l.masksProperties || [];
+        if (m.length !== 1 || m[0].mode !== 'a' || m[0].inv || m[0].pt.a || m[0].o.k !== 100 || m[0].x.k) throw new Error(`${l.nm}: máscara inesperada`);
+        const [c0, c1] = [v('Start Color'), v('End Color')];
+        l.ty = 4;
+        l.shapes = [{ ty: 'gr', nm: 'panel', np: 3, cix: 2, bm: 0, ix: 1, it: [
+            { ty: 'sh', nm: 'máscara', ix: 1, ks: m[0].pt },
+            { ty: 'gf', nm: 'Gradient Ramp', o: { a: 0, k: 100, ix: 10 }, r: 1, bm: 0, t: 1,
+                g: { p: 2, k: { a: 0, k: [0, c0[0], c0[1], c0[2], 1, c1[0], c1[1], c1[2]], ix: 9 } },
+                s: { a: 0, k: v('Start of Ramp'), ix: 5 }, e: { a: 0, k: v('End of Ramp'), ix: 6 } },
+            { ty: 'tr', nm: 'Transformar', p: { a: 0, k: [0, 0], ix: 2 }, a: { a: 0, k: [0, 0], ix: 1 },
+                s: { a: 0, k: [100, 100], ix: 3 }, r: { a: 0, k: 0, ix: 6 }, o: { a: 0, k: 100, ix: 7 },
+                sk: { a: 0, k: 0, ix: 4 }, sa: { a: 0, k: 0, ix: 5 } }] }];
+        for (const k of ['refId', 'masksProperties', 'hasMask', 'ef']) delete l[k];
+    }
+    // ---- la textura gris de las estadísticas
+    // Su matte (BORDE DE SOMBRA 2, la forma del panel) llega lejos de ella: el export de Bodymovin
+    // 5.9 no dice cuál es (no trae tp) y Lottie matea con la capa de arriba, un sólido. Pasa a
+    // estar justo encima, que es lo que Lottie entiende.
+    const tex = layer(d, 'TEXTURA BASE 4_1.png'), mate = layer(d, 'BORDE DE SOMBRA 2');
+    if (!tex.tt || !mate.td || d.layers.filter(l => l.td).length !== 1 || d.layers.filter(l => l.tt).length !== 1) throw new Error('textura: mattes inesperados');
+    d.layers.splice(d.layers.indexOf(mate), 1);
+    d.layers.splice(d.layers.indexOf(tex), 0, mate);
+    // Su Hue/Saturation (saturación −100, claridad −23) Lottie tampoco lo pinta: la textura es
+    // gris (R = G = B), así que sólo cuenta la claridad, que la oscurece al 77 %. Un Tint de negro a
+    // gris 77 %, que Lottie sí pinta, da lo mismo.
+    const hs = (tex.ef || []).find(e => e.mn === 'ADBE HUE SATURATION');
+    if (!hs || tex.ef.length !== 1) throw new Error('textura: sin Hue/Saturation');
+    const hv = nm => hs.ef.find(x => x.nm === nm).v.k;
+    if (hv('Channel Control') !== 1 || hv('Master Hue') || hv('Master Saturation') !== -100 || hv('Colorize')) throw new Error('textura: Hue/Saturation inesperado');
+    const g = 1 + hv('Master Lightness') / 100;
+    tex.ef = [{ ty: 20, nm: 'Tint', np: 6, mn: 'ADBE Tint', ix: 1, en: 1, ef: [
+        { ty: 2, nm: 'Map Black To', mn: 'ADBE Tint-0001', ix: 1, v: { a: 0, k: [0, 0, 0, 1], ix: 1 } },
+        { ty: 2, nm: 'Map White To', mn: 'ADBE Tint-0002', ix: 2, v: { a: 0, k: [g, g, g, 1], ix: 2 } },
+        { ty: 0, nm: 'Amount to Tint', mn: 'ADBE Tint-0003', ix: 3, v: { a: 0, k: 100, ix: 3 } }] }];
+    rename(d, 'TEXTURA BASE 4_1.png', 'textura');
+
+    // ---- la barra de Bravos
+    const ref = layer(d, '.BARRAAGUILAS'), refA = d.assets.find(a => a.id === ref.refId);
+    const [bw, bh] = medidasPng(path.join(REPO, 'lanzador', LAN_BARRA_BRAVOS));
+    if (d.layers.some(l => l.nm === '.BARRABRAVOS')) throw new Error('la barra de Bravos ya viene en el export: sacar LAN_BARRA_BRAVOS');
+    if (refA.w !== 512 || refA.h !== bh) throw new Error('barras: medidas inesperadas');
+    const k = bw / refA.w, bravos = clone(ref);
+    bravos.nm = '.BARRABRAVOS';
+    bravos.cl = 'BARRABRAVOS';
+    bravos.ind = freeInd(d, Math.max(...d.layers.map(l => l.ind)) + 1);
+    bravos.refId = 'image_barra_bravos';
+    bravos.ks.a.k[0] = r2(ref.ks.a.k[0] * k);
+    for (const v of bravos.masksProperties[0].pt.k.v) v[0] = r2(v[0] * k);
+    d.assets.push({ id: bravos.refId, w: bw, h: bh, u: 'images/', p: path.basename(LAN_BARRA_BRAVOS), e: 0 });
+    d.layers.splice(d.layers.indexOf(layer(d, '.BARRACARDENALES')) + 1, 0, bravos);
+
+    // ---- el equipo: cada clave prende el panel de color, su escudo grande (en overlay) y la barra
+    // (imagen, con el escudo de marca de agua). Los escudos de Cardenales y Bravos llegan como
+    // LOGOGRANDE (el de Cardenales sin el punto) y el panel de Bravos como COLORBARAVOS.
+    // El escudo va al 49 %, como el de las compuertas de la defensiva, y por lo mismo ese 49 % pasa de
+    // la capa al CSS de su <image> (g[id^="escudo"] > image, por su ln): el UPDATE escribe ahí su
+    // _opacidad y lo pisaría con un 1 (el escudo salía al 100 % y el panel, mucho más claro).
+    const ALIAS = { BARAVOS: 'BRAVOS' };
+    for (const l of [...d.layers]) {
+        const escudo = l.nm.match(/^\.?LOGO(?:GRANDE)?([A-Z]+)$/);
+        const m = escudo || l.nm.match(/^\.COLOR([A-Z]+)$/) || (l.ty === 2 && l.nm.match(/^\.BARRA([A-Z]+)$/));
+        if (!m) continue;
+        const sig = SIGLAS[ALIAS[m[1]] || m[1]];
+        if (!sig) throw new Error(`${l.nm}: equipo desconocido`);
+        if (escudo) {
+            if (l.ks.o.a || l.ks.o.k !== 49 || l.ty !== 2) throw new Error(`${l.nm}: opacidad inesperada`);
+            l.ks.o.k = 100;
+            l.ln = 'escudo' + sig;
+        }
+        rename(d, l.nm, sig + '_opacidad');
+    }
+    for (const s of Object.values(SIGLAS)) {
+        const n = d.layers.filter(l => l.nm === `.${s}_opacidad`).length;
+        if (n !== 3) throw new Error(`${s}_opacidad: ${n} capas`);
+    }
+
+    // ---- timeline: el frame 0 ya está vacío. Los markers del diseñador (start 0–30, stop 120–150)
+    // no sirven: la entrada dura hasta el 109 y el stop no anima nada. La salida, la entrada al revés.
+    const ultimo = Math.max(...propiedadesAnimadas(d.layers).flatMap(p => p.k.map(k => k.t)));
+    if (ultimo > ENTRADA_LAN - 0.5) throw new Error(`la entrada termina en el ${ultimo}: mover ENTRADA_LAN`);
+    for (const l of d.layers) {
+        l.ip = Math.max(l.ip, 1);
+        l.op = ENTRADA_LAN + 1;
+    }
+    d.op = ENTRADA_LAN + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: ENTRADA_LAN, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: ENTRADA_LAN, cm: 'salida', dr: -ENTRADA_LAN }
+    ];
+    d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
+    allCaps(d);
+    save(path.join(REPO, 'lanzador/data.json'), d);
 }
 
 // ---------------------------------------------------------------- parcial

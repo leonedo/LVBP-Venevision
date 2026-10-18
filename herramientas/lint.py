@@ -8,10 +8,13 @@ def p(g, msg): problems.append(f'{g}: {msg}')
 GRAFICOS = sorted(g for g in os.listdir(REPO) if os.path.isfile(REPO + g + '/data.json') and os.path.isfile(REPO + g + '/index.html'))
 # Clases repetidas a propósito. En la defensiva y la ofensiva, la clave del equipo prende su barra,
 # las dos mitades del escudo de las compuertas y las dos pantallas de color de las puertas; en el
-# bateador, su barra, el fondo de color y el escudo (prep.js): la misma clase en todas.
-REPETIDAS = {g: re.compile(r'[A-Z]+_opacidad') for g in ('defensiva', 'ofensiva', 'bateador')}
+# bateador, su barra, el fondo de color y el escudo; en el lanzador, el panel de color, el escudo y
+# la barra (prep.js): la misma clase en todas.
+REPETIDAS = {g: re.compile(r'[A-Z]+_opacidad') for g in ('defensiva', 'ofensiva', 'bateador', 'lanzador')}
 # Las compuertas: su 49 % va en el CSS (prep.js), no en la capa.
 PUERTAS = {g: 'g[id^="puerta"] > image' for g in ('defensiva', 'ofensiva')}
+# El escudo grande del lanzador, lo mismo: su 49 % va en el CSS.
+ESCUDOS = {'lanzador': 'g[id^="escudo"] > image'}
 for g in GRAFICOS:
     d = json.load(open(REPO + g + '/data.json'))
     html = open(REPO + g + '/index.html').read()
@@ -88,8 +91,18 @@ for g in GRAFICOS:
             if l['ks']['o'].get('k') != 100: p(g, f'compuerta {l["ln"]}: opacidad en la capa (va en el CSS)')
             # el gris del Emboss de AE, que Lottie no pinta (prep.js, GRIS_PUERTA)
             if not any(e.get('ty') == 21 for e in l.get('ef', [])): p(g, f'compuerta {l["ln"]}: sin el Fill gris (sale blanca)')
-    # el Hue/Saturation de la V de Venevisión, que Lottie no pinta (prep.js, horneaClaridad)
-    if g == 'score':
-        for l in d['layers']:
-            if any(e.get('mn') == 'ADBE HUE SATURATION' for e in l.get('ef', [])): p(g, f'{l["nm"]!r}: Hue/Saturation sin aplicar (Lottie no lo pinta)')
+    if g in ESCUDOS:
+        if ESCUDOS[g] not in html: p(g, 'index.html no le pone su opacidad al escudo grande')
+        esc = [l for l in d['layers'] if (l.get('ln') or '').startswith('escudo')]
+        if len(esc) != 8: p(g, f'{len(esc)} escudos con ln escudo<SIGLAS> (van 8)')
+        for l in esc:
+            if l['ks']['o'].get('k') != 100: p(g, f'escudo {l["ln"]}: opacidad en la capa (va en el CSS)')
+    # efectos de AE que Lottie no pinta y prep.js pasa a otra cosa: el Gradient Ramp (el panel del
+    # lanzador) y el Hue/Saturation donde cambia lo que se ve (la V de Venevisión del score, la
+    # textura del lanzador; en las compuertas de la defensiva y la ofensiva sólo mueve el Tone, que
+    # no se ve)
+    sin_pintar = {'ADBE Ramp'} | ({'ADBE HUE SATURATION'} if g in ('score', 'lanzador') else set())
+    for l in d['layers']:
+        for e in l.get('ef', []):
+            if e.get('mn') in sin_pintar: p(g, f'{l["nm"]!r}: {e["mn"]} sin aplicar (Lottie no lo pinta)')
 print('\n'.join(problems) if problems else f'lint: sin problemas ({", ".join(GRAFICOS)})')
