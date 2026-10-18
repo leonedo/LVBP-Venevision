@@ -866,7 +866,12 @@ if (hay('FINAL DE INNING')) {
     const secuencia = d.assets.find(a => a.id === pepsi.refId);
     if (!secuencia || secuencia.layers.length !== 262 || pepsi.st !== pepsi.ip) throw new Error('PEPSI LOGO: secuencia inesperada');
     // Su primer frame vacío del final: los PNG vacíos de la secuencia son el mismo archivo (el del 0).
-    const png = k => fs.readFileSync(path.join(SRC, 'FINAL DE INNING', ...(a => [a.u, a.p])(d.assets.find(a => a.id === secuencia.layers[k].refId))));
+    // (el frame k de la secuencia es la capa que se ve en su k: los nm vienen al revés, PEPSI_00296 en el 0)
+    const png = k => {
+        const l = secuencia.layers.find(c => c.ip <= k + 0.5 && k + 0.5 < c.op); // a mitad del frame: los ip traen decimales
+        const a = d.assets.find(x => x.id === l.refId);
+        return fs.readFileSync(path.join(SRC, 'FINAL DE INNING', a.u, a.p));
+    };
     const kFin = Math.round(PAR_FIN_PEPSI - pepsi.st);
     if (!png(kFin).equals(png(0)) || png(kFin - 1).equals(png(0))) throw new Error('PEPSI LOGO: medir de nuevo PAR_FIN_PEPSI (su primer frame vacío del final)');
     const marcoDer = layer(d, 'MARCO DE PUBLICIDAD 4'); // la raya derecha, que sale con el cuadro (273–282)
@@ -879,7 +884,7 @@ if (hay('FINAL DE INNING')) {
     for (const l of d.layers) {
         // los mattes, con la capa que matean
         const ref = l.td ? d.layers[d.layers.indexOf(l) + 1] : l;
-        if (l.op < 297 || ref.ip > PAR_PAUSA) throw new Error(`${l.nm}: ip ${l.ip}, op ${l.op}`);
+        if (l.op < PAR_FIN_PEPSI || ref.ip > PAR_PAUSA) throw new Error(`${l.nm}: ip ${l.ip}, op ${l.op}: termina antes de la salida`);
         l.op = (ref === pepsi || ref === marcoDer) ? PAR_FIN_PEPSI : PAR_FIN - Math.max(ref.ip, 1) + 0.001;
     }
     for (const l of d.layers) l.ip = Math.max(l.ip, 1);

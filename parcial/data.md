@@ -19,7 +19,8 @@ takes no data).
 
 **Same keys as the LVBP-Meridiano `parcial`**, which in turn are the ones of `score` for what both
 show: the team bars, `inning`, the two arrows and the runs (`CARRERASVISITA`, `CARRERASLOCAL`). A
-client can send the same values to the three, plus the team names and the positions. Hits and
+client can send the same values to the three, plus the team names and the positions: **always send
+the positions** too (`""` leaves one empty), or the design's `3B` stays in front of every batter. Hits and
 errors follow the style of the runs: `HITSVISITA`, `ERRORESVISITA`, `HITSLOCAL`, `ERRORESLOCAL`.
 Meridiano's `titulo` and `publicidad` don't exist here: they are ignored.
 
@@ -41,7 +42,7 @@ bottom). Extra innings (two digits) fit.
 **Batters:** three rows, top to bottom, under `titulo_jugadores` (`AL BATE`). Each row is the
 position (`posicion1`–`posicion3`, in cyan, centered in its slot: any two-letter position fits) and
 the surname (`jugador1`–`jugador3`, in white, left-aligned), as in the LVBP-Venevision `ofensiva`
-(`posicionN`, `jugadorN`). Up to about 9 letters of surname keep the design size (`CASTILLO`);
+(`posicionN`, `jugadorN`). Up to about 8 letters of surname keep the design size (`CASTILLO`);
 longer ones shrink within the column (`RODRÍGUEZ` a little, `MONASTERIOS` about a quarter). An
 empty string leaves the slot empty.
 
@@ -93,7 +94,7 @@ empty string leaves the slot empty.
 | Frames | 0 – 338 |
 | Duration | 11.28 s |
 
-Bottom of the screen, a little right of center (x 310–1540, y 677–930): it doesn't touch the score.
+Bottom of the screen, about centered (x 310–1540, y 677–930; 35 px left of center): it doesn't touch the score.
 Frame 0 is empty: nothing shows before `play`.
 
 ## Text layers

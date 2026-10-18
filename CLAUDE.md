@@ -17,7 +17,7 @@ keys del UPDATE están en su `data.md`.
 | `defensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el campo con las 9 posiciones (rótulo y apellido); arriba a la izquierda, la barra del equipo y DEFENSIVA. El frame 0 está vacío | stage `play` pause (0–53) | `salida`: la entrada al revés (1,8 s): las compuertas se cierran y termina en el frame vacío |
 | `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA. El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
 | `bateador/` | Barra baja del bateador: a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87) | `salida`: la entrada al revés (2,9 s) |
-| `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, un poco a la derecha del centro: barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de Pepsi (fijo: una secuencia de PNG). El frame 0 está vacío | stage `play` pause (0–222): la pizarra entra hasta el 41, el cuadro de Pepsi hasta el 73 y le pasa un brillo del 181 al 220 | `salida`: el cuadro de Pepsi sale como lo animó el diseñador y después la pizarra, su entrada al revés (3,9 s) |
+| `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, casi centrado (35 px a la izquierda): barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de Pepsi (fijo: una secuencia de PNG). El frame 0 está vacío | stage `play` pause (0–222): la pizarra entra hasta el 41, el cuadro de Pepsi hasta el 73 y le pasa un brillo del 181 al 220 | `salida`: el cuadro de Pepsi sale como lo animó el diseñador y después la pizarra, su entrada al revés (3,9 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces `visita_vs_local`),
@@ -198,7 +198,7 @@ todas visibles al arrancar, como en el score: el controlador manda `1` a la que 
 `0` a las otras siete. Sin data queda arriba Bravos, en las dos filas.
 
 Textos: en mayúsculas. Cada bateador es la posición (cian, centrada en su caja: entra cualquiera de
-dos letras, DH mide 33 de 40) y el apellido (blanco, alineado a la izquierda): entran unas 9 letras
+dos letras, DH mide 33 de 40) y el apellido (blanco, alineado a la izquierda): entran unas 8 letras
 (`CASTILLO`); más largos encogen dentro de la columna (`RODRÍGUEZ` baja de 30 a 28, `MONASTERIOS` a
 22). Los nombres de equipo, unas 10 letras (`MAGALLANES`, `CARDENALES`); los números, dos cifras; el
 inning, dos. Todo en una línea: un texto muy largo encoge, no parte.
