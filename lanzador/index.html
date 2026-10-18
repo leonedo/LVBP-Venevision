@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+
+    <title>Lanzador LVBP Venevisión</title>
+
+    <style>
+
+        #bm {
+            position: fixed;
+        }
+
+        /* Equipo oculto hasta que el UPDATE mande su _opacidad (el inline gana): panel, escudo y barra */
+        .AGUI_opacidad, .ANZ_opacidad, .BRAVOS_opacidad, .CARD_opacidad,
+        .LEO_opacidad, .MAGA_opacidad, .TIBUS_opacidad, .TIGRES_opacidad {
+            opacity: 0;
+        }
+
+        /* El escudo grande va al 49 % del diseño. En la capa no: el UPDATE escribe
+           ahí su _opacidad y lo pisaría con un 1 (herramientas/prep.js) */
+        g[id^="escudo"] > image {
+            opacity: 0.49;
+        }
+
+        body {
+            overflow: hidden;
+            margin: 0;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bm"></div>
+
+
+
+
+    <!-- Scripts -->
+    <script>
+        let data_file = "data.json";  // nombre del archivo Lottie
+
+        // --- AUDIO ---
+        // let audio_clips = [{ src: '../audio/aud_0.mp3', inframe: 5 }];
+
+        // --- RELOJ / FECHA ---
+        // Requiere capas de texto en el Lottie con clase "time" y/o "date"
+        // window.ENABLE_CLOCK = true;       // activa el reloj automatico al cargar
+        // window.CLOCK_SECONDS = true;      // muestra segundos (intervalo baja a 1s)
+    </script>
+    <script src="../webcg-framework.umd.js"></script>
+    <script src="../lottie.js"></script>
+    <script src="../index.js"></script>
+    <script>
+        // Panel de devtools: con Live Server (puerto 5500) o con ?debug=true en cualquier puerto
+        if (location.port === "5500" || /[?&]debug=true\b/.test(location.search)) {
+            document.write('<script src="../webcg-devtools.umd.js"><' + '/script>');
+        }
+    </script>
+
+</body>
+
+</html>
