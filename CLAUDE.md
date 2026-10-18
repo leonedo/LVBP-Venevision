@@ -217,9 +217,11 @@ en total). No es un loop.
 
 Pendiente con el diseñador: los PNG vienen reducidos a una paleta de unos 40 colores con tramado (la
 compresión de imágenes de Bodymovin): en el brillo se ve la trama y, como cada frame se trama
-distinto, los bordes del logo titilan entre frames (hasta 55–88 niveles en unos 600 px) aunque esté
-quieto. Hace falta la secuencia con color completo (mismos nombres y tamaños: se reemplazan los
-archivos). Y no hay un frame limpio después del brillo: en el 221 todavía queda un resto en la
+distinto, los bordes del logo titilaban entre frames (hasta 55–88 niveles en unos 600 px) aunque
+estuviera quieto. Mientras tanto, en el tramo quieto (del 76 al 171, antes del brillo) se ve un solo
+PNG (`PAR_QUIETO`, Leon, 2026-10-18), y en la pausa no titila: es un solo frame. Hace falta la
+secuencia con color completo (mismos nombres y tamaños: se reemplazan los archivos y `PAR_QUIETO`
+pasa a `null`). Y no hay un frame limpio después del brillo: en el 221 todavía queda un resto en la
 esquina de arriba a la izquierda (sale del todo en el 224, cuando las letras ya se van), y el logo
 chico queda 1 px corrido respecto del de antes del brillo, así que no se puede pausar en otro frame
 sin un salto. Si el diseñador deja unos frames limpios después del brillo, mover `PAR_PAUSA`.
@@ -432,12 +434,17 @@ pintó antes: renderizados cada uno en una página recién cargada, son idéntic
   (`PAR_FIN_PEPSI`) es el primer frame vacío del final de la secuencia: `prep.js` lo comprueba (los
   PNG vacíos son el mismo archivo) y falla si cambia. Las capas que arrancan en el 0 pasan al 1: el
   frame 0 queda vacío.
+- **Tramo quieto:** los frames 38–133 de la secuencia (`PAR_QUIETO`; al aire, del 76 al 171) son el
+  logo quieto, con el tramado distinto en cada uno: queda la capa del 38, que dura todo el tramo, y
+  las otras 95 salen del JSON con sus imágenes (medido: el centro de la luz del logo no se corre más
+  de 0,04 px en el tramo; al entrar y al salir, el salto es el de un frame cualquiera). Si la
+  secuencia cambia de tiempos, medir de nuevo; con los PNG de color completo, `null`.
 - **Imágenes:** las 270 del export van tal cual a `parcial/images/` (`img_0`–`261`, la secuencia;
-  `img_262`–`269`, las barras).
+  `img_262`–`269`, las barras). Con el tramo quieto, `img_39`–`133` quedan en la carpeta sin usar.
 
 Comparado frame a frame contra el export del 2026-10-18 (sin data, con su `op` llevado al 300):
 idéntico al píxel del 0 al 221, salvo las columnas de 1 px del arreglo del key (x 714–715, 998–999 y
-1215–1216).
+1215–1216) y el tramo quieto (77–171, en el cuadro de Pepsi).
 
 ### QA
 
