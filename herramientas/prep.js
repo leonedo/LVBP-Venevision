@@ -44,6 +44,12 @@ function freeInd(d, ind) {
 // El diseño va todo en mayúsculas: All Caps (ca: 1) en todas las capas de texto, que es lo que
 // index.js mira para pasar a mayúsculas el texto del UPDATE. Lottie tampoco lo aplica al texto
 // por defecto, que se pasa acá.
+// Los textos del UPDATE arrancan vacíos (Leon, 2026-10-18): lo que el controlador no manda no sale,
+// en vez de quedar al aire el texto de ejemplo del diseño (NOMBRE APELLIDO, .000, el split…). Va al
+// final de la receta: las cajas se miden con el texto del diseño.
+function vaciaTextos(d) {
+    for (const l of d.layers) if (l.ty === 5 && l.cl) for (const k of l.t.d.k) k.s.t = '';
+}
 function allCaps(d) {
     for (const l of d.layers) if (l.ty === 5) for (const k of l.t.d.k) {
         k.s.ca = 1;
@@ -784,6 +790,7 @@ if (hay('LOWBAR BATEADOR')) {
     ];
     d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
     allCaps(d);
+    vaciaTextos(d);
     save(path.join(REPO, 'bateador/data.json'), d);
 }
 
@@ -957,6 +964,7 @@ if (hay('PITCHERS')) {
     ];
     d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
     allCaps(d);
+    vaciaTextos(d);
     save(path.join(REPO, 'lanzador/data.json'), d);
 }
 
