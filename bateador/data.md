@@ -26,8 +26,7 @@ don't show. The teams overlap, so if you switch teams you have to turn off the p
 (`etiquetaN`): any stat can go in any slot, the design's AVE / HR / CI / OPS are only the default.
 
 **Split:** `informacionbarranegra`, the black bar above the name: what the stats are (the season,
-the split). It is always on air: **always send it**, or the design's `DE POR VIDA CON BASES
-LLENAS` stays there.
+the split). The bar is always on air: send the text with every payload, or it stays empty.
 
 ```json
 {
@@ -71,6 +70,9 @@ is empty: nothing shows before `play`.
 
 ## Text layers
 
+**All text layers start empty:** a key that isn't sent shows nothing (the design's sample text,
+in the table, is not on air). Send every key.
+
 All are box text: a longer string shrinks to fit instead of overflowing, always on one line. The
 name, first name and surname as in the design: up to about 19 characters keep the design size
 (`AEVERSON ARTEAGA` fits); longer ones shrink within the bar (`ALEXANDER MONASTERIOS` to 87 %). The
@@ -79,7 +81,7 @@ the position 2 or 3 letters.
 Each value is right-aligned against its label and grows to the left: `1.000` fits at the design
 size in slots 1, 2 and 4, and shrinks a little in slot 3. Labels fit about 3 letters.
 
-| Class | nm | Default text |
+| Class | nm | Design text (starts empty) |
 |-------|----|-------------|
 | `informacionbarranegra` | `.informacionbarranegra` | DE POR VIDA CON BASES LLENAS |
 | `nombrejugador` | `.nombrejugador` | NOMBRE  APELLIDO |

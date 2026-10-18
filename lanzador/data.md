@@ -79,6 +79,9 @@ is empty: nothing shows before `play`.
 
 ## Text layers
 
+**All text layers start empty:** a key that isn't sent shows nothing (the design's sample text,
+in the table, is not on air). Send every key.
+
 All are box text: a longer string shrinks to fit instead of overflowing, always on one line. The
 first name and the surname are two boxes, each up to about 9 letters at the design size
 (`ALEXANDER`, `RODRÍGUEZ` fit; `MONASTERIOS` shrinks to 80 %); each one shrinks on its own. The
@@ -86,7 +89,7 @@ number fits 2 digits (3 shrink a little), `manodelanzar` 2 letters. The labels a
 their column, about 4 characters at the design size (`WHIP`, `K-BB`); the values are centered in
 theirs, up to 6 characters (`100-20`, `130.2`).
 
-| Class | nm | Default text |
+| Class | nm | Design text (starts empty) |
 |-------|----|-------------|
 | `nombre` | `.nombre` | NOMBRE |
 | `apellido` | `.apellido` | APELLIDO |

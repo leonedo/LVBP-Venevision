@@ -164,9 +164,9 @@ controlador le mande a las dos la misma data: `nombrejugador` (nombre y apellido
 `numerouniforme`, `posicion`, `valor1`…`valor4` / `etiqueta1`…`etiqueta4` (casilleros genéricos, de
 izquierda a derecha: el AVE / HR / CI / OPS del diseño es sólo el texto por defecto),
 `informacionbarranegra` (el split, en la barra negra: como en Meridiano, siempre al aire; Leon,
-2026-10-18) y `<SIGLAS>_opacidad`. No tiene `titulo`. El controlador tiene que mandar siempre
-`informacionbarranegra`, o queda al aire el DE POR VIDA CON BASES LLENAS del diseño: hasta la
-`0.11.0` de cue-qs-beisbol no la manda.
+2026-10-18) y `<SIGLAS>_opacidad`. No tiene `titulo`. Todos los textos arrancan vacíos (Leon,
+2026-10-18): lo que el controlador no manda no sale, en vez del texto de ejemplo del diseño. El
+split también: hasta la `0.11.0` de cue-qs-beisbol no se manda, y la barra negra sale vacía.
 
 Equipo: cada clave prende tres capas, la barra del nombre (imagen, con el escudo de marca de agua),
 el fondo de color de la izquierda (forma con degradado) y el escudo grande encima (imagen en
@@ -208,7 +208,7 @@ dicen lo mismo, `manodelanzar`, `etiqueta1`…`etiqueta6` / `valor1`…`valor6` 
 arriba abajo: el G-P / EFE / BB / SO / WHIP / IL del diseño es sólo el texto por defecto) y
 `<SIGLAS>_opacidad`; `numerouniforme`, la del bateador. Propias: `nombre` y `apellido`, en dos líneas
 (Leon, 2026-10-18; la `nombrelanzador` de Meridiano es el nombre completo en una). No tiene `titulo`,
-`informacionbarranegra` ni `logomeridiano`.
+`informacionbarranegra` ni `logomeridiano`. Todos los textos arrancan vacíos, como en el bateador.
 
 Equipo: cada clave prende tres capas, el panel de color (forma con degradado), el escudo grande
 encima (imagen en *overlay*, al 49 %) y la barra del nombre (imagen, con el escudo de marca de agua),
@@ -452,6 +452,8 @@ el título del export): igual salvo 1 o 2 niveles de 255 en el escudo.
 - **Markers y timeline:** `START` (0–30) y `STOP` (90–120) del diseñador → `play`, `salida` y `stop`
   como en la defensiva. La entrada termina en el 86 (el OPS): si cambia, mover `ENTRADA_BAT`. Las
   capas que arrancan en el 0 pasan al 1: el frame 0 queda vacío.
+- **Textos vacíos:** al final, `vaciaTextos()` deja vacío el texto de todas las capas con clase (las
+  cajas ya se midieron con el del diseño).
 - **Imágenes:** las 17 del export van tal cual a `bateador/images/`.
 
 Comparado frame a frame contra el export del 2026-10-18 (con todos los equipos prendidos, el texto
@@ -498,6 +500,7 @@ barra; antes del arreglo del key. Con la fuente variable del export, los textos 
 - **Markers y timeline:** `start` (0–30) y `stop` (120–150) del diseñador → `play`, `salida` y `stop`
   como en el bateador. La entrada termina en el 109 (el último rótulo): si cambia, mover
   `ENTRADA_LAN`. El frame 0 ya llega vacío.
+- **Textos vacíos:** como en el bateador, `vaciaTextos()` al final.
 - **Imágenes:** las 16 del export van tal cual a `lanzador/images/`, más `barra_bravos.png`.
 
 Comparado frame a frame contra el export del 2026-10-18 con el panel, la textura y el escudo
