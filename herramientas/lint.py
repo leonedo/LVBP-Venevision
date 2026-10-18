@@ -60,6 +60,11 @@ for g in GRAFICOS:
         if pl.get('type') and pl['type'] not in ('pause', 'loop'): p(g, f'stage {name}: type {pl["type"]}')
         end = m['tm'] + m['dr']
         if not (d['ip'] <= m['tm'] <= d['op'] and d['ip'] <= end <= d['op']): p(g, f'marker {name} fuera de la timeline')
+    # el contrato de salida: el layer se suelta, como mucho, 5 s después de que empieza la salida
+    # (EXIT_FALLBACK_MS): una salida de más de 4,5 s la corta el respaldo (CLAUDE.md)
+    salidas = {'stop'} | {(m.get('payload') or {}).get('stop') for m in d['markers']} - {None}
+    for name in salidas:
+        if name in ms and abs(ms[name]['dr']) / d['fr'] > 4.5: p(g, f'la salida {name} dura {abs(ms[name]["dr"]) / d["fr"]:.1f} s (más de 4,5)')
     # cada fuente en un archivo de la carpeta del gráfico (CasparCG la abre con file://)
     for f in d['fonts']['list']:
         if not f.get('fPath', '').startswith('font/') or not os.path.isfile(REPO + g + '/' + f['fPath']): p(g, f'fPath {f.get("fPath")!r}')
@@ -83,18 +88,6 @@ for g in GRAFICOS:
             if l['ks']['o'].get('k') != 100: p(g, f'compuerta {l["ln"]}: opacidad en la capa (va en el CSS)')
             # el gris del Emboss de AE, que Lottie no pinta (prep.js, GRIS_PUERTA)
             if not any(e.get('ty') == 21 for e in l.get('ef', [])): p(g, f'compuerta {l["ln"]}: sin el Fill gris (sale blanca)')
-    # las letras grandes de PEPSI, mateadas con el recuadro gris: en AE las recorta la T de "preservar
-    # transparencia", que Lottie no exporta, y sin el mate se ven antes que el recuadro (prep.js)
-    # y blancas con un Fill, y los bateadores con el apellido en blanco (un animador de texto): lo que
-    # en AE es estilo y Bodymovin no exporta (prep.js)
-    if g == 'parcial':
-        letras = [l for l in d['layers'] if l['nm'].startswith('pepsi letra')]
-        if len(letras) != 5 or any(l.get('tt') != 1 for l in letras): p(g, 'letras de PEPSI sin su mate: se ven antes que el recuadro')
-        blanco = lambda e: e.get('ty') == 21 and e['ef'][2]['v']['k'][:3] == [1, 1, 1]
-        if any(not any(blanco(e) for e in l.get('ef', [])) for l in letras): p(g, 'letras de PEPSI sin el Fill blanco: salen negras')
-        apellido = lambda a: a['a'].get('fc', {}).get('k') == [1, 1, 1, 1] and a['s'].get('b') == 3 and a['s']['s']['k'] == 1 and a['s'].get('r') == 2
-        for n in (1, 2, 3):
-            if not any(l.get('cl') == f'jugador{n}' and any(apellido(a) for a in l['t'].get('a', [])) for l in d['layers']): p(g, f'jugador{n} sin el animador del apellido en blanco')
     # el Hue/Saturation de la V de Venevisión, que Lottie no pinta (prep.js, horneaClaridad)
     if g == 'score':
         for l in d['layers']:

@@ -17,7 +17,7 @@ keys del UPDATE están en su `data.md`.
 | `defensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el campo con las 9 posiciones (rótulo y apellido); arriba a la izquierda, la barra del equipo y DEFENSIVA. El frame 0 está vacío | stage `play` pause (0–53) | `salida`: la entrada al revés (1,8 s): las compuertas se cierran y termina en el frame vacío |
 | `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA. El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
 | `bateador/` | Barra baja del bateador: a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87) | `salida`: la entrada al revés (2,9 s) |
-| `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo a la derecha del centro: barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE y el cuadro de Pepsi (fijo, animado). El frame 0 está vacío | stage `play` pause (0–116): la pizarra entra hasta el 50 y el cuadro de Pepsi hasta el 115 | `salida`: la entrada al revés (3,9 s) |
+| `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, un poco a la derecha del centro: barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de Pepsi (fijo: una secuencia de PNG). El frame 0 está vacío | stage `play` pause (0–222): la pizarra entra hasta el 41, el cuadro de Pepsi hasta el 73 y le pasa un brillo del 181 al 220 | `salida`: el cuadro de Pepsi sale como lo animó el diseñador y después la pizarra, su entrada al revés (3,9 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces `visita_vs_local`),
@@ -25,15 +25,15 @@ del 2026-10-17; `defensiva.png` / `ofensiva.png` (Leones, con nombres de ejemplo
 `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), del 2026-10-17; `bateador.png`
 (Leones, con data de ejemplo) y `bateador_equipos.png` (los 8 equipos, recortado a la barra), del
 2026-10-17; `parcial.png` (pantalla completa con el ejemplo de su `data.md`, Magallanes y Cardenales)
-y `parcial_equipos.png` (los 56 cruces `visita_vs_local`, recortado a la pizarra), del 2026-10-17. Si
+y `parcial_equipos.png` (los 56 cruces `visita_vs_local`, recortado a la pizarra), del 2026-10-18. Si
 un gráfico cambia, hay que regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último
 frame de la entrada). No entran al zip (`.gitattributes`).
 
 No hay video de referencia del diseñador, y ningún export trae salida (los markers `stop` del score,
-90–120, de la defensiva, 60–90, y de la ofensiva y el bateador, 90–120, no animan nada; el parcial
-no trae markers) ni la bajada de la barra
-de jugadores del score: son la animación de entrada al revés, como en todos los gráficos de
-Meridiano. Si el diseñador manda una salida propia, reemplaza a ésta.
+90–120, de la defensiva, 60–90, y de la ofensiva y el bateador, 90–120, no animan nada) ni la
+bajada de la barra de jugadores del score: son la animación de entrada al revés, como en todos los
+gráficos de Meridiano. Si el diseñador manda una salida propia, reemplaza a ésta: el cuadro de Pepsi
+del parcial trae la suya, y la pizarra sale después, al revés.
 
 **Score.** Claves: las del score de LVBP-Meridiano donde dicen lo mismo, para que el controlador le mande a
 los dos la misma data: `conteobolasystrikes`, `outs`, `inning`, `INNINGarriba_opacidad` /
@@ -186,62 +186,56 @@ a su vez son las del score donde dicen lo mismo, para que el controlador les man
 misma data: `<SIGLAS>VISITA_opacidad` / `<SIGLAS>LOCAL_opacidad`, `inning`,
 `INNINGarriba_opacidad` / `INNINGabajo_opacidad`, `CARRERASVISITA`, `HITSVISITA`, `ERRORESVISITA`
 (y `LOCAL`), `jugador1`…`jugador3` y `titulo_jugadores` (el AL BATE). No tiene `titulo` ni
-`publicidad`. Propias: `NOMBREVISITA` / `NOMBRELOCAL`, el nombre escrito sobre la barra (`AGUILAS`;
-en el score, `EQUIPOVISITA` son las siglas, y por eso no se reusa), y los rótulos fijos
-`rotulocarreras`, `rotulohits`, `rotuloerrores` (la C, la H y la E). El payload del parcial de
-Meridiano no trae los nombres: el controlador tiene que mandarlos siempre, o quedan al aire los del
+`publicidad`. Propias: `posicion1`…`posicion3` (la posición de cada bateador, en su capa, como en la
+ofensiva), `NOMBREVISITA` / `NOMBRELOCAL`, el nombre escrito sobre la barra (`AGUILAS`; en el score,
+`EQUIPOVISITA` son las siglas, y por eso no se reusa), y los rótulos fijos `rotulocarreras`,
+`rotulohits`, `rotuloerrores` (la C, la H y la E). El payload del parcial de Meridiano no trae los
+nombres ni las posiciones: el controlador tiene que mandarlos siempre, o quedan al aire los del
 diseño (AGUILAS y LEONES) sobre las barras de otros equipos.
 
-Barras de equipo: imágenes apiladas, todas visibles al arrancar, como en el score: el controlador
-manda `1` a la que va en cada fila y `0` a las otras siete. Sin data quedan arriba las del diseño,
-Águilas de visita y Leones de local. El export sólo trae esas dos (PNG de 512 × 512 con la barra en
-x 0, y 192): las otras seis son las `BARRA_<EQUIPO>_VISITA` de la ofensiva (las más parecidas a las
-del export: 2 niveles de 255 de diferencia media), copiadas a `images/barra_<equipo>.png`, con la
-misma máscara de cada fila y la primera columna con color alineada a la de las del export (la de
-Bravos y la de Tigres traen 2 y 4 columnas transparentes a la izquierda).
+Barras de equipo: imágenes apiladas, las 8 de cada fila, cada una con su máscara (un track matte),
+todas visibles al arrancar, como en el score: el controlador manda `1` a la que va en cada fila y
+`0` a las otras siete. Sin data queda arriba Bravos, en las dos filas.
 
-Textos: en mayúsculas. Los bateadores van con la posición y el apellido, como el diseño (`3B
-TOVAR`), alineados a la izquierda, la primera palabra en cian y el resto en blanco (en AE es un
-estilo por carácter, que Bodymovin no exporta: lo pone un animador de texto por palabras, que sigue
-funcionando con el texto del UPDATE): entran unas 11 letras (`CF CASTILLO`); más largos encogen dentro
-de la columna (`SS MONASTERIOS` baja de 30 a 24, `3B A. MONASTERIOS` a 20). El parcial de Meridiano
-los lleva con la inicial y el apellido (`A. MONASTERIOS`): qué manda el controlador lo decide su
-armador de VV. Los nombres de equipo, unas 10 letras (`MAGALLANES`, `CARDENALES`); los números, dos
-cifras; el inning, dos. Todo en una línea: un texto muy largo encoge, no parte.
+Textos: en mayúsculas. Cada bateador es la posición (cian, centrada en su caja: entra cualquiera de
+dos letras, DH mide 33 de 40) y el apellido (blanco, alineado a la izquierda): entran unas 9 letras
+(`CASTILLO`); más largos encogen dentro de la columna (`RODRÍGUEZ` baja de 30 a 28, `MONASTERIOS` a
+22). Los nombres de equipo, unas 10 letras (`MAGALLANES`, `CARDENALES`); los números, dos cifras; el
+inning, dos. Todo en una línea: un texto muy largo encoge, no parte.
 
 Cuadro de Pepsi: fijo, sin claves (Leon, 2026-10-17, entre arreglarlo, una publicidad genérica como
-la de Meridiano o sacarlo). Cómo tiene que quedar lo dice una captura de AE del diseñador
-(2026-10-17): en la pausa, el logo chico a la izquierda y PEPSI grande en blanco a su derecha,
-centrado en alto con él. Los dos exports del 2026-10-17 traen la misma animación (el segundo, el
-"arreglado", es igual al primero salvo el `ascent` de la fuente: lo que cambió en AE no llegó al
-JSON), con estos problemas: la imagen `Pepsi Insert (1).png` faltaba en el proyecto del diseñador y
-llegaba como las barras de color de AE en el centro de la pantalla (se saca); las letras grandes de
-PEPSI aparecían del 15 al 30, antes que el recuadro, sobre el video (en AE las recorta la T de
-*preservar transparencia*, que Lottie no exporta: van mateadas con una copia del recuadro gris, que
-crece del 37 al 50 y las destapa); esas letras llegan negras y 79 px más abajo que en la captura,
-contra el borde de abajo del recuadro (suben al centro del logo del final y van blancas con un efecto
-Fill, que Lottie sí pinta); un círculo negro (`Capa de formas 13`), el aro del logo dibujado 170 px
-más arriba del logo, que ya trae el suyo (se saca); y un final a medio hacer, del 282 al 372 (el
-logo se vuelve un PEPSI chico, el recuadro se corta y quedan letras sueltas sobre el video), que no
-se usa: la pausa es el 116. Mientras el logo crece en el centro (62–95) pasa por encima de las
-letras, y al achicarse hacia la izquierda (95–115) las destapa. Las rayas grises de los costados
-traen un *CC Light Sweep*, un brillo que Lottie no pinta (su sombra sí); el Hue/Saturation de las
-letras está en cero y se saca. Si el diseñador manda un export con el PEPSI ya blanco (otro efecto,
-o el Hue/Saturation con claridad), `prep.js` falla: mirarlo y sacar el Fill; si las letras ya vienen
-a la altura del logo, no se mueven (las sube hasta el logo, no una distancia fija).
+la de Meridiano o sacarlo). Los dos primeros exports (2026-10-17) lo traían en vectores y con
+problemas que no se podían resolver sin adivinar: una imagen que faltaba, letras que se veían antes
+que el recuadro, un círculo suelto, un final a medio hacer, y el PEPSI blanco de la captura de AE del
+diseñador, que no llegaba al JSON. Desde el export del 2026-10-18 es una **secuencia de PNG** (Leon):
+un precomp de 262 frames de 334 × 208 (0,8 MB), a escala 1, con el brillo y su salida tal como en
+AE. Flujo (Leon, 2026-10-18): la pizarra entra del 0 al 41, el cuadro del 37 al 73, el logo queda
+quieto, le pasa un brillo (181–220) y la entrada para en el 221; la salida es la del diseñador para
+el cuadro (222–295: las letras se van, el logo se vuelve un punto y el recuadro se cierra) y después
+la pizarra, que el export no saca (la corta en el 297): su entrada al revés, del 296 al 337 (3,9 s
+en total). No es un loop.
+
+Pendiente con el diseñador: los PNG vienen reducidos a una paleta de unos 40 colores con tramado (la
+compresión de imágenes de Bodymovin): en el brillo se ve la trama y, como cada frame se trama
+distinto, los bordes del logo titilan entre frames (hasta 55–88 niveles en unos 600 px) aunque esté
+quieto. Hace falta la secuencia con color completo (mismos nombres y tamaños: se reemplazan los
+archivos). Y no hay un frame limpio después del brillo: en el 221 todavía queda un resto en la
+esquina de arriba a la izquierda (sale del todo en el 224, cuando las letras ya se van), y el logo
+chico queda 1 px corrido respecto del de antes del brillo, así que no se puede pausar en otro frame
+sin un salto. Si el diseñador deja unos frames limpios después del brillo, mover `PAR_PAUSA`.
 
 Key: los recuadros de la pizarra se tocan borde con borde, y dos bordes suavizados que caen en el
-mismo píxel no suman 100 %: en el key de CasparCG quedaban tres columnas de 1 px al 86–94 % (entre
-el nombre y los números, los números y los bateadores, y los bateadores y la raya de Pepsi), una
-línea finita de video al aire. Los números y los bateadores crecen 1 px sobre el vecino y el key
+mismo píxel no suman 100 %: en el key de CasparCG quedaban columnas de 1 px al 86–94 % (entre el
+nombre y los números, los números y los bateadores, y los bateadores y la raya del cuadro de Pepsi),
+una línea finita de video al aire. Los números y los bateadores crecen 1 px sobre el vecino y el key
 queda lleno (las barras, 1 px más cortas debajo del nombre).
 
 Colores en NTSC compuesto (2026-10-17, con setup de 7,5 IRE): las barras de los 8 equipos, medidas
-en los 56 cruces, quedan legales (la más alta, Leones, 106 IRE; la más baja, Cardenales, −7,1: son
-otros PNG que los del score, del mismo diseño); el cian de los números y los bateadores y el
-amarillo del AL BATE son los del score (113,5 y 114,4 IRE): quedan así, como allá. El azul de Pepsi
-(`#0125FF`) baja a −14 IRE, legal hasta −20; si hiciera falta subirlo a −7, `#1032FF`. En HD
-(Rec.709) todo es legal.
+en los 56 cruces del primer export, quedan legales (la más alta, Leones, 106 IRE; la más baja,
+Cardenales, −7,1); el cian de los números y las posiciones y el amarillo del AL BATE son los del
+score (113,5 y 114,4 IRE): quedan así, como allá. En la secuencia de Pepsi (2026-10-18), lo más alto
+es el blanco (100 IRE) y el azul de Pepsi baja a −14,2 IRE, legal hasta −20; si hiciera falta subirlo
+a −7, `#1032FF` (en los PNG del diseñador). En HD (Rec.709) todo es legal.
 
 ### Cuando llega un export nuevo del diseñador
 
@@ -408,50 +402,42 @@ pintó antes: renderizados cada uno en una página recién cargada, son idéntic
 
 **Parcial**
 
-- **Clases:** todo llega sin clase. `10` → `inning`; las flechas `Capa de formas 10` (▲) y `Capa de
-  formas 9` (la misma, rotada 180°: ▼) → `INNINGarriba_opacidad` / `INNINGabajo_opacidad`;
-  `CARRERA ALTA`, `HITS ALTA`, `ERROR ALTA` (la fila de arriba, la visita) → `CARRERASVISITA`,
-  `HITSVISITA`, `ERRORESVISITA`, y las `BAJA` → `…LOCAL`; `NOMBRE EQUIPO VISITANTE` / `LOCAL` →
-  `NOMBREVISITA` / `NOMBRELOCAL`; `C`, `H`, `E` → `rotulocarreras`, `rotulohits`, `rotuloerrores`;
-  `AL BATE` → `titulo_jugadores`; `3B TOVAR 2`, `CF CASTRO 2`, `LF RONDON 2` → `jugador1`…`3`; las
-  barras `BARRA_AGUILAS_VISITA.ai` (fila de arriba) y `BARRA_LEONES_VISITA.ai` (abajo, aunque diga
-  VISITA; clase `ai`) → `AGUIVISITA_opacidad` / `LEOLOCAL_opacidad`, más las 14 copias (ver arriba).
-  Las imágenes de Pepsi llegan con la clase `ai` repetida: se les saca y se renombran (`pepsi
-  logo`, `pepsi letra N`, `pepsi logo letra N`).
+- **Clases:** `.inning` → `inning`; las flechas `.INNINGARRIBAFLECHA` / `.INNINGABAJOFLECHA` (la
+  misma forma, rotada 180°) → `INNINGarriba_opacidad` / `INNINGabajo_opacidad`; `.CARRERA ALTA`,
+  `.HITS ALTA`, `.ERROR ALTA` (la fila de arriba, la visita; con espacio, clases inválidas) →
+  `CARRERASVISITA`, `HITSVISITA`, `ERRORESVISITA`, y las `BAJA` → `…LOCAL` (`ERRORESBAJA` llega
+  sin el punto); `.VISITANTE` / `.LOCAL` → `NOMBREVISITA` / `NOMBRELOCAL`; `C`, `H`, `E` →
+  `rotulocarreras`, `rotulohits`, `rotuloerrores`; `.albate` → `titulo_jugadores`;
+  `.POSPREVENIDO1`…`3` → `posicion1`…`3` (el texto por defecto pierde el espacio final, que Lottie no
+  cuenta al centrar); `.PREVENIDO1`…`3` → `jugador1`…`3`; las barras `.<EQUIPO><LOCAL|VISITA>` (sin
+  `_`, con el nombre del equipo) → `<SIGLAS><LOCAL|VISITA>_opacidad`. Las `mask N` (sus mattes) y
+  el precomp `PEPSI LOGO` quedan como vienen.
 - **Fuente:** `fPath` llega como la carpeta (`FINAL DE INNING/FONT`): pasa a `font/LTEnergyVFVF.ttf`,
-  el mismo archivo que el del score. El `ascent` queda el del export (el segundo trae 72.9996, el de
-  la estática; el primero, 73.6996, el de la variable): mueve los textos menos de medio píxel.
+  el mismo archivo que el del score. El `ascent` queda el del export (72.9996).
 - **All Caps:** llega apagado en todas las capas de texto: `prep.js` lo prende.
 - **Textos de caja:** ya llegan de caja, con `lh` 0.01 (va 1.2 del cuerpo) y cajas que cruzaban su
-  lugar. Medidos en el frame 115 con la fuente cargada: `inning` a 38, centrado, 4 px antes de cada
+  lugar. Medidos en el frame 221 con la fuente cargada: `inning` a 38, centrado, 4 px antes de cada
   flecha; los nombres a 203, centrados, 8 px adentro de la caja negra; `titulo_jugadores` a 274,
-  centrado, 8 px adentro de la columna. Los bateadores llegaban centrados pero corridos a mano para
-  verse alineados a la izquierda: pasan a la izquierda desde donde empieza el texto del diseño (Lw
-  `3B TOVAR` 121.3922, `CF CASTRO` 133.4531, `LF RONDON` 132.5813), hasta 8 px antes del final de la
-  columna (x 1307), con un animador de texto (`apellido en blanco`: por palabras, `b` 3, desde el
-  índice 1 al 100, `r` 2; Lottie no recalcula ese 100 al cambiar el texto) que pinta de blanco todo
-  menos la primera palabra. Los números quedan con su caja
-  (72, entran dos cifras). El alto de todas, el ascent del cuerpo más 2, como en el bateador.
+  centrado, 8 px adentro de la columna; los apellidos a 129.46 (`PAR_JUGADOR`), desde donde empiezan
+  hasta 8 px antes del final de la columna (x 1215: la caja del export entraba 40 px en el cuadro de
+  Pepsi). Las posiciones y los números quedan con su caja. El alto de todas, el ascent del cuerpo
+  más 2, como en el bateador.
 - **Key:** `Capa de formas 1` (los números) crece 1 px a cada lado y `Capa de formas 4` (los
   bateadores) 1 px a la derecha (ver *Key* arriba).
-- **Pepsi:** se sacan `Pepsi Insert (1).png` (y su asset, `img_2.jpg`) y `Capa de formas 13`; las 5
-  letras grandes van con `tt` 1 y, encima de cada una, una copia del recuadro gris (`Capa de formas
-  11`) con `td` 1; suben hasta el centro del logo en el 115 (sale de `Nulo 24` y del logo: y 841.5)
-  y su Hue/Saturation, en cero, se cambia por un Fill blanco (`prep.js` falla si el Hue/Saturation
-  cambia algo).
-- **Markers y timeline:** el export no trae markers y dura 900 frames. `play`, `salida` y `stop`
-  como en la defensiva, con la entrada hasta el 115 (el logo se achica, 95–115): si cambia, mover
-  `PAR_ENTRADA`. Los keyframes del final descartado (282 en adelante, `PAR_DESCARTE`) se borran, y
-  `prep.js` falla si algo se mueve entre los dos. Las capas que arrancan en el 0 pasan al 1: el frame
-  0 queda vacío.
-- **Imágenes:** del export, `img_0`, `img_1`, `img_3` e `img_4` tal cual a `parcial/images/`; las
-  seis barras, copias de `ofensiva/images/img_3–5, 7–9` (`prep.js` falla si dejan de ser iguales:
-  copiarlas de nuevo y medir sus columnas transparentes de la izquierda, `PAR_BARRAS`).
+- **Markers y timeline:** el export dice que dura 38 frames (su `op`), sus capas llegan al 297 y sus
+  markers (`START` 0–30, `stop` 270–298) no sirven. `play` 0–222 (pausa en el 221, `PAR_PAUSA`),
+  `salida` 222–338 y `stop` en el 0. La pizarra (todo menos `PEPSI LOGO` y su raya derecha, `MARCO DE
+  PUBLICIDAD 4`, que sale con él) suma su entrada al revés desde el 296 (`alReves`, como la bajada de
+  la barra del score): una capa que entraba en el frame t se va en el 337 − t. El 296
+  (`PAR_FIN_PEPSI`) es el primer frame vacío del final de la secuencia: `prep.js` lo comprueba (los
+  PNG vacíos son el mismo archivo) y falla si cambia. Las capas que arrancan en el 0 pasan al 1: el
+  frame 0 queda vacío.
+- **Imágenes:** las 270 del export van tal cual a `parcial/images/` (`img_0`–`261`, la secuencia;
+  `img_262`–`269`, las barras).
 
-Comparado frame a frame contra el segundo export (Águilas y Leones, con el texto del diseño):
-idéntico del 0 al 115 fuera del cuadro de Pepsi y de los apellidos de los bateadores, salvo las dos
-columnas de 1 px del arreglo del key (x 806 y 1090). El preparado contra la captura de AE, en la
-pausa: igual, a la escala de la captura.
+Comparado frame a frame contra el export del 2026-10-18 (sin data, con su `op` llevado al 300):
+idéntico al píxel del 0 al 221, salvo las columnas de 1 px del arreglo del key (x 714–715, 998–999 y
+1215–1216).
 
 ### QA
 

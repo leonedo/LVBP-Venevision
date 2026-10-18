@@ -1,7 +1,7 @@
 // Prepara los exports del diseñador para CasparCG: la receta de "Cuando llega un export nuevo"
 // de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13), de la
 // defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15), del bateador (LOWBAR BATEADOR,
-// 2026-10-16) y del parcial (FINAL DE INNING, 2026-10-17): si el diseñador cambia nombres de
+// 2026-10-16) y del parcial (FINAL DE INNING, 2026-10-18): si el diseñador cambia nombres de
 // capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
@@ -759,75 +759,68 @@ if (hay('LOWBAR BATEADOR')) {
 
 // ---------------------------------------------------------------- parcial
 // El score de fin de inning (el export es FINAL DE INNING): C H E de los dos equipos con su barra y
-// su nombre, el inning con sus flechas, los tres que vienen al bate y el cuadro de Pepsi. Las claves,
-// las del parcial de LVBP-Meridiano, que a su vez son las del score donde dicen lo mismo: los escudos
-// (<SIGLAS>VISITA_opacidad, <SIGLAS>LOCAL_opacidad), inning, las flechas, CARRERAS/HITS/ERRORES
-// VISITA y LOCAL, jugador1–3 y titulo_jugadores. Propias: NOMBREVISITA / NOMBRELOCAL (el nombre
-// escrito sobre la barra; en el score, EQUIPOVISITA son las siglas) y los rótulos fijos C, H, E.
-// Cajas medidas en el frame 115 con la fuente cargada (todo cuelga de Nulo 23, al 102 %).
+// su nombre, el inning con sus flechas, los tres que vienen al bate (posición y apellido) y el cuadro
+// de Pepsi, que desde el export del 2026-10-18 llega como una secuencia de PNG (262 frames de 334 ×
+// 208, un precomp). Las claves, las del parcial de LVBP-Meridiano, que a su vez son las del score donde
+// dicen lo mismo: los escudos (<SIGLAS>VISITA_opacidad, <SIGLAS>LOCAL_opacidad), inning, las flechas,
+// CARRERAS/HITS/ERRORES VISITA y LOCAL, jugador1–3 y titulo_jugadores. Propias: posicion1–3 (como en la
+// ofensiva), NOMBREVISITA / NOMBRELOCAL (el nombre escrito sobre la barra; en el score, EQUIPOVISITA
+// son las siglas) y los rótulos fijos C, H, E.
+// Cajas medidas en el frame 221 con la fuente cargada (todo cuelga de Nulo 23, al 102 %, salvo las
+// posiciones, sin parent).
 const PAR_INNING = 38;                 // 4 px antes de cada flecha (10 mide 26.7)
 const PAR_NOMBRE = 203;                // 8 px adentro de la caja negra (221 px; AGUILAS mide 120.1)
 const PAR_TITULO = 274;                // 8 px adentro de la columna de los bateadores (216 px)
-// Los bateadores: el diseño los dejó centrados, pero corridos a mano para que se vean alineados a la
-// izquierda (x 1108.6 el primero y 1110.5 los otros dos). Pasan a la izquierda desde donde empieza el
-// texto del diseño (Lw, su ancho de línea) y llegan hasta 8 px antes del final de la columna (x 1307.2).
-const PAR_JUGADORES = [['3B TOVAR 2', 121.3922, 169.39], ['CF CASTRO 2', 133.4531, 167.62], ['LF RONDON 2', 132.5813, 167.74]];
-// Las barras de los equipos que no vinieron (el export trae Águilas y Leones, en PNG de 512 × 512 con
-// la barra en x 0, y 192): las BARRA_<EQUIPO>_VISITA de la ofensiva, del mismo diseño, copiadas a mano
-// a parcial/images. [archivo, el de ofensiva/images del que es copia, columnas transparentes a la
-// izquierda del PNG]. Si la ofensiva cambia sus barras, prep.js falla: copiarlas de nuevo y medir
-// esas columnas.
-const PAR_BARRAS = {
-    BRAVOS: ['barra_bravos.png', 'img_3.png', 2], CARD: ['barra_cardenales.png', 'img_4.png', 0],
-    ANZ: ['barra_caribes.png', 'img_5.png', 0], MAGA: ['barra_magallanes.png', 'img_7.png', 0],
-    TIBUS: ['barra_tiburones.png', 'img_9.png', 0], TIGRES: ['barra_tigres.png', 'img_8.png', 4]
-};
-const PAR_ENTRADA = 116;               // la entrada termina en el 115 (el logo de Pepsi se achica)
-const PAR_DESCARTE = 282;              // del 282 al 372, el final a medio hacer del cuadro de Pepsi
+// El apellido, alineado a la izquierda desde donde empieza en el diseño (x 1061.6), hasta 8 px antes
+// del final de la columna (x 1215.2): la caja del export llegaba 40 px adentro del cuadro de Pepsi.
+// TOVAR mide 83.5 y CASTILLO 115.9.
+const PAR_JUGADOR = { ps: 32.8073883056641, W: 129.46 };
+// Flujo: la pizarra entra del 0 al 41 y el cuadro de Pepsi del 37 al 73; el logo queda quieto, le pasa
+// un brillo (181–220) y la entrada para en el 221, con el logo limpio (Leon, 2026-10-18). La salida es
+// la del diseñador para el cuadro de Pepsi (222–295: las letras se van, el logo se vuelve un punto y el
+// recuadro se cierra) y después la pizarra, que el export no saca (la corta en el 297): su entrada al
+// revés, del 296 al 337. En total, 3,9 s.
+const PAR_PAUSA = 222;                 // play 0–222: queda en el 221
+const PAR_PIZARRA = 41;                // la entrada de la pizarra termina en el 41 (el tercer bateador)
+const PAR_FIN_PEPSI = 296;             // la secuencia queda vacía desde el 296 (su frame 259)
+const PAR_FIN = PAR_FIN_PEPSI + PAR_PIZARRA; // 337, vacío
 if (hay('FINAL DE INNING')) {
     const d = load(path.join(SRC, 'FINAL DE INNING/data.json'));
-    const quitar = nm => d.layers.splice(d.layers.indexOf(layer(d, nm)), 1)[0];
 
     // ---- textos
-    rename(d, '10', 'inning');
+    rename(d, '.inning', 'inning');
     anchoCentrado(doc(d, '.inning'), PAR_INNING);
     // ▲ y ▼: la misma forma, la de abajo rotada 180°
-    if (layer(d, 'Capa de formas 10').ks.r.k !== 0 || layer(d, 'Capa de formas 9').ks.r.k !== 180) throw new Error('flechas: rotación inesperada');
-    rename(d, 'Capa de formas 10', 'INNINGarriba_opacidad');
-    rename(d, 'Capa de formas 9', 'INNINGabajo_opacidad');
-    // ALTA es la fila de arriba, la de la visita
-    for (const [fila, lado] of [['ALTA', 'VISITA'], ['BAJA', 'LOCAL']]) {
-        rename(d, 'CARRERA ' + fila, 'CARRERAS' + lado);
-        rename(d, 'HITS ' + fila, 'HITS' + lado);
-        rename(d, 'ERROR ' + fila, 'ERRORES' + lado);
-    }
-    rename(d, 'NOMBRE EQUIPO VISITANTE', 'NOMBREVISITA');
-    rename(d, 'NOMBRE EQUIPO LOCAL', 'NOMBRELOCAL');
+    if (layer(d, '.INNINGARRIBAFLECHA').ks.r.k !== 0 || layer(d, '.INNINGABAJOFLECHA').ks.r.k !== 180) throw new Error('flechas: rotación inesperada');
+    rename(d, '.INNINGARRIBAFLECHA', 'INNINGarriba_opacidad');
+    rename(d, '.INNINGABAJOFLECHA', 'INNINGabajo_opacidad');
+    // ALTA es la fila de arriba, la de la visita. Los errores de abajo llegan sin el punto (sin clase).
+    rename(d, '.CARRERA ALTA', 'CARRERASVISITA');
+    rename(d, '.HITS ALTA', 'HITSVISITA');
+    rename(d, '.ERROR ALTA', 'ERRORESVISITA');
+    rename(d, '.CARRERA BAJA', 'CARRERASLOCAL');
+    rename(d, '.HITS BAJA', 'HITSLOCAL');
+    rename(d, 'ERRORESBAJA', 'ERRORESLOCAL');
+    rename(d, '.VISITANTE', 'NOMBREVISITA');
+    rename(d, '.LOCAL', 'NOMBRELOCAL');
     anchoCentrado(doc(d, '.NOMBREVISITA'), PAR_NOMBRE);
     anchoCentrado(doc(d, '.NOMBRELOCAL'), PAR_NOMBRE);
     rename(d, 'C', 'rotulocarreras');
     rename(d, 'H', 'rotulohits');
     rename(d, 'E', 'rotuloerrores');
-    rename(d, 'AL BATE', 'titulo_jugadores');
+    rename(d, '.albate', 'titulo_jugadores');
     anchoCentrado(doc(d, '.titulo_jugadores'), PAR_TITULO);
-    // En AE la posición (la primera palabra) va en cian y el apellido en blanco (captura del diseñador,
-    // 2026-10-17): un estilo por carácter que Bodymovin no exporta, y llega todo en cian. Lo pone un
-    // animador de texto: blanco desde la segunda palabra (por palabras, b 3, en índices, r 2: de la
-    // palabra 1 a la 100, e fijo; Lottie no lo recalcula al cambiar el texto).
-    const apellidoBlanco = {
-        nm: 'apellido en blanco',
-        s: { t: 0, xe: { a: 0, k: 0 }, ne: { a: 0, k: 0 }, a: { a: 0, k: 100 }, b: 3, rn: 0, sh: 1, s: { a: 0, k: 1 }, e: { a: 0, k: 100 }, o: { a: 0, k: 0 }, r: 2 },
-        a: { fc: { a: 0, k: [1, 1, 1, 1] } }
-    };
-    PAR_JUGADORES.forEach(([nm, Lw, W], i) => {
-        const l = rename(d, nm, 'jugador' + (i + 1));
-        const s = doc(d, '.jugador' + (i + 1));
-        if (s.j !== 2 || l.t.a.length) throw new Error(`${nm}: j ${s.j}, ${l.t.a.length} animadores`);
-        s.ps[0] += (s.sz[0] - Lw) / 2;
-        s.sz[0] = W;
-        s.j = 0;
-        l.t.a = [clone(apellidoBlanco)];
-    });
+    // Los bateadores, en dos capas: la posición (cian, centrada en su caja: entra cualquiera de dos
+    // letras, DH mide 33 de 40) y el apellido (blanco).
+    for (let n = 1; n <= 3; n++) {
+        rename(d, '.POSPREVENIDO' + n, 'posicion' + n);
+        const p = doc(d, '.posicion' + n);
+        p.t = p.t.trim();              // "3B ": Lottie no cuenta el espacio final al centrar
+        rename(d, '.PREVENIDO' + n, 'jugador' + n);
+        const j = doc(d, '.jugador' + n);
+        if (j.j !== 0 || j.ps[0] !== PAR_JUGADOR.ps) throw new Error(`jugador${n}: j ${j.j}, ps ${j.ps[0]}: medir de nuevo PAR_JUGADOR`);
+        j.sz[0] = PAR_JUGADOR.W;
+    }
     // Las cajas vienen de AE con lh 0.01, como en el score: lh a 1.2 del cuerpo. El alto, como en el
     // bateador: entra una línea al cuerpo del diseño (su ascent, más 2) y no dos hasta un 40 % del
     // cuerpo. Con el del export, un nombre largo partía en dos líneas chicas en vez de encoger.
@@ -837,50 +830,22 @@ if (hay('FINAL DE INNING')) {
         k.s.sz[1] = +(d.fonts.list[0].ascent * k.s.s / 100 + 2).toFixed(2);
     }
 
-    // ---- las barras de los equipos: imágenes apiladas, todas visibles al arrancar, como en el score.
-    // Cada fila lleva su máscara animada (la barra baja desde arriba); las nuevas van debajo de la del
-    // diseño, que queda arriba si no llega data.
-    const filas = [['VISITA', 'BARRA_AGUILAS_VISITA.ai', 'AGUI'], ['LOCAL', 'BARRA_LEONES_VISITA.ai', 'LEO']];
-    const del512 = Object.fromEntries(filas.map(([, nm, sig]) => [sig, layer(d, nm).refId]));
-    let ind = Math.max(...d.layers.map(l => l.ind));
-    for (const [lado, nm, sigFila] of filas) {
-        const ref = layer(d, nm);
-        if (ref.ks.a.k[0] !== 256 || ref.ks.a.k[1] !== 256) throw new Error(`${nm}: ancla ${ref.ks.a.k}`);
-        const nuevas = [];
-        for (const sig of Object.values(SIGLAS)) {
-            if (sig === sigFila) continue;
-            const c = clone(ref);
-            c.ind = ++ind;
-            c.nm = `.${sig}${lado}_opacidad`;
-            c.cl = `${sig}${lado}_opacidad`;
-            if (del512[sig]) { c.refId = del512[sig]; nuevas.push(c); continue; } // la otra del export
-            const [png, deOfensiva, izq] = PAR_BARRAS[sig];
-            const file = path.join(REPO, 'parcial/images', png);
-            if (!fs.existsSync(file)) throw new Error(`falta parcial/images/${png} (la barra de la ofensiva)`);
-            if (!fs.readFileSync(file).equals(fs.readFileSync(path.join(REPO, 'ofensiva/images', deOfensiva))))
-                throw new Error(`parcial/images/${png} no es ofensiva/images/${deOfensiva}: copiarla de nuevo y medir sus columnas transparentes`);
-            const [w, h] = medidasPng(file);
-            const id = 'image_' + png.replace(/\.png$/, '');
-            if (!d.assets.some(a => a.id === id)) d.assets.push({ id, w, h, u: 'images/', p: png, e: 0 });
-            c.refId = id;
-            // La barra en el mismo lugar que en el PNG de 512: su primera columna con color en x 0 y su
-            // borde de arriba en y 192. La máscara, en las coordenadas de la imagen nueva.
-            c.ks.a.k = [256 + izq, 256 - 192, 0];
-            for (const kf of c.masksProperties[0].pt.k) for (const v of kf.s[0].v) { v[0] += izq; v[1] -= 192; }
-            nuevas.push(c);
-        }
-        d.layers.splice(d.layers.indexOf(ref) + 1, 0, ...nuevas);
-        rename(d, nm, `${sigFila}${lado}_opacidad`);
+    // ---- las barras de los equipos: las 8 de cada fila, imágenes apiladas con su máscara (un track
+    // matte), todas visibles al arrancar, como en el score.
+    for (const l of d.layers) {
+        const m = (l.nm || '').match(/^\.([A-Z]+?)(LOCAL|VISITA)$/);
+        if (!m || l.ty !== 2) continue;
+        if (!SIGLAS[m[1]]) throw new Error(`equipo desconocido ${m[1]}`);
+        rename(d, l.nm, SIGLAS[m[1]] + m[2] + '_opacidad');
     }
     for (const s of Object.values(SIGLAS)) for (const lado of ['VISITA', 'LOCAL']) layer(d, `.${s}${lado}_opacidad`);
 
     // ---- los recuadros que se tocan: dos bordes suavizados que caen en el mismo píxel no suman 100 %
-    // de opacidad, y en el key quedaba una columna de 1 px al 86–94 % entre el nombre y los números
-    // (x 807), los números y los bateadores (1090) y los bateadores y la raya gris del cuadro de Pepsi
-    // (1307): al aire, una línea finita de video. Los recuadros crecen 1 px sobre el vecino: los
-    // números a la derecha, por debajo de los bateadores, y a la izquierda, por encima del final de
-    // las barras (que quedan 1 px más cortas, abajo del nombre); los bateadores a la derecha, por
-    // debajo de la raya.
+    // de opacidad, y en el key quedaba una columna de 1 px al 86–94 % entre el nombre y los números,
+    // los números y los bateadores, y los bateadores y la raya gris del cuadro de Pepsi: al aire, una
+    // línea finita de video. Los recuadros crecen 1 px sobre el vecino: los números a la derecha, por
+    // debajo de los bateadores, y a la izquierda, por encima del final de las barras (que quedan 1 px
+    // más cortas, abajo del nombre); los bateadores a la derecha, por debajo de la raya.
     const nulo = layer(d, 'Nulo 23');
     if (nulo.ks.s.a || nulo.ks.s.k[0] !== 102) throw new Error('Nulo 23: escala inesperada');
     const ensancha = (nm, izq, der) => {
@@ -895,78 +860,35 @@ if (hay('FINAL DE INNING')) {
     ensancha('Capa de formas 1', 1, 1);
     ensancha('Capa de formas 4', 0, 1);
 
-    // ---- el cuadro de Pepsi.
-    // La imagen "Pepsi Insert (1).png" faltaba en el proyecto del diseñador: llega como las barras de
-    // color de AE, en el centro de la pantalla. Y el círculo (Capa de formas 13) es un sobrante: el aro
-    // del logo, 170 px más arriba del logo, que ya trae el suyo en el PNG.
-    const insert = quitar('Pepsi Insert (1).png');
-    d.assets = d.assets.filter(a => a.id !== insert.refId);
-    quitar('Capa de formas 13');
-    // Las letras grandes de PEPSI aparecen del 15 al 30, antes que el recuadro: en AE no se ven hasta que
-    // el recuadro gris crece debajo (37–50), por la T de "preservar transparencia", que Lottie no
-    // exporta. Cada letra va mateada con una copia del recuadro gris, que hace lo mismo.
-    // Cómo tiene que quedar, según la captura de AE del diseñador (2026-10-17): el PEPSI en blanco, a la
-    // derecha del logo chico del final y centrado en alto con él. Los dos exports las traen negras y 79 px
-    // más abajo, contra el borde de abajo del recuadro, con un Hue/Saturation en cero: suben hasta el
-    // centro del logo al final de la entrada y van blancas con un efecto Fill, que Lottie sí pinta (como
-    // el gris de las compuertas de la defensiva). El Hue/Saturation se saca.
-    const gris = layer(d, 'Capa de formas 11');
-    const logo = layer(d, 'pepsi-seeklogo-3.ai');
-    const n24 = layer(d, 'Nulo 24');
-    // El centro del logo en el 115, en coordenadas de la composición, como las letras (sin parent): Nulo 24
-    // sin parent ni rotación, y el ancla del logo en el centro de su PNG.
-    const altoLogo = d.assets.find(a => a.id === logo.refId).h;
-    if (logo.parent !== n24.ind || n24.parent || n24.ks.r.a || n24.ks.r.k || n24.ks.p.a || !n24.ks.s.a || logo.ks.p.a || logo.ks.a.k[1] !== altoLogo / 2)
-        throw new Error('logo de Pepsi: transform inesperado');
-    const escalaFin = n24.ks.s.k.filter(k => k.t < PAR_ENTRADA).at(-1).s[1] / 100;
-    const yLogo = n24.ks.p.k[1] + escalaFin * (logo.ks.p.k[1] - n24.ks.a.k[1]);
-    const letras = d.layers.filter(l => l.nm === 'pepsi-type-3.ai' && !l.parent);
-    if (letras.length !== 5) throw new Error(`letras de PEPSI: ${letras.length}`);
-    const subir = yLogo - letras[0].ks.p.k[1];
-    letras.forEach((l, i) => {
-        if (l.tt || l.ks.p.a || l.ef?.length !== 1 || l.ef[0].mn !== 'ADBE HUE SATURATION') throw new Error(`letra ${i + 1}: matte, posición o efectos inesperados`);
-        const hs = nm => l.ef[0].ef.find(x => x.nm === nm).v.k;
-        if (hs('Channel Control') !== 1 || hs('Master Hue') || hs('Master Saturation') || hs('Master Lightness') || hs('Colorize'))
-            throw new Error(`letra ${i + 1}: el Hue/Saturation cambia algo`);
-        l.ef = [relleno(1, 1)];        // blanco
-        l.ks.p.k[1] += subir;
-        const m = clone(gris);
-        Object.assign(m, { ind: ++ind, nm: 'pepsi mascara ' + (i + 1), td: 1 });
-        l.tt = 1;
-        l.nm = 'pepsi letra ' + (i + 1);
-        delete l.cl;                   // la clase "ai" (la extensión del archivo de AE), repetida
-        d.layers.splice(d.layers.indexOf(l), 0, m);
-    });
-    logo.nm = 'pepsi logo';
-    delete logo.cl;
-    d.layers.filter(l => l.nm === 'pepsi-type-3.ai').forEach((l, i) => {
-        if (l.parent !== logo.ind) throw new Error('pepsi-type-3.ai: parent inesperado');
-        l.nm = 'pepsi logo letra ' + (i + 1);
-        delete l.cl;
-    });
-
-    // ---- timeline: la entrada (0–115) y la pausa. El export sigue hasta el 900: del 282 al 372 el logo
-    // se vuelve un PEPSI chico, el recuadro se corta y quedan letras sueltas. No se usa, y entre la
-    // entrada y ese final no se mueve nada. El frame 0 vacío, como en la defensiva.
-    for (const p of propiedadesAnimadas(d.layers)) {
-        if (p.k.some(k => k.t > PAR_ENTRADA - 0.5 && k.t < PAR_DESCARTE - 0.5)) throw new Error('hay animación entre la entrada y el final: mover PAR_ENTRADA');
-        // ni un tramo que cruce la pausa: el último keyframe de la entrada y el primero del final, iguales
-        const corte = p.k.findIndex(k => k.t >= PAR_DESCARTE - 0.5);
-        if (corte > 0 && !p.k[corte - 1].h && JSON.stringify(p.k[corte - 1].s) !== JSON.stringify(p.k[corte].s))
-            throw new Error('hay animación entre la entrada y el final: mover PAR_ENTRADA');
-        p.k = p.k.filter(k => k.t < PAR_DESCARTE - 0.5);
-        if (p.k.length < 2) throw new Error('una propiedad queda con un solo keyframe');
+    // ---- timeline. El export dice que dura 38 frames (op) y sus capas llegan hasta el 297; sus
+    // markers (START 0–30, stop 270–298) no sirven: la entrada dura hasta el 221.
+    const pepsi = layer(d, 'PEPSI LOGO');
+    const secuencia = d.assets.find(a => a.id === pepsi.refId);
+    if (!secuencia || secuencia.layers.length !== 262 || pepsi.st !== pepsi.ip) throw new Error('PEPSI LOGO: secuencia inesperada');
+    // Su primer frame vacío del final: los PNG vacíos de la secuencia son el mismo archivo (el del 0).
+    const png = k => fs.readFileSync(path.join(SRC, 'FINAL DE INNING', ...(a => [a.u, a.p])(d.assets.find(a => a.id === secuencia.layers[k].refId))));
+    const kFin = Math.round(PAR_FIN_PEPSI - pepsi.st);
+    if (!png(kFin).equals(png(0)) || png(kFin - 1).equals(png(0))) throw new Error('PEPSI LOGO: medir de nuevo PAR_FIN_PEPSI (su primer frame vacío del final)');
+    const marcoDer = layer(d, 'MARCO DE PUBLICIDAD 4'); // la raya derecha, que sale con el cuadro (273–282)
+    // La pizarra (todo menos el cuadro de Pepsi y su raya derecha): su entrada al revés desde el 296.
+    // Una capa que entraba en el frame t se va en el PAR_FIN − t.
+    for (const l of d.layers) {
+        if (l === pepsi || l === marcoDer) continue;
+        for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, PAR_PIZARRA, PAR_FIN_PEPSI);
     }
     for (const l of d.layers) {
-        if (l.ip > PAR_ENTRADA || l.op < PAR_ENTRADA + 1) throw new Error(`${l.nm}: ip ${l.ip}, op ${l.op}`);
-        l.ip = Math.max(l.ip, 1);
-        l.op = PAR_ENTRADA + 1;
+        // los mattes, con la capa que matean
+        const ref = l.td ? d.layers[d.layers.indexOf(l) + 1] : l;
+        if (l.op < 297 || ref.ip > PAR_PAUSA) throw new Error(`${l.nm}: ip ${l.ip}, op ${l.op}`);
+        l.op = (ref === pepsi || ref === marcoDer) ? PAR_FIN_PEPSI : PAR_FIN - Math.max(ref.ip, 1) + 0.001;
     }
-    d.op = PAR_ENTRADA + 1;
+    for (const l of d.layers) l.ip = Math.max(l.ip, 1);
+    if (Math.max(...propiedadesAnimadas(d.layers).flatMap(p => p.k.map(k => k.t))) > PAR_FIN) throw new Error('animación después del final');
+    d.op = PAR_FIN + 1;
     d.markers = [
-        { tm: 0, cm: 'play', dr: PAR_ENTRADA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'play', dr: PAR_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
         { tm: 0, cm: 'stop', dr: 1 },
-        { tm: PAR_ENTRADA, cm: 'salida', dr: -PAR_ENTRADA }
+        { tm: PAR_PAUSA, cm: 'salida', dr: PAR_FIN + 1 - PAR_PAUSA }
     ];
     d.fonts.list[0].fPath = 'font/LTEnergyVFVF.ttf';
     allCaps(d);
