@@ -784,6 +784,12 @@ const PAR_PAUSA = 222;                 // play 0–222: queda en el 221
 const PAR_PIZARRA = 41;                // la entrada de la pizarra termina en el 41 (el tercer bateador)
 const PAR_FIN_PEPSI = 296;             // la secuencia queda vacía desde el 296 (su frame 259)
 const PAR_FIN = PAR_FIN_PEPSI + PAR_PIZARRA; // 337, vacío
+// Los PNG de la secuencia vienen reducidos a unos 40 colores con tramado, y cada frame se trama
+// distinto: con el logo quieto, sus bordes titilaban. En los frames 38–133 de la secuencia (al aire,
+// del 76 al 171, antes del brillo) el logo no se mueve (medido: el centro de su luz no se corre más de
+// 0,04 px), y se ve un solo PNG, el primero (Leon, 2026-10-18). Cuando lleguen los PNG con color
+// completo, null.
+const PAR_QUIETO = [38, 134];          // frames de la secuencia, del 38 al 133
 if (hay('FINAL DE INNING')) {
     const d = load(path.join(SRC, 'FINAL DE INNING/data.json'));
 
@@ -867,13 +873,23 @@ if (hay('FINAL DE INNING')) {
     if (!secuencia || secuencia.layers.length !== 262 || pepsi.st !== pepsi.ip) throw new Error('PEPSI LOGO: secuencia inesperada');
     // Su primer frame vacío del final: los PNG vacíos de la secuencia son el mismo archivo (el del 0).
     // (el frame k de la secuencia es la capa que se ve en su k: los nm vienen al revés, PEPSI_00296 en el 0)
+    const capa = k => secuencia.layers.find(c => c.ip <= k + 0.5 && k + 0.5 < c.op); // a mitad del frame: los ip traen decimales
     const png = k => {
-        const l = secuencia.layers.find(c => c.ip <= k + 0.5 && k + 0.5 < c.op); // a mitad del frame: los ip traen decimales
-        const a = d.assets.find(x => x.id === l.refId);
+        const a = d.assets.find(x => x.id === capa(k).refId);
         return fs.readFileSync(path.join(SRC, 'FINAL DE INNING', a.u, a.p));
     };
     const kFin = Math.round(PAR_FIN_PEPSI - pepsi.st);
     if (!png(kFin).equals(png(0)) || png(kFin - 1).equals(png(0))) throw new Error('PEPSI LOGO: medir de nuevo PAR_FIN_PEPSI (su primer frame vacío del final)');
+    if (PAR_QUIETO) {
+        // la capa del primer frame dura hasta el final del tramo; las otras se van, con sus imágenes
+        const [k0, k1] = PAR_QUIETO;
+        const primera = capa(k0), fuera = new Set();
+        for (let k = k0 + 1; k < k1; k++) fuera.add(capa(k));
+        primera.op = capa(k1 - 1).op;
+        secuencia.layers = secuencia.layers.filter(c => !fuera.has(c));
+        const usadas = new Set(secuencia.layers.map(c => c.refId));
+        d.assets = d.assets.filter(a => usadas.has(a.id) || ![...fuera].some(c => c.refId === a.id));
+    }
     const marcoDer = layer(d, 'MARCO DE PUBLICIDAD 4'); // la raya derecha, que sale con el cuadro (273–282)
     // La pizarra (todo menos el cuadro de Pepsi y su raya derecha): su entrada al revés desde el 296.
     // Una capa que entraba en el frame t se va en el PAR_FIN − t.
