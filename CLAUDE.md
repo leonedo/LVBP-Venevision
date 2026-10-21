@@ -18,19 +18,20 @@ suavizado de algunos bordes de letra). Las keys del UPDATE están en su `data.md
 | `defensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el campo con las 9 posiciones (rótulo y apellido); arriba a la izquierda, la barra del equipo y DEFENSIVA. El frame 0 está vacío | stage `play` pause (0–53) | `salida`: la entrada al revés (1,8 s): las compuertas se cierran y termina en el frame vacío |
 | `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA. El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
 | `bateador/` | Barra baja del bateador, abajo a la izquierda: arriba, una barra negra con el split; a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87) | `salida`: la entrada al revés (2,9 s) |
-| `lanzador/` | El lanzador (el export es PITCHERS), en la mitad izquierda: un panel del color del equipo con su escudo grande, de arriba abajo en el borde izquierdo; la barra del equipo con el nombre y el apellido (dos líneas) y el número; la mano de lanzar y 6 estadísticas (rótulo y valor) sobre una textura gris. El frame 0 está vacío | stage `play` pause (0–110) | `salida`: la entrada al revés (3,7 s) |
+| `lanzador/` | El lanzador (el export es PITCHERS), en la mitad izquierda: un panel del color del equipo con su escudo grande, de arriba abajo en el borde izquierdo; la barra del equipo con el nombre y el apellido (dos líneas) y el número, y debajo una barra negra con el split; la mano de lanzar y 6 estadísticas (rótulo y valor) sobre una textura gris. El frame 0 está vacío | stage `play` pause (0–110) | `salida`: la entrada al revés (3,7 s) |
 | `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, casi centrado (35 px a la izquierda): barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de Pepsi (fijo: una secuencia de PNG). El frame 0 está vacío | stage `play` pause (0–222): la pizarra entra hasta el 41, el cuadro de Pepsi hasta el 73 y le pasa un brillo del 181 al 220 | `salida`: el cuadro de Pepsi sale como lo animó el diseñador y después la pizarra, su entrada al revés (3,9 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
 `visita_vs_local`), del 2026-10-17; `defensiva.png` / `ofensiva.png` (Leones, con nombres de
-ejemplo) y `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), del 2026-10-17;
-`bateador.png` / `lanzador.png` (Leones, con data de ejemplo) y `bateador_equipos.png` /
-`lanzador_equipos.png` (los 8 equipos, recortado al gráfico), del 2026-10-18; `parcial.png`
-(pantalla completa con el ejemplo de su `data.md`, Magallanes y Cardenales) y `parcial_equipos.png`
-(los 56 cruces `visita_vs_local`, recortado a la pizarra), del 2026-10-18. Si un gráfico cambia, hay
-que regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último frame de la entrada).
-No entran al zip (`.gitattributes`).
+ejemplo) y `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), las de la defensiva del
+2026-10-21 y las de la ofensiva del 2026-10-17; `bateador.png` / `lanzador.png` (Leones, con data de
+ejemplo) y `bateador_equipos.png` / `lanzador_equipos.png` (los 8 equipos, recortado al gráfico),
+las del bateador del 2026-10-18 y las del lanzador del 2026-10-21; `parcial.png` (pantalla completa
+con el ejemplo de su `data.md`, Magallanes y Cardenales) y `parcial_equipos.png` (los 56 cruces
+`visita_vs_local`, recortado a la pizarra), del 2026-10-18. Si un gráfico cambia, hay que
+regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último frame de la entrada). No
+entran al zip (`.gitattributes`).
 
 No hay video de referencia del diseñador, y ningún export trae salida (los markers `stop` del score,
 90–120, de la defensiva, 60–90, de la ofensiva y el bateador, 90–120, y del lanzador, 120–150, no
@@ -116,8 +117,11 @@ chequeo del Fill en el lint). Con las puertas de color, el de Tigres va al 95 %,
 (`images/compuerta_aguilas.png`, 2026-10-15), y `prep.js` le arma las dos capas con las de Caribes.
 
 Textos: en mayúsculas, como en el score. Los apellidos van como se los manda el controlador a
-Meridiano (`F.RODRIGUEZ`): al tamaño del diseño entran unas 10 letras (`F.RODRÍGUEZ` baja de 20 a
-19, `A.CAMPUSANO` a 17); más largos encogen dentro de su barra azul. Es de pantalla completa desde
+Meridiano (`F.RODRIGUEZ`), en cuerpo 25, el de los rótulos (el export los trae en 20: Leon,
+2026-10-21, con una captura de AE donde APELLIDO llena su barra azul): al tamaño del diseño entran
+unas 8 letras (`APELLIDO`, `R.LOPEZ`; `E.ROSARIO` baja a 23–24, `F.RODRÍGUEZ` a 19–20,
+`A.CAMPUSANO` a 16–17, según la barra); más largos encogen dentro de su barra azul, y uno que encoge
+queda arriba en ella (la caja de Lottie no centra en vertical). Es de pantalla completa desde
 su primer frame, así que el frame 0 queda vacío: no se ve nada antes del `play` (un `CG ADD` sin
 autoplay) y la salida termina en vacío. Un `stop` a mitad de la entrada salta al gráfico completo
 y sale desde ahí, como en Meridiano.
@@ -200,37 +204,53 @@ que en sus brillos llega a 121,4 IRE (el *overlay* lleva a 255 el rojo y el verd
 debajo de lo blanco del escudo; con el fondo de la ofensiva llegaba a 121, y antes a 131). Lo más
 bajo, Cardenales, −8,6. En HD (Rec.709) todo es legal.
 
-**Lanzador.** El export es PITCHERS (2026-10-18); la carpeta, como su equivalente de Meridiano (Leon).
-En la mitad izquierda: el panel de color del equipo con su escudo grande, del borde de arriba al de
-abajo (x 0–540), y a su derecha la barra del equipo con el nombre, el apellido y el número (y 100–255)
-y el panel de estadísticas (hasta x 1127, y 960). Claves: las del lanzador de LVBP-Meridiano donde
-dicen lo mismo, `manodelanzar`, `etiqueta1`…`etiqueta6` / `valor1`…`valor6` (casilleros genéricos, de
-arriba abajo: el G-P / EFE / BB / SO / WHIP / IL del diseño es sólo el texto por defecto) y
-`<SIGLAS>_opacidad`; `numerouniforme`, la del bateador. Propias: `nombre` y `apellido`, en dos líneas
-(Leon, 2026-10-18; la `nombrelanzador` de Meridiano es el nombre completo en una). No tiene `titulo`,
-`informacionbarranegra` ni `logomeridiano`. Todos los textos arrancan vacíos, como en el bateador.
+**Lanzador.** El export es PITCHERS; la carpeta, como su equivalente de Meridiano (Leon). El del
+2026-10-21 reemplazó al del 2026-10-18 (Leon): es el mismo diseño al 80 %, con una barra negra para el
+split debajo del nombre y las estadísticas 44 px más abajo para hacerle lugar, todo colgado de un nulo
+nuevo, `Null 7`, que en la entrada se corre 174 px a la derecha; trae también otro degradado en la
+línea plateada, más oscuro. En la mitad izquierda: el panel de color del equipo con su escudo grande,
+del borde de arriba al de abajo (x 0–630), y a su derecha la barra del equipo con el nombre, el
+apellido y el número (y 166–288), la barra negra del split (y 292–345) y el panel de estadísticas
+(hasta x 1061, y 901). Claves: las del lanzador de LVBP-Meridiano donde dicen lo mismo,
+`manodelanzar`, `informacionbarranegra` (el split; como en el bateador, siempre al aire),
+`etiqueta1`…`etiqueta6` / `valor1`…`valor6` (casilleros genéricos, de arriba abajo: el G-P / EFE / BB /
+SO / WHIP / IL del diseño es sólo el texto por defecto) y `<SIGLAS>_opacidad`; `numerouniforme`, la
+del bateador. Propias: `nombre` y `apellido`, en dos líneas (Leon, 2026-10-18; la `nombrelanzador` de
+Meridiano es el nombre completo en una). No tiene `titulo` ni `logomeridiano`. Todos los textos
+arrancan vacíos, como en el bateador. El split también: hasta que lo manden LVBP-Stats y
+cue-qs-beisbol, la barra negra sale vacía.
 
 Equipo: cada clave prende tres capas, el panel de color (forma con degradado), el escudo grande
-encima (imagen en *overlay*, al 49 %) y la barra del nombre (imagen, con el escudo de marca de agua),
-así que la clase se repite a propósito. Empiezan ocultas (CSS de `index.html`): el controlador manda
-`1` al que lanza y `0` a los otros siete. Sin equipo no se ven el panel ni la barra: quedan la línea
-plateada y las filas azules de las estadísticas, enteras hasta el borde izquierdo. Los colores, los
-del diseñador (Leon, 2026-10-18): parecidos a los del bateador, salvo Tigres, azul acá y casi negro
-allá. El 49 % del escudo va en el CSS de su `<image>` (`g[id^="escudo"] > image`, por el `ln`
-`escudo<SIGLAS>`), como el de las compuertas: el UPDATE escribe su `opacity` en la capa y lo pisaría
-con un 1 (el escudo salía al 100 % y el panel, mucho más claro). La barra de Bravos no vino en el
-export: es la del bateador (`images/barra_bravos.png`, la misma serie de barras).
+encima (imagen en *overlay*, al 49 %) y la barra del nombre (imagen, con el escudo de marca de
+agua), así que la clase se repite a propósito. Empiezan ocultas (CSS de `index.html`): el
+controlador manda `1` al que lanza y `0` a los otros siete. Sin equipo no se ven el panel ni la
+barra: quedan la línea plateada, la barra negra del split y las filas azules de las estadísticas,
+enteras hasta el borde izquierdo. Los colores, los del diseñador (Leon, 2026-10-18): parecidos a los
+del bateador, salvo Tigres, azul acá y casi negro allá. El 49 % del escudo va en el CSS de su
+`<image>` (`g[id^="escudo"] > image`, por el `ln` `escudo<SIGLAS>`), como el de las compuertas: el
+UPDATE escribe su `opacity` en la capa y lo pisaría con un 1 (el escudo salía al 100 % y el panel,
+mucho más claro). La barra de Bravos no vino en el export: es la del bateador
+(`images/barra_bravos.png`, la misma serie de barras).
 
 Textos: en mayúsculas. El nombre y el apellido, cada uno en su caja: entran unas 9 letras en cada
 línea (`ALEXANDER`, `RODRÍGUEZ`; `MONASTERIOS` baja de 55 a 44), y cada línea encoge por su lado.
-El número entra con 2 cifras (`100` baja de 80 a 74), la mano con 2 letras. Los rótulos, alineados a
-la izquierda en su columna, unas 4 letras (`WHIP`, `K-BB`); los valores, centrados en la suya, hasta
-6 caracteres (`100-20`, `130.2`).
+El número entra con 2 cifras (`100` baja de 80 a 74), la mano con 2 letras. El split, unas 21
+(`TEMPORADA 2026-27`; `TEMPORADA 2026-27 · VS ZURDOS` baja de 55 a 42 y `· COMO RELEVISTA` a 36, y
+queda arriba en la barra, como en el bateador). Los rótulos, alineados a la izquierda en su columna,
+unas 4 letras (`WHIP`, `K-BB`); los valores, centrados en la suya, hasta 6 caracteres (`100-20`,
+`130.2`). Las cajas son las del export anterior: al 80 %, las mismas medidas en unidades de la capa.
+
+Key: la barra negra del split queda 4 px debajo de la del nombre, sin tocarla. En el key de CasparCG
+no hay filas ni columnas a menos de 255 donde se tocan los recuadros: quedan 4 píxeles sueltos, al
+88–95 %, en las puntas de las diagonales (x 458–587).
 
 Colores en NTSC compuesto (2026-10-18): legal salvo el escudo de Leones, que llega a 121,2 IRE en
-sus brillos sobre lo claro del panel (más área que en el bateador), y el cian de los rótulos y la
-mano (`#00D9E2`, 113,5, como el del score). Lo más bajo, Cardenales, −8,6. Si hiciera falta bajar
-Leones a 120, el panel o el escudo un poco más oscuros. En HD (Rec.709) todo es legal.
+sus brillos sobre lo claro del panel (más área que en el bateador), y el cian de los rótulos, la
+mano y el split (`#00D9E2`, 113,5, como el del score). Lo más bajo, Cardenales, −8,6. Si hiciera
+falta bajar Leones a 120, el panel o el escudo un poco más oscuros. En HD (Rec.709) todo es legal. El
+export del 2026-10-21 no los cambia: medidos los 8 equipos con el mismo método, lo más alto y lo más
+bajo de cada uno da igual que con el anterior (la barra negra y la línea plateada nueva quedan en el
+medio).
 
 **Parcial.** El score de fin de inning; el diseñador lo llama FINAL DE INNING, y la carpeta se llama
 como su equivalente de Meridiano (Leon, 2026-10-17). Claves: las del parcial de LVBP-Meridiano, que
@@ -369,6 +389,9 @@ del diseño): idéntico al píxel del 0 al 90, salvo la barra de Águilas local 
 - **Textos de caja:** los apellidos ya llegan de caja (con `lh` 52, no parten en líneas encimadas),
   pero la caja pasaba 27 px el final de su barra azul: va hasta 8 px antes (anchos medidos con la
   fuente, uno por posición, en `DEF_POSICIONES`). Los rótulos, a 52 centrados (su placa rosa).
+- **Cuerpo de los apellidos:** de 20 (24 en RF) a 25, el de los rótulos (`DEF_CUERPO`, ver arriba);
+  RF, a la misma escala de pantalla que los demás (`DEF_ESCALA`). Crecen desde el centro de la letra
+  (`ps[1]` sube la mitad de lo que crece el ascent): con APELLIDO, el centro queda donde estaba.
 - **Markers y timeline:** `start` / `stop` del diseñador → `play`, `salida` y `stop` de la tabla de
   arriba. La entrada termina en el 52 (el título): si cambia, mover `ENTRADA_DEF` (`prep.js` falla
   si algún keyframe pasa de ahí). Todas las capas arrancan en el frame 1.
@@ -471,8 +494,12 @@ barra; antes del arreglo del key. Con la fuente variable del export, los textos 
   `.NUMEROSINNINGLANZADOS` → `valor1`…`6`; los paneles `.COLOR<EQUIPO>` (el de Bravos,
   `.COLORBARAVOS`), los escudos `.LOGO<EQUIPO>` (los de Cardenales y Bravos, `LOGOGRANDE…`, el de
   Cardenales sin el punto) y las barras `.BARRA<EQUIPO>` → `<SIGLAS>_opacidad`; `TEXTURA BASE
-  4_1.png` (clase `png`) → `textura`. Los sólidos azules, los bordes de sombra y los nulos quedan
-  como vienen.
+  4_1.png` (clase `png`) → `textura`; el split, `.MANODELLANZADOR 2` (una copia de la mano, con su
+  clase) → `informacionbarranegra`. Los sólidos azules (y el negro del split, `Sólido Profundo Azul
+  2`), los bordes de sombra y los nulos quedan como vienen.
+- **Nulo raíz:** desde el export del 2026-10-21 todo cuelga de `Null 7` (s 80 %, p `[782, 515]` al
+  final de la entrada): las cajas se calculan en px de pantalla con `enPantalla()`. Si llega a otra
+  escala, falla (`LAN_RAIZ`): medir de nuevo los bordes.
 - **Fuente:** `fPath` llega como la carpeta (`PITCHERS/FONT`, con la variable): pasa a
   `font/LTEnergy-Regular.ttf`, como el bateador.
 - **All Caps:** llega apagado en todas las capas de texto: `prep.js` lo prende.
@@ -490,13 +517,17 @@ barra; antes del arreglo del key. Con la fuente variable del export, los textos 
   el ancla y la máscara de la de Águilas (512 px) por 514/512. Si el diseñador la manda, `prep.js`
   falla: sacar `LAN_BARRA_BRAVOS`.
 - **Textos de caja:** ya llegan de caja, pero las del nombre y el apellido cruzaban el número y el
-  final de la barra. Bordes medidos en el frame 109, cajas a 8 px: el número, centrado donde lo puso
-  el diseño (x 896), en 80 px; el nombre y el apellido, desde donde empiezan hasta 8 px antes del
-  número; la mano, centrada en su placa (termina en x 635). Los rótulos llegaban centrados, cada uno
-  en una caja distinta, y en pantalla quedaban alineados a la izquierda a ojo (empiezan entre x 596 y
-  601): pasan a la izquierda, todos desde el x del primero (599), hasta 4 px antes de la columna de
-  los valores (x 720); los valores, centrados donde estaban (x 814), desde 4 px después. El alto, el
-  ascent del cuerpo más 2. El `NOMBRE \r` del diseño pierde el salto de línea del final.
+  final de la barra. Bordes medidos en el frame 109, cajas a 6,4 px (los 8 del export anterior, al
+  80 %): el número, centrado donde lo puso el diseño (x 874), en 64 px; el nombre y el apellido,
+  desde donde empiezan hasta el margen antes del número; la mano, centrada en su placa (termina en
+  x 665,2); el split, desde donde empieza hasta el margen antes del final de la barra negra (x 904
+  donde empiezan las letras; la caja del export la pasaba 20 px). Los rótulos llegaban centrados,
+  cada uno en una caja distinta, y en pantalla quedaban alineados a la izquierda a ojo (empiezan
+  entre x 634 y 638): pasan a la izquierda, todos desde el x del primero (636,4), hasta 3,2 px antes
+  de la columna de los valores (x 733,2); los valores, centrados donde estaban (x 808,4), desde 3,2 px
+  después. Son las medidas del export anterior (x 599, 720, 814…) pasadas al 80 % (x 157,2 + 0,8 x):
+  las cajas quedan iguales en unidades de cada capa. El alto, el ascent del cuerpo más 2. El
+  `NOMBRE \r` del diseño pierde el salto de línea del final.
 - **Markers y timeline:** `start` (0–30) y `stop` (120–150) del diseñador → `play`, `salida` y `stop`
   como en el bateador. La entrada termina en el 109 (el último rótulo): si cambia, mover
   `ENTRADA_LAN`. El frame 0 ya llega vacío.
@@ -507,6 +538,11 @@ Comparado frame a frame contra el export del 2026-10-18 con el panel, la textura
 arreglados a mano (sólo Águilas, el texto del diseño y la misma fuente): idéntico en la pausa salvo
 los rótulos que se movieron (hasta 3 px); durante la entrada, del 42 al 69, hasta 10/255 en los
 bordes del escudo en *overlay* (el 49 % en el `<image>` y no en la capa).
+
+El del 2026-10-21, contra el preparado anterior (`deepdiff.py`): cambian sólo los transforms (el nulo
+y las estadísticas más abajo) y el degradado de la línea plateada, y se suman `Null 7`, `Null 8`, la
+barra negra y el split; las cajas de texto, iguales. Con data, el gráfico es el anterior al 80 %.
+Las 16 imágenes llegan con otra paleta de la compresión de Bodymovin (el mismo dibujo).
 
 **Parcial**
 

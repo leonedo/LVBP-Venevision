@@ -1,7 +1,7 @@
 // Prepara los exports del diseñador para CasparCG: la receta de "Cuando llega un export nuevo"
 // de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13), de la
 // defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15), del bateador (LOWBAR BATEADOR,
-// 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18) y del lanzador (PITCHERS, 2026-10-18): si
+// 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18) y del lanzador (PITCHERS, 2026-10-21): si
 // el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
@@ -376,7 +376,13 @@ function complementaria(l) {
 // [capa del nombre, capa del rótulo, posición, ancho de la caja del nombre]. El ancho llega hasta
 // 8 px antes del final de su barra azul (en el export, la caja pasaba 27 px de la barra): medido
 // en el frame 53 con la fuente cargada, a la escala de la capa (0.9009 × 1.3 del nulo; RF va a
-// 0.79989). APELLIDO, el texto del diseño, mide 76.1 (91.3 en RF).
+// 0.79989). APELLIDO, el texto del diseño, mide 76.1 al cuerpo del export (20; 24 en RF).
+// El cuerpo de los nombres pasa a 25, el de los rótulos, como en la captura de AE que mandó Leon el
+// 2026-10-21 (APELLIDO, 108 px de pantalla; con el 20 del export, 87): RF, a la misma escala de
+// pantalla que los demás (en el export iba un 7 % más grande). Crecen desde el centro de la letra,
+// que queda donde estaba: un nombre que encoge queda arriba en su barra, como antes.
+const DEF_CUERPO = 25;
+const DEF_ESCALA = 90.09;              // la de 8 de las 9 capas de los nombres
 const DEF_POSICIONES = [
     [',catcher', 'C', 'catcher', 104.4],
     [',pitcher', 'P', 'lanzador', 101.9],
@@ -394,9 +400,16 @@ if (hay('DEFENSIVA')) {
     const d = load(path.join(SRC, 'DEFENSIVA/data.json'));
 
     // ---- textos. Los nombres ya son de caja (lh 52: no parten en líneas encimadas).
+    const ascent = d.fonts.list[0].ascent / 100;
     for (const [nombre, rotulo, pos, W] of DEF_POSICIONES) {
-        rename(d, nombre, 'jugador' + pos);  // primero el nombre: el rótulo toma su nm
-        doc(d, '.jugador' + pos).sz[0] = W;
+        const l = rename(d, nombre, 'jugador' + pos);  // primero el nombre: el rótulo toma su nm
+        const s = doc(d, '.jugador' + pos);
+        s.sz[0] = W;
+        if (l.ks.s.a || l.ks.s.k[0] !== l.ks.s.k[1]) throw new Error(`${l.nm}: escala inesperada`);
+        const cuerpo = +(DEF_CUERPO * DEF_ESCALA / l.ks.s.k[0]).toFixed(2);
+        s.ps[1] = +(s.ps[1] - ascent * (cuerpo - s.s) / 2).toFixed(3);
+        s.s = cuerpo;
+        if (s.sz[1] < ascent * cuerpo) throw new Error(`${l.nm}: la caja no tiene alto para el cuerpo ${cuerpo}`);
         rename(d, rotulo, pos);
         anchoCentrado(doc(d, '.' + pos), 52); // la placa rosa (70 px de pantalla), 4 px por lado
     }
@@ -795,30 +808,42 @@ if (hay('LOWBAR BATEADOR')) {
 }
 
 // ---------------------------------------------------------------- lanzador
-// El lanzador (el export es PITCHERS, 2026-10-18; la carpeta, como su equivalente de Meridiano):
-// a la izquierda, de arriba abajo, un panel del color del equipo con su escudo grande; la barra del
-// equipo con el nombre y el apellido, en dos líneas, y el número; la mano de lanzar, y seis
-// estadísticas (rótulo y valor) sobre una textura gris. Las claves, las del lanzador de
-// LVBP-Meridiano donde dicen lo mismo: manodelanzar, etiquetaN / valorN (casilleros genéricos, 1 a 6
-// de arriba abajo) y <SIGLAS>_opacidad. Propias: nombre y apellido (en Meridiano, nombrelanzador
-// es el nombre completo en una línea) y numerouniforme (la del bateador). No tiene titulo ni
-// informacionbarranegra.
-// Bordes medidos en px de pantalla en el frame 109 con la fuente cargada; las cajas quedan a 8 px.
-// El número, centrado donde lo puso el diseño (x 896), en 80 px (00 mide 66); el nombre y el
-// apellido, desde donde empiezan hasta 8 px antes del número (las cajas del export cruzaban el
-// número y el final de la barra). La mano, centrada en su placa azul (termina en x 635).
-const LAN_MARGEN = 8;
-const LAN_NUMERO = 80;
-const LAN_MANO_HASTA = 635;
+// El lanzador (el export es PITCHERS; la carpeta, como su equivalente de Meridiano): a la izquierda,
+// de arriba abajo, un panel del color del equipo con su escudo grande; la barra del equipo con el
+// nombre y el apellido, en dos líneas, y el número; abajo, una barra negra con el split; la mano de
+// lanzar, y seis estadísticas (rótulo y valor) sobre una textura gris. Las claves, las del lanzador
+// de LVBP-Meridiano donde dicen lo mismo: manodelanzar, etiquetaN / valorN (casilleros genéricos, 1
+// a 6 de arriba abajo), informacionbarranegra (el split) y <SIGLAS>_opacidad. Propias: nombre y
+// apellido (en Meridiano, nombrelanzador es el nombre completo en una línea) y numerouniforme (la
+// del bateador). No tiene titulo.
+// El export del 2026-10-21 (Leon: reemplaza al del 2026-10-18) es el mismo diseño al 80 %, con la
+// barra negra del split (una copia negra de la última fila de las estadísticas, Sólido Profundo
+// Azul 2, y su texto, una copia de la mano) y las estadísticas 44,4 px más abajo, para hacerle
+// lugar. Todo cuelga de `Null 7` (s 80, a [−179, 0], p [782, 515] al final: lo que no tenía parent
+// queda en x 157,2 + 0,8 x, y 83 + 0,8 y), que en la entrada se corre 174 px a la derecha (0–49).
+// Las medidas son las del export anterior pasadas por ese cambio: las cajas quedan iguales, en
+// unidades de cada capa (y 6,4 px de margen, los 8 de antes).
+// Bordes medidos en px de pantalla en el frame 109 con la fuente cargada. El número, centrado donde
+// lo puso el diseño (x 874), en 64 px (00 mide 53); el nombre y el apellido, desde donde empiezan
+// hasta el margen antes del número (las cajas del export cruzaban el número y el final de la
+// barra). La mano, centrada en su placa azul (termina en x 665,2). El split, desde donde empieza
+// hasta el margen antes del final de la barra negra (904 donde empiezan las letras; la caja del
+// export la cruzaba 20 px).
+const LAN_RAIZ = { nm: 'Null 7', s: 80 };
+const LAN_MARGEN = 6.4;
+const LAN_NUMERO = 64;
+const LAN_MANO_HASTA = 665.2;
+const LAN_SPLIT_HASTA = 904;
 // Los rótulos de las estadísticas llegan centrados, cada uno en una caja distinta, y en pantalla
-// quedan alineados a la izquierda a ojo (empiezan entre x 596 y 601): pasan a la izquierda, todos
-// desde el x del primero (G-P, 599), hasta 4 px antes de la columna de los valores (x 720). Los
-// valores quedan centrados donde los puso el diseño (x 814), desde 4 px después de esa columna.
+// quedan alineados a la izquierda a ojo (empiezan entre x 634 y 638): pasan a la izquierda, todos
+// desde el x del primero (G-P, 636,4), hasta la mitad del margen antes de la columna de los valores
+// (x 733,2). Los valores quedan centrados donde los puso el diseño (x 808,4), desde la mitad del
+// margen después de esa columna.
 const LAN_STATS = [['.GANADOSYPERDIDOS', 'NUMEROSDEGANADOSYPERDIDOS'], ['.EFECTIVIDAD', '.NNUMEROSEFECTIVIDAD'],
     ['.BASEXBOLAS', '.NUMEROSBASESXBOLAS'], ['.PONCHES', '.NUMEROSPONCHE'], ['.WHIP', '.NUMEROSWHIP'],
     ['.INNINIGSLANZADOS', '.NUMEROSINNINGLANZADOS']];
-const LAN_ROTULOS_DESDE = 599;
-const LAN_COLUMNA = 720;
+const LAN_ROTULOS_DESDE = 636.4;
+const LAN_COLUMNA = 733.2;
 const ENTRADA_LAN = 110;               // la entrada termina en el 109 (el último rótulo)
 // La barra de Bravos no vino: es la del bateador (la misma serie de barras), con las medidas de
 // las otras, que escalan con el ancho de su imagen (el ancla y la máscara).
@@ -827,6 +852,8 @@ if (hay('PITCHERS')) {
     const d = load(path.join(SRC, 'PITCHERS/data.json'));
     const local = (l, X) => (X - enPantalla(d, l, 0)) / escalaX(d, l);
     const r2 = v => +v.toFixed(2);
+    const raiz = layer(d, LAN_RAIZ.nm);
+    if (raiz.parent || raiz.ks.s.a || raiz.ks.s.k[0] !== LAN_RAIZ.s) throw new Error(`${LAN_RAIZ.nm}: escala inesperada: medir de nuevo los bordes`);
 
     // ---- textos
     rename(d, '.NOMBRE', 'nombre');
@@ -845,6 +872,11 @@ if (hay('PITCHERS')) {
     const mano = layer(d, '.manodelanzar'), sm = doc(d, '.manodelanzar');
     const cm = enPantalla(d, mano, sm.ps[0] + sm.sz[0] / 2);
     anchoCentrado(sm, r2(2 * (LAN_MANO_HASTA - LAN_MARGEN - cm) / escalaX(d, mano)));
+    // el split llega como una copia de la mano (con su clase): queda como en el bateador
+    rename(d, '.MANODELLANZADOR 2', 'informacionbarranegra');
+    const split = layer(d, '.informacionbarranegra'), ss = doc(d, '.informacionbarranegra');
+    if (ss.j !== 0) throw new Error(`.informacionbarranegra: j ${ss.j}`);
+    ss.sz[0] = r2(local(split, LAN_SPLIT_HASTA - LAN_MARGEN) - ss.ps[0]);
     LAN_STATS.forEach(([rotulo, valor], i) => {
         const le = layer(d, rotulo), e = doc(d, rotulo), lv = layer(d, valor), v = doc(d, valor);
         if (e.j !== 2 || v.j !== 2) throw new Error(`${rotulo}: j ${e.j}, ${valor}: j ${v.j}`);

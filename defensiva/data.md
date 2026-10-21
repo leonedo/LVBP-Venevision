@@ -62,8 +62,9 @@ Full screen. Frame 0 is empty: nothing shows before `play`.
 ## Text layers
 
 All are box text: a longer string shrinks to fit instead of overflowing. The players (`jugador…`)
-fit about 10 letters at the design size (`ABCDEFGHIJ`; `F.RODRÍGUEZ` goes from 20 to 19,
-`A.CAMPUSANO` to 17); longer ones shrink within their bar. An empty string leaves the bar empty.
+fit about 8 letters at the design size (`APELLIDO`, `R.LOPEZ`; `E.ROSARIO` goes from 25 to 23–24,
+`F.RODRÍGUEZ` to 19–20, `A.CAMPUSANO` to 16–17, depending on the bar); longer ones shrink within
+their bar. An empty string leaves the bar empty.
 The position labels (`catcher` … `rightfield`) and `titulo` are fixed in the design: a controller
 doesn't need to send them.
 
