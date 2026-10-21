@@ -30,6 +30,10 @@ exist here.
 (`valorN`): any stat can go in any slot, the design's G-P / EFE / BB / SO / WHIP / IL are only the
 default. Same scheme as the LVBP-Meridiano `lanzador`.
 
+**Split:** `informacionbarranegra`, the black bar under the name: what the stats are (the season,
+the split), as in the LVBP-Meridiano `lanzador`. The bar is always on air: send the text with every
+payload, or it stays empty.
+
 ```json
 {
   "AGUI_opacidad": 0,
@@ -44,6 +48,7 @@ default. Same scheme as the LVBP-Meridiano `lanzador`.
   "apellido": "CHACÍN",
   "numerouniforme": "45",
   "manodelanzar": "LD",
+  "informacionbarranegra": "TEMPORADA 2026-27",
   "etiqueta1": "G-P",
   "valor1": "10-2",
   "etiqueta2": "EFE",
@@ -59,10 +64,9 @@ default. Same scheme as the LVBP-Meridiano `lanzador`.
 }
 ```
 
-`manodelanzar`, `etiquetaN` / `valorN` and the team keys are those of the LVBP-Meridiano
-`lanzador`; `numerouniforme`, the one of the LVBP-Venevision `bateador`. Meridiano's
-`nombrelanzador`, `titulo`, `informacionbarranegra` and `logomeridiano` don't exist here: they are
-ignored.
+`manodelanzar`, `informacionbarranegra`, `etiquetaN` / `valorN` and the team keys are those of
+the LVBP-Meridiano `lanzador`; `numerouniforme`, the one of the LVBP-Venevision `bateador`.
+Meridiano's `nombrelanzador`, `titulo` and `logomeridiano` don't exist here: they are ignored.
 
 ## Animation
 
@@ -74,8 +78,8 @@ ignored.
 | Duration | 3.70 s |
 
 Left half of the screen: the team's color panel covers the left edge from top to bottom
-(x 0–540), and the name bar and the stats panel sit to its right (up to x 1127, y 100–960). Frame 0
-is empty: nothing shows before `play`.
+(x 0–630), and to its right sit the name bar, the split's black bar under it and the stats panel
+(up to x 1061, y 166–901). Frame 0 is empty: nothing shows before `play`.
 
 ## Text layers
 
@@ -85,7 +89,9 @@ in the table, is not on air). Send every key.
 All are box text: a longer string shrinks to fit instead of overflowing, always on one line. The
 first name and the surname are two boxes, each up to about 9 letters at the design size
 (`ALEXANDER`, `RODRÍGUEZ` fit; `MONASTERIOS` shrinks to 80 %); each one shrinks on its own. The
-number fits 2 digits (3 shrink a little), `manodelanzar` 2 letters. The labels are left-aligned in
+number fits 2 digits (3 shrink a little), `manodelanzar` 2 letters. The split, up to about 21
+characters (`TEMPORADA 2026-27` fits; `TEMPORADA 2026-27 · VS ZURDOS` shrinks to 76 %,
+`TEMPORADA 2026-27 · COMO RELEVISTA` to 65 %). The labels are left-aligned in
 their column, about 4 characters at the design size (`WHIP`, `K-BB`); the values are centered in
 theirs, up to 6 characters (`100-20`, `130.2`).
 
@@ -95,6 +101,7 @@ theirs, up to 6 characters (`100-20`, `130.2`).
 | `apellido` | `.apellido` | APELLIDO |
 | `numerouniforme` | `.numerouniforme` | 00 |
 | `manodelanzar` | `.manodelanzar` | LD |
+| `informacionbarranegra` | `.informacionbarranegra` | TEMPORADA 25-26 |
 | `etiqueta1` / `valor1` | `.etiqueta1` / `.valor1` | G-P / 0-0 |
 | `etiqueta2` / `valor2` | `.etiqueta2` / `.valor2` | EFE / 00 |
 | `etiqueta3` / `valor3` | `.etiqueta3` / `.valor3` | BB / 00 |
