@@ -217,8 +217,8 @@ apellido y el número (y 166–288), la barra negra del split (y 292–345) y el
 SO / WHIP / IL del diseño es sólo el texto por defecto) y `<SIGLAS>_opacidad`; `numerouniforme`, la
 del bateador. Propias: `nombre` y `apellido`, en dos líneas (Leon, 2026-10-18; la `nombrelanzador` de
 Meridiano es el nombre completo en una). No tiene `titulo` ni `logomeridiano`. Todos los textos
-arrancan vacíos, como en el bateador. El split también: hasta que lo manden LVBP-Stats y
-cue-qs-beisbol, la barra negra sale vacía.
+arrancan vacíos, como en el bateador. El split también: lo mandan LVBP-Stats desde la 2.3.0.15 y
+cue-qs-beisbol desde la 0.13.0 (2026-10-21); con una versión anterior, la barra negra sale vacía.
 
 Equipo: cada clave prende tres capas, el panel de color (forma con degradado), el escudo grande
 encima (imagen en *overlay*, al 49 %) y la barra del nombre (imagen, con el escudo de marca de
