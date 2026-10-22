@@ -1,16 +1,20 @@
 // Prepara los exports del diseñador para CasparCG: la receta de "Cuando llega un export nuevo"
 // de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13 y 22), de la
 // defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15), del bateador (LOWBAR BATEADOR,
-// 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18) y del lanzador (PITCHERS, 2026-10-21): si
-// el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
+// 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18), del lanzador (PITCHERS, 2026-10-21) y del
+// 3 en línea (3 EN LINEA, 2026-10-22): si el diseñador cambia nombres de capas, falla diciendo cuál
+// no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
-//      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/. Los que no estén se saltean:
-//      alcanza con el zip que llegó.
-//   2. node herramientas/prep.js $EXPORTS .
-//   3. git diff, herramientas/lint.py y QA con el runtime real (CLAUDE.md).
-// Las fuentes, las imágenes y los index.html no los toca: se copian a mano la primera vez.
+//      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/. Los que no estén se
+//      saltean: alcanza con el zip que llegó.
+//   2. Si llegó el 3 EN LINEA: python3 herramientas/tresenlinea.py "$EXPORTS/3 EN LINEA" . (sus
+//      imágenes: el recorte y los frames de la salida).
+//   3. node herramientas/prep.js $EXPORTS .
+//   4. git diff, herramientas/lint.py y QA con el runtime real (CLAUDE.md).
+// Las fuentes, las imágenes (salvo las del 3 en línea) y los index.html no los toca: se copian a mano
+// la primera vez.
 const fs = require('fs');
 const path = require('path');
 
@@ -1184,4 +1188,112 @@ if (hay('FINAL DE INNING')) {
     d.fonts.list[0].fPath = 'font/LTEnergyVFVF.ttf';
     allCaps(d);
     save(path.join(REPO, 'parcial/data.json'), d);
+}
+
+// ---------------------------------------------------------------- 3 en línea
+// Los tres que vienen al bate, con el panel de Empire Keeway (el export es 3 EN LINEA): abajo a la
+// derecha entra el panel con sus logos y se va, y queda la caja, la banda naranja con el 3 EN LÍNEA
+// y el recuadro azul con los tres nombres. Todo es una secuencia de PNG (un precomp de 198 frames,
+// 3NLSEQ, y una imagen fija para la pausa); lo único editable son los nombres, que aparecen letra por
+// letra (un animador de opacidad, uno detrás del otro, del 40 al 60). Las claves, las de los
+// bateadores del parcial (jugador1–3), para que el controlador les mande a los dos la misma data.
+// Las imágenes las prepara antes herramientas/tresenlinea.py: las recorta a TEL_RECORTE y arma los
+// frames de la salida (images/salida_<k>.png).
+const TEL_RECORTE = [1441, 555, 479, 525]; // x, y, ancho y alto en pantalla (RECORTE de tresenlinea.py)
+// Los nombres, desde donde empiezan en el diseño (x 1467.9) hasta 8 px antes de la columna naranja
+// (x 1726: la caja del export entraba 3 px en ella). Renglones cada 45 px: llegaban cada 46 y 44
+// (márgenes de 11 y 14 px en el recuadro azul, y 807–951); el del medio queda donde estaba, y el de
+// arriba y el de abajo bajan 1 px (márgenes de 12 y 13).
+const TEL_HASTA = 1718;
+const TEL_RENGLON = 45;
+// Flujo: el panel entra (4–17), la caja crece debajo (16–43 de la secuencia: la columna naranja, la
+// banda, el título y el recuadro azul), los nombres aparecen (40–60), el panel pasa sus logos con un
+// brillo y se va por la derecha (177–193), y la entrada para en la imagen fija (196; los últimos
+// frames de la secuencia son iguales a ella). El export no trae salida (su stop, 210–240, no anima
+// nada), y la entrada al revés no sirve: dura 6,5 s y traería de vuelta el panel. La salida es la
+// entrada de la caja y los nombres al revés, sin el panel (Leon, 2026-10-22): lo que la entrada
+// muestra en el instante t, la salida lo muestra en el TEL_FIN − t, del 197 (el 60, los nombres
+// completos) al 241 (el 16, vacío); 1,5 s. El frame k de la secuencia se ve de k a k + 1 (con unos
+// decimales de más en el ip de cada capa), así que en la salida va de TEL_FIN − k − 1 a TEL_FIN − k.
+const TEL_PAUSA = 197;                 // play 0–197: queda en el 196, la imagen fija
+const TEL_CAJA = [16, 44];             // la caja crece del 16 al 43 de la secuencia: salida_16–43
+const TEL_NOMBRES = 60;                // el último nombre termina de aparecer en el 60
+const TEL_FIN = TEL_PAUSA + TEL_NOMBRES;
+if (hay('3 EN LINEA')) {
+    const d = load(path.join(SRC, '3 EN LINEA/data.json'));
+    const seq = layer(d, '3NLSEQ'), fija = layer(d, '3NLSEQ_00223.png');
+    const secuencia = d.assets.find(a => a.id === seq.refId);
+    if (!secuencia || secuencia.layers.length !== 198 || seq.st !== 0 || fija.ip !== seq.op) throw new Error('3NLSEQ: secuencia inesperada');
+
+    // ---- el recorte: cada imagen, del tamaño del archivo recortado y en su lugar de la pantalla
+    const [rx, ry, rw, rh] = TEL_RECORTE;
+    const medidas = p => {
+        const [w, h] = medidasPng(path.join(REPO, 'tresenlinea/images', p));
+        if (w !== rw || h !== rh) throw new Error(`${p}: ${w} × ${h}: correr antes herramientas/tresenlinea.py`);
+    };
+    for (const a of d.assets) {
+        if (!a.p) continue;
+        if (a.u !== 'images/' || a.w !== 1920 || a.h !== 1080) throw new Error(`${a.p}: ${a.w} × ${a.h} en ${a.u}`);
+        medidas(a.p);
+        a.w = rw;
+        a.h = rh;
+    }
+    for (const l of [...d.layers, ...secuencia.layers]) {
+        if (l.ty !== 2) continue;
+        const { a, p } = l.ks;
+        if (a.a || p.a || a.k[0] !== 960 || a.k[1] !== 540 || p.k[0] !== 960 || p.k[1] !== 540) throw new Error(`${l.nm}: transform inesperado`);
+        a.k = [0, 0, 0];
+        p.k = [rx, ry, 0];
+    }
+    delete fija.cl;                    // la clase png: no es una clave
+
+    // ---- los nombres
+    const medio = layer(d, '.JUGADOR2').ks.p.k[1];
+    for (let n = 1; n <= 3; n++) {
+        const l = layer(d, '.JUGADOR' + n), s = doc(d, '.JUGADOR' + n);
+        if (s.j !== 0 || l.parent || l.ks.p.a) throw new Error(`JUGADOR${n}: j ${s.j}, parent ${l.parent}`);
+        s.sz[0] = +((TEL_HASTA - enPantalla(d, l, s.ps[0])) / escalaX(d, l)).toFixed(2);
+        // el alto, como en el bateador: entra una línea al cuerpo del diseño y no dos hasta un 40 %
+        s.sz[1] = +(d.fonts.list[0].ascent * s.s / 100 + 2).toFixed(2);
+        const y = medio + (n - 2) * TEL_RENGLON;
+        if (Math.abs(l.ks.p.k[1] - y) > 1.01) throw new Error(`JUGADOR${n}: y ${l.ks.p.k[1]}: medir de nuevo los renglones`);
+        l.ks.p.k[1] = y;
+        rename(d, '.JUGADOR' + n, 'jugador' + n);
+    }
+
+    // ---- la salida: los nombres desaparecen como aparecieron, al revés (el último, primero), y
+    // después la caja se cierra con sus propios frames al revés
+    const vacio = TEL_FIN - TEL_CAJA[0];   // 241, el primer frame vacío
+    for (let n = 1; n <= 3; n++) {
+        const l = layer(d, '.jugador' + n), props = propiedadesAnimadas([l.ks, l.t]);
+        const ks = props.length === 1 && props[0].k;
+        if (!ks || ks[0].t < TEL_CAJA[0] || ks[ks.length - 1].t > TEL_NOMBRES + 0.5) throw new Error(`jugador${n}: animación inesperada: medir de nuevo TEL_NOMBRES`);
+        const hasta = ks[ks.length - 1].t;
+        alReves(props[0], ks[0].t, hasta, TEL_FIN - hasta);
+        l.op = vacio;
+    }
+    if (propiedadesAnimadas([d.layers.filter(l => l.ty !== 5), secuencia.layers]).length) throw new Error('animación fuera de los nombres');
+    fija.op = TEL_FIN - TEL_CAJA[1];   // hasta el 212: la caja completa
+    let ind = Math.max(...d.layers.map(l => l.ind));
+    const cierre = [];
+    for (let k = TEL_CAJA[1] - 1; k >= TEL_CAJA[0]; k--) {
+        const id = 'salida_' + k, p = id + '.png';
+        medidas(p);
+        d.assets.push({ id, w: rw, h: rh, u: 'images/', p, e: 0 });
+        cierre.push(Object.assign(clone(fija), { ind: ++ind, nm: p, refId: id, ip: TEL_FIN - k - 1, op: TEL_FIN - k, st: TEL_FIN - k - 1 }));
+    }
+    d.layers.splice(d.layers.indexOf(fija) + 1, 0, ...cierre);
+
+    // ---- timeline: los markers del diseñador (start 0–30, stop 210–240) no sirven
+    for (const l of d.layers) l.ip = Math.max(l.ip, 1);
+    d.op = vacio + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: TEL_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: TEL_PAUSA, cm: 'salida', dr: vacio + 1 - TEL_PAUSA }
+    ];
+    d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
+    allCaps(d);
+    vaciaTextos(d);
+    save(path.join(REPO, 'tresenlinea/data.json'), d);
 }
