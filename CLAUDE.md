@@ -6,11 +6,12 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Seis gráficos, en LT Energy: el score y el parcial con `font/LTEnergyVFVF.ttf` (fuente
+proyecto*). Siete gráficos, en LT Energy: el score y el parcial con `font/LTEnergyVFVF.ttf` (fuente
 variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva, el
-bateador y el lanzador con `font/LTEnergy-Regular.ttf`, la estática que mandó el diseñador con sus
-primeros exports (los del 2026-10-18 traen la variable: mide igual, y en el render difiere en el
-suavizado de algunos bordes de letra). Las keys del UPDATE están en su `data.md`.
+bateador, el lanzador y el 3 en línea con `font/LTEnergy-Regular.ttf`, la estática que mandó el
+diseñador con sus primeros exports (los del 2026-10-18 traen la variable: mide igual, y en el render
+difiere en el suavizado de algunos bordes de letra; el del 3 en línea, del 2026-10-22, otra vez la
+estática). Las keys del UPDATE están en su `data.md`.
 
 | Carpeta | Qué es | Flujo | Salida |
 |---|---|---|---|
@@ -20,6 +21,7 @@ suavizado de algunos bordes de letra). Las keys del UPDATE están en su `data.md
 | `bateador/` | Barra baja del bateador, abajo a la izquierda: arriba, una barra negra con el split; a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87) | `salida`: la entrada al revés (2,9 s) |
 | `lanzador/` | El lanzador (el export es PITCHERS), en la mitad izquierda: un panel del color del equipo con su escudo grande, de arriba abajo en el borde izquierdo; la barra del equipo con el nombre y el apellido (dos líneas) y el número, y debajo una barra negra con el split; la mano de lanzar y 6 estadísticas (rótulo y valor) sobre una textura gris. El frame 0 está vacío | stage `play` pause (0–110) | `salida`: la entrada al revés (3,7 s) |
 | `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, casi centrado (35 px a la izquierda): barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de Pepsi (fijo: una secuencia de PNG). El frame 0 está vacío | stage `play` pause (0–222): la pizarra entra hasta el 41, el cuadro de Pepsi hasta el 73 y le pasa un brillo del 181 al 220 | `salida`: el cuadro de Pepsi sale como lo animó el diseñador y después la pizarra, su entrada al revés (3,9 s) |
+| `tresenlinea/` | Los tres que vienen al bate (el export es 3 EN LINEA), abajo a la derecha: un panel de Empire Keeway entra con sus logos y se va, y queda la caja, la banda naranja con el 3 EN LÍNEA y el recuadro azul con los tres nombres (todo una secuencia de PNG, salvo los nombres). El frame 0 está vacío | stage `play` pause (0–197): la caja crece del 16 al 43, los nombres aparecen del 40 al 60 y el panel se va del 177 al 193 | `salida`: los nombres y la caja, su entrada al revés, sin el panel (1,5 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
@@ -29,7 +31,9 @@ ejemplo) y `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), las
 ejemplo) y `bateador_equipos.png` / `lanzador_equipos.png` (los 8 equipos, recortado al gráfico),
 las del bateador del 2026-10-18 y las del lanzador del 2026-10-21; `parcial.png` (pantalla completa
 con el ejemplo de su `data.md`, Magallanes y Cardenales) y `parcial_equipos.png` (los 56 cruces
-`visita_vs_local`, recortado a la pizarra), del 2026-10-18. Si un gráfico cambia, hay que
+`visita_vs_local`, recortado a la pizarra), del 2026-10-18; `tresenlinea.png` (pantalla completa con
+el ejemplo de su `data.md`, en la pausa) y `tresenlinea_panel.png` (en el 120, con el panel), del
+2026-10-22. Si un gráfico cambia, hay que
 regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último frame de la entrada). No
 entran al zip (`.gitattributes`).
 
@@ -37,7 +41,8 @@ No hay video de referencia del diseñador, y ningún export trae salida (los mar
 90–120, de la defensiva, 60–90, de la ofensiva y el bateador, 90–120, y del lanzador, 120–150, no
 animan nada) ni la bajada de la barra de jugadores del score: son la animación de entrada al revés,
 como en todos los gráficos de Meridiano. Si el diseñador manda una salida propia, reemplaza a ésta:
-el cuadro de Pepsi del parcial trae la suya, y la pizarra sale después, al revés.
+el cuadro de Pepsi del parcial trae la suya, y la pizarra sale después, al revés. En el 3 en línea
+(su `stop`, 210–240, tampoco anima) la entrada al revés traería de vuelta el panel: sale la caja sola.
 
 **Score.** Claves: las del score de LVBP-Meridiano donde dicen lo mismo, para que el controlador le mande a
 los dos la misma data: `conteobolasystrikes`, `outs`, `inning`, `INNINGarriba_opacidad` /
@@ -326,14 +331,66 @@ score (113,5 y 114,4 IRE): quedan así, como allá. En la secuencia de Pepsi (20
 es el blanco (100 IRE) y el azul de Pepsi baja a −14,2 IRE, legal hasta −20; si hiciera falta subirlo
 a −7, `#1032FF` (en los PNG del diseñador). En HD (Rec.709) todo es legal.
 
+**3 en línea.** Los tres que vienen al bate; el export es 3 EN LINEA, y la carpeta, `tresenlinea`
+(Leon, 2026-10-22). Abajo a la derecha, un panel de Empire Keeway entra, pasa sus logos con un brillo
+y se va por la derecha; debajo crece la caja: la columna y la banda naranjas con el título 3 EN
+LÍNEA, y el recuadro azul con los tres nombres. Todo es una secuencia de PNG (un precomp de 198
+frames y una imagen fija para la pausa) más los tres textos: lo único editable son los nombres.
+Claves: las de los bateadores del parcial, `jugador1`…`jugador3` (de arriba abajo), para que el
+controlador les mande a los dos la misma clave; no tiene `posicion` ni `titulo_jugadores` (el título
+es parte de la imagen). Los textos arrancan vacíos (Leon, 2026-10-22), como en el bateador.
+
+Nombres: la inicial y el apellido (`J. CASTILLO`; Leon pidió decidirlo por el espacio, 2026-10-22).
+Al tamaño del diseño (cuerpo 40) entran unos 12 caracteres. De 20 nombres de prueba, con el nombre
+completo encogían 16 (`ALEXANDER MONASTERIOS` a 23) y los tres renglones quedaban de tamaños
+distintos; con la inicial, 2, y poco (`A. MONASTERIOS` a 36, `C. CASTELLANOS` a 37); con el apellido
+solo entran todos, pero el recuadro queda medio vacío. El parcial recibe el apellido solo: la clave
+es la misma, el texto no. En mayúsculas, como en los demás. Aparecen letra por letra (un animador de
+opacidad), uno detrás del otro, del 40 al 60.
+
+Imágenes: el export las trae a 1920 × 1080 para un gráfico de 479 × 525, y `tresenlinea.py` las
+recorta, sin pérdida (el render queda idéntico al píxel). En CasparCG (1080p29.97, render por CPU), a
+pantalla completa se repetían 52 de los 186 frames de la entrada (se veía a saltos) y la página
+usaba un núcleo entero; recortadas, ninguno (sólo los que la secuencia ya trae iguales) y un 10 % de
+núcleo.
+
+Salida: el export no trae, y la entrada al revés dura 6,5 s y traería de vuelta el panel. Es la
+entrada de la caja y los nombres al revés, sin el panel (Leon, 2026-10-22, que no espera más nada
+del diseñador): los nombres se apagan del último al primero, el recuadro azul se cierra hacia
+arriba, el título sale por la derecha, la banda se recoge y la columna se afina hasta desaparecer
+(1,5 s). Los frames de la caja son los de la secuencia (16–43) sin el panel, que los tapa por arriba
+(desde la y 753 hasta su borde de abajo, en la 770 en el 16 y en la 755 desde el 21): `tresenlinea.py`
+repone esas filas con la imagen fija, al ancho que tiene la caja en la primera fila limpia (la columna
+y la banda son rectángulos).
+
+Queda así (el diseñador no manda más): los PNG vienen reducidos a una paleta de 24 a 60 colores con
+tramado, como el Pepsi del parcial. En el degradado azul del panel y en su brillo se ve la trama y,
+como cada frame se trama distinto, el fondo del panel hierve (3,7 niveles por frame en promedio; un
+7 % de los píxeles, más de 10), y los bordes de la caja y del título cambian de un frame a otro
+mientras está el panel. En la pausa es una sola imagen y no titila. A diferencia del Pepsi, no hay
+tramo quieto que congelar: los logos se mueven todo el tiempo.
+
+Renglones: llegaban cada 46 y 44 px (márgenes de 11 y 14 en el recuadro azul, y 807–951): van cada
+45, con el de arriba y el de abajo 1 px más abajo (márgenes de 12 y 13).
+
+Key: la caja es un solo PNG. En la pausa el key es 255 en todo el recuadro, salvo el borde de afuera
+de la derecha (x 1757, al 31 %, el suavizado del diseño); en la salida, sin huecos. Mientras sale el
+panel (180–192), la fila de arriba de la banda (y 753) queda al 94 %, como en el export: es el borde
+de afuera.
+
+Colores en NTSC compuesto (2026-10-22, con setup de 7,5 IRE, en todos los colores de la secuencia):
+todo legal; lo más alto, un naranja claro del panel (103,4 IRE), y lo más bajo, su azul (−1,1). En
+HD (Rec.709), también.
+
 ### Cuando llega un export nuevo del diseñador
 
 El score llega como `SCOREBUG.zip` (carpeta `SCOREBUG/` con `data.json`, `images/` y `FONT/`), la
 defensiva como `DEFENSIVA.rar` y la ofensiva como `OFENSIVA.rar` (carpetas `DEFENSIVA/` y
 `OFENSIVA/`; el `.rar` se abre con `unar`), el bateador como `LOWBAR_BATEADOR.zip` (antes `.rar`;
 carpeta `LOWBAR BATEADOR/`, con espacio), el parcial como `FINAL_DE_INNING.zip` (carpeta `FINAL DE
-INNING/`) y el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`). La receta de los seis es
-`herramientas/prep.js`, que prepara los que encuentre:
+INNING/`), el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`) y el 3 en línea como
+`3_EN_LINEA.zip` (carpeta `3 EN LINEA/`). La receta de los siete es `herramientas/prep.js`, que
+prepara los que encuentre (las imágenes del 3 en línea, antes, `herramientas/tresenlinea.py`):
 buscar las capas por `nm` (los índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
 
 **Score**
@@ -627,6 +684,38 @@ Comparado frame a frame contra el export del 2026-10-18 (sin data, con su `op` l
 idéntico al píxel del 0 al 221, salvo las columnas de 1 px del arreglo del key (x 714–715, 998–999 y
 1215–1216) y el tramo quieto (77–171, en el cuadro de Pepsi).
 
+**3 en línea**
+
+- **Imágenes, antes que `prep.js`:** `python3 herramientas/tresenlinea.py "$EXPORTS/3 EN LINEA" .`
+  recorta las 199 del export a `RECORTE` (x 1441–1920, y 555–1080: lo que tapa la secuencia en algún
+  frame; falla si algo queda afuera) y arma `salida_16`…`salida_43.png`. `prep.js` falla si las
+  imágenes no tienen el tamaño del recorte (`TEL_RECORTE`).
+- **Clases:** `.JUGADOR1`…`3` → `jugador1`…`3`. La imagen fija (`3NLSEQ_00223.png`, clase `png`)
+  pierde la clase; las capas del precomp `3NLSEQ` quedan como vienen.
+- **Recorte:** cada imagen, con el tamaño del recorte, y cada capa de imagen con el ancla en el 0 y
+  la posición en la esquina del recorte.
+- **Fuente:** `fPath` llega como `3 EN LINEA / FONT`: pasa a `font/LTEnergy-Regular.ttf` (el mismo
+  archivo que el del bateador).
+- **All Caps:** llega apagado: `prep.js` lo prende.
+- **Textos de caja:** ya llegan de caja, pero entraban 3 px en la columna naranja: van desde donde
+  empiezan (x 1467.9) hasta 8 px antes de ella (`TEL_HASTA`, x 1718), y el alto, el ascent del cuerpo
+  más 2. Los renglones, cada 45 (`TEL_RENGLON`): falla si llegan a más de 1 px de eso.
+- **Markers y timeline:** `start` (0–30) y `stop` (210–240) del diseñador → `play` 0–197 (pausa en
+  el 196, la imagen fija: `TEL_PAUSA`), `salida` 197–242 y `stop` en el 0. Los nombres suman su
+  aparición al revés (`alReves`) y la caja sus frames al revés: lo que la entrada muestra en el
+  instante t, la salida lo muestra en el 257 − t (`TEL_FIN`). Las capas de la secuencia traen unos
+  decimales de más en el ip (el frame k empieza en k × 1,00000004: en el frame entero k todavía se
+  ve el k − 1), así que el frame k se ve de k a k + 1, y `salida_k`, de 256 − k a 257 − k. Si cambia
+  cuándo crece la caja (`TEL_CAJA`, 16–43) o cuándo termina de aparecer el último nombre
+  (`TEL_NOMBRES`, el 60), mover las constantes: falla si un keyframe de los nombres pasa de ahí.
+- **Textos vacíos:** al final, como en el bateador.
+- **Imágenes:** las 199 del export, recortadas, en `tresenlinea/images/`, más las 28 de la salida.
+
+Comparado frame a frame contra el export (con IVAN MEDINA en los tres y los renglones donde
+llegaban): idéntico al píxel en 27 frames del 0 al 196. La salida, contra la entrada al revés
+(debajo del panel, desde la y 772): idéntica del 17 al 44; del 45 al 61, con la imagen fija contra
+los frames de la secuencia, difieren los bordes tramados.
+
 ### QA
 
 - Juzgar con el runtime real y la fuente cargada (`<gráfico>/index.html` en el browser o con
@@ -635,6 +724,11 @@ idéntico al píxel del 0 al 221, salvo las columnas de 1 px del arreglo del key
   `next` y `stop` desde cada stage, y que el layer se suelte.
 - Parcial: lo mismo que el score con su único stage, y el key en CasparCG (`casparcg-ctl
   snapshot`): sin columnas a menos de 255 entre los recuadros.
+- 3 en línea: entrada frame a frame, la salida contra la entrada al revés, data al aire, `stop` en
+  la pausa y a mitad de la entrada, y que el layer se suelte; en CasparCG, el key y que la entrada no
+  repita frames: se graba la salida del canal (`ADD 1-901 FILE "<ruta>.nut" -filter:v
+  crop=480:528:1440:552 -codec:v rawvideo`, `REMOVE 1-901` al terminar) y se cuentan los frames
+  iguales al anterior (la secuencia trae iguales el 23 y del 169 al 176).
 - Defensiva, ofensiva, bateador y lanzador: los 8 equipos (barra, color de las puertas, del fondo o
   del panel, y escudo), y sin equipo; entrada frame a frame, cambio de equipo al aire, `stop` en la
   pausa y a mitad de la entrada, y que el layer se suelte. El bateador y el lanzador, además, el key
@@ -660,6 +754,7 @@ con Playwright global, `$(npm root -g)/playwright/index.mjs`).
 | Script | Para qué |
 |---|---|
 | `prep.js` | La receta de arriba, ejecutable: prepara el export del diseñador. Instrucciones en su encabezado |
+| `tresenlinea.py` | Las imágenes del 3 en línea: el recorte y los frames de la salida (va antes de `prep.js`) |
 | `shot.mjs` | Frames de un gráfico con data: `node herramientas/shot.mjs <url> <salida> '<json>' <frames> [x,y,w,h]`; `JSON=<archivo>` sirve otro data.json para comparar versiones |
 | `matrix.mjs` | Muchas variantes de data en una carga (todos los cruces…), con reporte de textos y consola |
 | `onair.mjs` | Un flujo al aire (update, play, next, stop) con capturas en cada paso |
