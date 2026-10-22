@@ -46,7 +46,21 @@ above each game. `EN PUERTO LA CRUZ` and `EN BARQUISIMETO` fit at the design siz
 **Title:** `titulo`, ASÍ VAN in the design. It is the only text that doesn't start empty: send it only
 to change it (a longer title shrinks within the box).
 
-The graphic always shows three games: there is no key to hide one.
+**Days with fewer games:** the same graphic has a version with two games and one with one (the top
+ones: `1` and `2`, or `1`), each a full graphic with its own entry, pause and exit, stacked so that
+it ends at the same bottom edge as the three-game one. Send `play` as usual and, right after it,
+`goto('dosjuegos')` or `goto('unjuego')`:
+
+```
+CG 1-10 PLAY 1
+CG 1-10 INVOKE 1 "goto('dosjuegos')"
+```
+
+`play` alone shows three games. `goto` without `play` doesn't put the graphic on air (it won't pause
+and a later `CG STOP` is dropped): always `play` first. The first 12 frames of `play` are empty, so
+nothing of the three-game version shows before the `goto`. The keys are the same: a two-game graphic
+ignores the game 3 keys, a one-game graphic those of games 2 and 3. Don't send `next`: it would jump
+from one version to the next.
 
 ```json
 {
@@ -131,10 +145,11 @@ The graphic always shows three games: there is no key to hide one.
 |----------|-------|
 | Size | 1920 × 1080 px |
 | Frame rate | 29.9700012207031 fps |
-| Frames | 0 – 235 |
-| Duration | 7.84 s |
+| Frames | 0 – 806 |
+| Duration | 26.89 s (three versions: 0–235, 300–522, 600–806) |
 
-Bottom right (x 1415–1732, y 566–979 on air; y 368 up while the Harina PAN box is in). Frame 0 is
+Bottom right (x 1415–1732, y 566–979 on air with three games, 677–979 with two, 789–979 with one;
+the Harina PAN box adds 198 px on top while it's in, from y 368 with three games). Frame 0 is
 empty: nothing shows before `play`.
 
 ## Text layers
@@ -182,6 +197,10 @@ All start at opacity 1.
 | `play` | 0 | 166 | stage `pause`, order 1, `stop: "salida"` |
 | `stop` | 0 | 1 | — (frame 0, empty) |
 | `salida` | 166 | 69 | — (the column's entry in reverse, without the Harina PAN box) |
+| `dosjuegos` | 300 | 166 | stage `pause`, order 2, `stop: "salida2"` (two games) |
+| `salida2` | 466 | 56 | — (its column's entry in reverse) |
+| `unjuego` | 600 | 166 | stage `pause`, order 3, `stop: "salida1"` (one game) |
+| `salida1` | 766 | 40 | — (its column's entry in reverse) |
 
 `play` enters and pauses on frame 165 (5.5 s): the Harina PAN box comes in from the right (frames
 11–23), opens its doors and builds its logo; under it the title comes in (27–46) and the three games,
@@ -191,3 +210,8 @@ silently, the teams included. `stop` plays `salida` (frame 166 → 234, 2.3 s): 
 reverse (game 3 first, then 2 and 1, the title and the grey line), ending on an empty frame; it
 releases the layer when it ends. The `play` stage is active from frame 0, so a `stop` that arrives
 mid-entry also plays `salida`: it jumps to the full column, without the box, and exits from there.
+
+`dosjuegos` and `unjuego` are the same as `play` with fewer games: the box and the title come in the
+same way, the games one after the other, and they pause on frames 465 and 765 (5.5 s after the
+`goto`). `stop` plays their own exit: `salida2` (466 → 521, 1.9 s) and `salida1` (766 → 805, 1.3 s),
+also ending on an empty frame and releasing the layer.
