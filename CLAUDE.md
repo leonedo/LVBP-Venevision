@@ -24,7 +24,7 @@ UPDATE están en su `data.md`.
 | `lanzador/` | El lanzador (el export es PITCHERS), en la mitad izquierda: un panel del color del equipo con su escudo grande, de arriba abajo en el borde izquierdo; la barra del equipo con el nombre y el apellido (dos líneas) y el número, y debajo una barra negra con el split; la mano de lanzar y 6 estadísticas (rótulo y valor) sobre una textura gris. El frame 0 está vacío | stage `play` pause (0–110) | `salida`: la entrada al revés (3,7 s) |
 | `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, casi centrado (35 px a la izquierda): barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de Pepsi (fijo: una secuencia de PNG). El frame 0 está vacío | stage `play` pause (0–222): la pizarra entra hasta el 41, el cuadro de Pepsi hasta el 73 y le pasa un brillo del 181 al 220 | `salida`: el cuadro de Pepsi sale como lo animó el diseñador y después la pizarra, su entrada al revés (3,9 s) |
 | `tresenlinea/` | Los tres que vienen al bate (el export es 3 EN LINEA), abajo a la derecha: un panel de Empire Keeway entra con sus logos y se va, y queda la caja, la banda naranja con el 3 EN LÍNEA y el recuadro azul con los tres nombres (todo una secuencia de PNG, salvo los nombres). El frame 0 está vacío | stage `play` pause (0–197): la caja crece del 16 al 43, los nombres aparecen del 40 al 60 y el panel se va del 177 al 193 | `salida`: los nombres y la caja, su entrada al revés, sin el panel (1,5 s) |
-| `otrosjuegos/` | Cómo van los otros juegos (el export es OTROS JUEGOS; el título, ASÍ VAN), una columna abajo a la derecha: arriba, un cuadro de Harina PAN entra, arma su logo y se va (una secuencia de JPG); debajo, el título y tres juegos, cada uno con la sede, las barras de visita y local (escudo y nombre), las carreras y el inning con sus flechas. El frame 0 está vacío | stage `play` pause (0–166): el cuadro entra del 11 al 23, la columna del 27 al 95 (un juego detrás del otro) y el cuadro se va del 157 al 164. Con menos juegos, `play` y enseguida `goto` a `dosjuegos` (300–466) o `unjuego` (600–766), el mismo gráfico con 2 o 1 juegos | `salida`: la columna, su entrada al revés, sin el cuadro (2,3 s); `salida2` (1,9 s) y `salida1` (1,3 s) |
+| `otrosjuegos/` | Cómo van los otros juegos (el export es OTROS JUEGOS; el título, ASÍ VAN), una columna abajo a la derecha: arriba, un cuadro de Harina PAN entra, arma su logo y se va (una secuencia de JPG); debajo, el título y tres juegos, cada uno con la sede, las barras de visita y local (escudo y nombre), las carreras y el inning con sus flechas. El frame 0 está vacío | `play` lo pone al aire vacío (pausa en el 0); el controlador elige con un `goto`: `tresjuegos` (100–266), `dosjuegos` (400–566) o `unjuego` (700–866), el mismo gráfico con 3, 2 o 1 juegos. En cada uno, desde el `goto`, el cuadro entra del 11 al 23, la columna del 27 al 95 (un juego detrás del otro) y el cuadro se va del 157 al 164 | `salida`: la columna, su entrada al revés, sin el cuadro (2,3 s); `salida2` (1,9 s) y `salida1` (1,3 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
@@ -403,19 +403,24 @@ donde dicen lo mismo, con el número del juego al final (1 arriba, 3 abajo): `<S
 (ASÍ VAN). Los textos arrancan vacíos, como en el bateador, salvo el título: si no llega, queda ASÍ
 VAN.
 
-Días con menos juegos (Leon, 2026-10-22, sin pedirle nada al diseñador): la misma timeline trae dos
-tramos más, cada uno el gráfico entero (entrada, pausa y salida) con los juegos de arriba: 2 juegos
-desde el 300 (stage `dosjuegos`, salida `salida2`) y 1 desde el 600 (`unjuego`, `salida1`). Pausar
-antes el de tres no servía: los juegos entran encimados (el 2 empieza antes de que termine el 1) y el
-cuadro de PAN arma su logo hasta el 93, así que quedaba a medias. Cada tramo es una copia de sus capas
-con las mismas clases (un UPDATE llena los tres; el lint deja repetir una clase una vez por tramo). La
-columna baja hasta terminar donde termina la de tres (111 y 223 px, enteros: idéntica al píxel a la de
-tres corrida), y su último juego termina como el 3: las barras locales, 1,25 px antes que su cuadro
-negro (en el de tres, la banda de abajo las tapa). Se llega con `play` y enseguida `goto('dosjuegos')`
-o `goto('unjuego')`: `goto` solo no pone el gráfico al aire (`index.js` no pausa los stages sin el
-`play`, y webcg descarta el `CG STOP` de un gráfico que no está en play). Los primeros 12 frames del
-tramo de tres están vacíos: en CasparCG, con los dos comandos seguidos, lo primero que se ve ya es el
-tramo pedido. `next` saltaría de un tramo al siguiente: no se manda.
+Días con menos juegos (Leon, 2026-10-22, sin pedirle nada al diseñador): la timeline trae tres
+tramos, cada uno el gráfico entero (entrada, pausa y salida) con los juegos de arriba: 3 juegos desde
+el 100 (stage `tresjuegos`, salida `salida`), 2 desde el 400 (`dosjuegos`, `salida2`) y 1 desde el
+700 (`unjuego`, `salida1`). Pausar antes el de tres no servía: los juegos entran encimados (el 2
+empieza antes de que termine el 1) y el cuadro de PAN arma su logo hasta el 93, así que quedaba a
+medias. Cada tramo es una copia de sus capas con las mismas clases (un UPDATE llena los tres; el lint
+deja repetir una clase una vez por tramo). Con menos juegos, la columna baja hasta terminar donde
+termina la de tres (111 y 223 px, enteros: idéntica al píxel a la de tres corrida), y su último juego
+termina como el 3: las barras locales, 1,25 px antes que su cuadro negro (en el de tres, la banda de
+abajo las tapa).
+
+El tramo siempre lo elige el controlador (Leon, 2026-10-22): `play` pone el gráfico al aire en el
+frame 0, vacío, y queda pausado ahí hasta un `goto('tresjuegos')`, `goto('dosjuegos')` o
+`goto('unjuego')`. Así un `goto` que llega tarde sólo atrasa la entrada; si `play` arrancara el tramo
+de tres, un `goto` que llegara después de sus 12 frames vacíos dejaría ver el cuadro de PAN del tramo
+que no es. Sin el `goto` no sale nada (el `stop` lo suelta igual). `goto` sin `play` no sirve: no pone
+el gráfico al aire (`index.js` no pausa los stages sin el `play`, y webcg descarta el `CG STOP` de un
+gráfico que no está en play). `next` saltaría de un tramo al siguiente: no se manda.
 
 Barras de equipo: como en el score, imágenes apiladas, las 8 de cada fila con su máscara, todas
 visibles al arrancar: el controlador manda `1` a la que va y `0` a las otras siete, en cada fila. Sin
@@ -841,20 +846,21 @@ los frames de la secuencia, difieren los bordes tramados.
   última barra del juego), la primera banda (`Capa de formas 7`) 1 px más alta y los cuadros negros
   (`CUADRO SCORE`, ` 2`, ` 3`) 1 px más altos (ver *Key* arriba). Si la columna se mueve, medir de
   nuevo `OJ_FONDO`.
-- **Markers y timeline:** `START` (0–30) y `STOP` (167–197) del diseñador → `play` 0–166 (pausa en el
-  165, el primer frame sin el cuadro de PAN: `OJ_PAUSA`), `salida` 166–235 y `stop` en el 0. La columna
-  suma su entrada al revés (`alReves`) desde el 166: una capa que entraba en el frame t se va en el
-  261 − t, y el 234 (la raya gris sin ancho) es el primer frame vacío. La entrada de la columna termina
-  en el 95 (`OJ_ENTRADA`): `prep.js` falla si algo de la columna anima después. Las capas que arrancan
-  en el 0 pasan al 1.
+- **Markers y timeline:** `START` (0–30) y `STOP` (167–197) del diseñador → en cada tramo, contado
+  desde su comienzo, el stage 0–166 (pausa en el 165, el primer frame sin el cuadro de PAN:
+  `OJ_PAUSA`) y su salida desde el 166; y al principio, `play` (pausa en el 0, vacío) y `stop` en el 0.
+  La columna suma su entrada al revés (`alReves`) desde el 166: en el de tres, una capa que entraba en
+  el frame t se va en el 261 − t, y el 234 (la raya gris sin ancho) es el primer frame vacío. La entrada
+  de la columna termina en el 95 (`OJ_ENTRADA`): `prep.js` falla si algo de la columna anima después.
+  Las capas que arrancan en el 0 pasan al 1.
 - **Tramos:** `otrosJuegos(juegos)` arma cada tramo como un gráfico solo, desde el frame 0: con 2 o 1
   juegos saca las capas de los de abajo (las que cuelgan de `RESULTADO <n>` y de su `Null 1`, más la
   sede, el inning y las carreras, y sus mattes), achica las máscaras de las barras locales del último
   para que terminen como las del juego 3, no le agranda el cuadro negro hacia abajo, y corre las capas
   sin parent hasta que su cuadro termine donde el del 3. La entrada del tramo termina con su último
-  juego (66, 82 o 95), y la salida es esa entrada al revés. Después los tramos de 2 y 1 se copian a
-  `OJ_TRAMO` (300 y 600) con `ind` nuevos (y sus `parent` y `tp`), y se corren el ip, el op, el st y
-  todos los keyframes. `prep.js` falla si un tramo empieza antes de que termine el anterior.
+  juego (66, 82 o 95), y la salida es esa entrada al revés. Después los tres se copian a `OJ_TRAMO`
+  (100, 400 y 700) con `ind` nuevos (y sus `parent` y `tp`), y se corren el ip, el op, el st y todos
+  los keyframes. `prep.js` falla si un tramo empieza antes de que termine el anterior.
 - **Textos vacíos:** al final, todos salvo `titulo`.
 - **Imágenes:** las 154 del export van tal cual a `otrosjuegos/images/` (`img_0`–`137`, los JPG de la
   secuencia; `img_138`–`153`, las barras).
@@ -863,9 +869,9 @@ Comparado frame a frame contra el export (del 0 al 165, con todas las barras pre
 diseño): idéntico salvo el desenfoque de los textos mientras entran, el escudo de Leones visita del
 juego 1 (la imagen corregida), el cuadro de PAN desde el 95 (el JPG quieto) y las filas de 1 px del
 arreglo del key (la 643 y, en el cuadro negro, la 667, la 779 y la 890). La salida, contra la entrada
-al revés: idéntica (hasta 1 nivel). Con los tramos, el de tres quedó idéntico al publicado antes, y la
-pausa de los de 2 y 1, idéntica a la de tres corrida 111 y 223 px (hasta 1 nivel), salvo el borde de
-abajo.
+al revés: idéntica (hasta 1 nivel). Con los tramos, el de tres quedó idéntico al publicado antes (100
+frames después), y la pausa de los de 2 y 1, idéntica a la de tres corrida 111 y 223 px (hasta 1
+nivel), salvo el borde de abajo.
 
 ### QA
 
@@ -884,9 +890,10 @@ abajo.
   `FINAL` en el inning), entrada frame a frame contra el export, la salida contra la entrada al revés,
   data al aire, `stop` en la pausa y a mitad de la entrada, y que el layer se suelte; en CasparCG, el
   key con los 8 casos (sin filas ni columnas a menos de 255 adentro de la columna) y que la entrada no
-  repita frames (como en el 3 en línea, `crop=400:720:1400:300`). Los tramos de 2 y 1: `CG PLAY` y
-  `CG INVOKE 1 "goto('dosjuegos')"`, el key en la pausa, que no se vea nada del tramo de tres antes del
-  goto (grabando el canal) y que el `CG STOP` suelte el layer.
+  repita frames (como en el 3 en línea, `crop=400:720:1400:300`). Los tres tramos: `CG PLAY` solo (no
+  sale nada, y el `CG STOP` suelta el layer), y con un `CG INVOKE 1 "goto('dosjuegos')"` unos segundos
+  después (grabando el canal: vacío hasta que entra el tramo pedido), el key en la pausa y que el
+  `CG STOP` suelte el layer.
 - Defensiva, ofensiva, bateador y lanzador: los 8 equipos (barra, color de las puertas, del fondo o
   del panel, y escudo), y sin equipo; entrada frame a frame, cambio de equipo al aire, `stop` en la
   pausa y a mitad de la entrada, y que el layer se suelte. El bateador y el lanzador, además, el key

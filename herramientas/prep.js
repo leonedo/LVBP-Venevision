@@ -1327,23 +1327,27 @@ const OJ_SEDE = 289;
 const OJ_INNING = 51;
 const OJ_TITULO = 300;
 const OJ_LW = { '10': 25.026562499999997, 'EN CARACAS': 90.79874999999998 };
-// Flujo: el cuadro de PAN entra por la derecha (11–23), abre sus puertas y arma el logo; debajo entra
-// la columna (27–95: la raya gris, el ASÍ VAN y los tres juegos, uno detrás del otro) y el cuadro se va
-// por la derecha (157–164). La entrada para en el 165, el primer frame sin el cuadro. El export no trae
+// Flujo de cada tramo, desde su comienzo: el cuadro de PAN entra por la derecha (11–23), abre sus
+// puertas y arma el logo; debajo entra la columna (27–95: la raya gris, el ASÍ VAN y los tres juegos,
+// uno detrás del otro) y el cuadro se va por la derecha (157–164). La entrada para en el 165, el primer
+// frame sin el cuadro. El export no trae
 // salida (su STOP, 167–197, no anima nada): es la entrada de la columna al revés, sin el cuadro, como
 // en el 3 en línea (2,3 s). Una capa que entraba en el frame t se va en el OJ_PAUSA + OJ_ENTRADA − t.
 const OJ_ENTRADA = 95;                 // la entrada de la columna termina en el 95 (las flechas y las carreras del juego 3)
-const OJ_PAUSA = 166;                  // play 0–166: queda en el 165
-// Días con menos juegos (Leon, 2026-10-22): la misma timeline trae otros dos tramos, cada uno un
-// gráfico entero (entrada, pausa y salida) con los juegos de arriba: 2 juegos desde el 300 (stage
-// dosjuegos) y 1 desde el 600 (unjuego). La columna baja hasta terminar donde termina la de tres
-// (111 y 223 px), y su último juego termina como el 3 (las barras locales, 1.25 px antes que el
-// cuadro negro: en el de tres, la banda de abajo las tapa). Se llega con play y enseguida
-// goto('dosjuegos') o goto('unjuego'): goto solo no pone el gráfico al aire, y sin eso no pausa (y
-// webcg descarta el CG STOP); los primeros 12 frames del tramo de tres están vacíos. La salida de
+const OJ_PAUSA = 166;                  // el stage de cada tramo, 0–166 desde su comienzo: queda en el 165
+// Días con menos juegos (Leon, 2026-10-22): la timeline trae tres tramos, cada uno un gráfico entero
+// (entrada, pausa y salida) con los juegos de arriba: 3 juegos desde el 100 (stage tresjuegos), 2
+// desde el 400 (dosjuegos) y 1 desde el 700 (unjuego). Con menos juegos, la columna baja hasta
+// terminar donde termina la de tres (111 y 223 px), y su último juego termina como el 3 (las barras
+// locales, 1.25 px antes que el cuadro negro: en el de tres, la banda de abajo las tapa). La salida de
 // cada tramo es su entrada al revés: el último juego primero.
-const OJ_TRAMO = { 3: 0, 2: 300, 1: 600 };
-const OJ_STAGE = { 3: 'play', 2: 'dosjuegos', 1: 'unjuego' };
+// El tramo siempre lo elige el controlador (Leon, 2026-10-22): play pone el gráfico al aire en el
+// frame 0, vacío, y queda ahí hasta un goto('tresjuegos'), goto('dosjuegos') o goto('unjuego'). Así un
+// goto que llega tarde sólo atrasa la entrada; si play arrancara un tramo, un goto tardío mostraría
+// unos frames del que no es. goto sin play no sirve: no pone el gráfico al aire (no pausa, y webcg
+// descarta el CG STOP).
+const OJ_TRAMO = { 3: 100, 2: 400, 1: 700 };
+const OJ_STAGE = { 3: 'tresjuegos', 2: 'dosjuegos', 1: 'unjuego' };
 const OJ_SALIDA = { 3: 'salida', 2: 'salida2', 1: 'salida1' };
 // La secuencia viene en JPG y cada frame se comprime distinto: con el logo quieto, sus bordes
 // titilaban un poco (hasta 30 niveles en unos 25 px de un frame al otro). Desde el frame 78 de la
@@ -1605,19 +1609,25 @@ function otrosJuegos(juegos) {
     for (const l of d.layers) l.ip = Math.max(l.ip, 1);
     d.op = vacio + 1;
     d.markers = [
-        { tm: 0, cm: OJ_STAGE[juegos], dr: OJ_PAUSA, payload: { name: OJ_STAGE[juegos], type: 'pause', order: 4 - juegos, stop: OJ_SALIDA[juegos] } },
+        { tm: 0, cm: OJ_STAGE[juegos], dr: OJ_PAUSA, payload: { name: OJ_STAGE[juegos], type: 'pause', order: 5 - juegos, stop: OJ_SALIDA[juegos] } },
         { tm: OJ_PAUSA, cm: OJ_SALIDA[juegos], dr: vacio + 1 - OJ_PAUSA }
     ];
     return d;
 }
 if (hay('OTROS JUEGOS')) {
-    // Los tres tramos en una timeline: el de 3 juegos desde el 0 y los otros, copias de sus capas (las
-    // mismas claves: un UPDATE llena los tres), corridos a OJ_TRAMO.
-    const [d, ...otros] = [3, 2, 1].map(otrosJuegos);
-    let ind = Math.max(...d.layers.map(l => l.ind));
-    for (const v of otros) {
-        const juegos = v.markers[0].payload.name === OJ_STAGE[2] ? 2 : 1, S = OJ_TRAMO[juegos];
-        if (S < d.op) throw new Error(`el tramo de ${juegos} empezaría en el ${S}, antes del final del anterior (${d.op})`);
+    // Los tres tramos en una timeline, copias de sus capas (las mismas claves: un UPDATE llena los
+    // tres), corridos a OJ_TRAMO. Antes, en el frame 0, vacío, la espera: play pausa ahí.
+    const tramos = [3, 2, 1].map(juegos => [juegos, otrosJuegos(juegos)]);
+    const d = tramos[0][1];   // las fuentes, las imágenes y el precomp, del tramo de tres
+    const capas = [];
+    const marcas = [
+        { tm: 0, cm: 'play', dr: 0, payload: { name: 'play', type: 'pause', order: 1 } },
+        { tm: 0, cm: 'stop', dr: 1 }
+    ];
+    let ind = 0, fin = 1;
+    for (const [juegos, v] of tramos) {
+        const S = OJ_TRAMO[juegos];
+        if (S < fin) throw new Error(`el tramo de ${juegos} empezaría en el ${S}, antes del final del anterior (${fin})`);
         if (v.assets.length !== d.assets.length) throw new Error('los tramos no usan las mismas imágenes');
         const mapa = {};
         for (const l of v.layers) mapa[l.ind] = ++ind;
@@ -1629,11 +1639,13 @@ if (hay('OTROS JUEGOS')) {
             if (l.ty === 5 && l.t.d.k.length !== 1) throw new Error(`${l.nm}: texto animado`);
             for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) for (const k of p.k) k.t += S;
         }
-        d.layers.push(...v.layers);
-        for (const m of v.markers) d.markers.push(Object.assign(m, { tm: m.tm + S }));
-        d.op = v.op + S;
+        capas.push(...v.layers);
+        for (const m of v.markers) marcas.push(Object.assign(m, { tm: m.tm + S }));
+        fin = v.op + S;
     }
-    d.markers.splice(1, 0, { tm: 0, cm: 'stop', dr: 1 });
+    d.layers = capas;
+    d.markers = marcas;
+    d.op = fin;
     const archivos = { 'LTEnergy-Regular': 'font/LTEnergy-Regular.ttf', 'ChakraPetch-Bold': 'font/ChakraPetch-Bold.ttf' };
     for (const f of d.fonts.list) {
         if (!archivos[f.fName]) throw new Error(`fuente ${f.fName}`);
