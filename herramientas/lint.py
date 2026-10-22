@@ -11,6 +11,9 @@ GRAFICOS = sorted(g for g in os.listdir(REPO) if os.path.isfile(REPO + g + '/dat
 # bateador, su barra, el fondo de color y el escudo; en el lanzador, el panel de color, el escudo y
 # la barra (prep.js): la misma clase en todas.
 REPETIDAS = {g: re.compile(r'[A-Z]+_opacidad') for g in ('defensiva', 'ofensiva', 'bateador', 'lanzador')}
+# Gráficos con tramos: la timeline trae una copia de las capas por stage (los otros juegos: 3, 2 y 1
+# juegos), con las mismas clases. Una clase se repite una vez por tramo, nunca dentro del mismo.
+TRAMOS = {'otrosjuegos'}
 # Las compuertas: su 49 % va en el CSS (prep.js), no en la capa.
 PUERTAS = {g: 'g[id^="puerta"] > image' for g in ('defensiva', 'ofensiva')}
 # El escudo grande del lanzador, lo mismo: su 49 % va en el CSS.
@@ -39,8 +42,14 @@ for g in GRAFICOS:
     check_layers(d['layers'], 'main')
     for cid, c in comps.items(): check_layers(c['layers'], cid)
     cls = [l['cl'] for l in d['layers'] if l.get('cl')]
+    if g in TRAMOS:
+        inicios = sorted(m['tm'] for m in d['markers'] if (m.get('payload') or {}).get('type'))
+        por_tramo = [[l['cl'] for l in d['layers'] if l.get('cl') and max(i for i, t in enumerate(inicios) if t <= l['ip']) == n] for n in range(len(inicios))]
+        for n, cs in enumerate(por_tramo):
+            for c in set(cs):
+                if cs.count(c) > 1: p(g, f'clase duplicada {c} en el tramo {n + 1}')
     for c in set(cls):
-        if cls.count(c) > 1 and not (g in REPETIDAS and REPETIDAS[g].fullmatch(c)): p(g, f'clase duplicada {c}')
+        if cls.count(c) > 1 and g not in TRAMOS and not (g in REPETIDAS and REPETIDAS[g].fullmatch(c)): p(g, f'clase duplicada {c}')
         if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_-]*', c): p(g, f'clase inválida {c!r}')
     for l in d['layers']:
         nm = l.get('nm', '')

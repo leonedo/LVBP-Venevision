@@ -125,6 +125,16 @@ function enPantalla(d, l, x) {
     return x;
 }
 const escalaX = (d, l) => enPantalla(d, l, 1) - enPantalla(d, l, 0);
+// Lo mismo en y.
+function enPantallaY(d, l, y) {
+    for (let c = l; c; c = c.parent ? d.layers.find(o => o.ind === c.parent) : null) {
+        const { p, a, s, r } = c.ks;
+        if ((r && (r.a || r.k)) || p.s) throw new Error(`${c.nm}: rotada o con posición separada`);
+        y = ultimoValor(p)[1] + (y - ultimoValor(a)[1]) * ultimoValor(s)[1] / 100;
+    }
+    return y;
+}
+const escalaY = (d, l) => enPantallaY(d, l, 1) - enPantallaY(d, l, 0);
 
 // ---------------------------------------------------------------- score
 // Escudos: las siglas de los escudos del score de LVBP-Meridiano, para que el controlador mande
@@ -1324,6 +1334,17 @@ const OJ_LW = { '10': 25.026562499999997, 'EN CARACAS': 90.79874999999998 };
 // en el 3 en línea (2,3 s). Una capa que entraba en el frame t se va en el OJ_PAUSA + OJ_ENTRADA − t.
 const OJ_ENTRADA = 95;                 // la entrada de la columna termina en el 95 (las flechas y las carreras del juego 3)
 const OJ_PAUSA = 166;                  // play 0–166: queda en el 165
+// Días con menos juegos (Leon, 2026-10-22): la misma timeline trae otros dos tramos, cada uno un
+// gráfico entero (entrada, pausa y salida) con los juegos de arriba: 2 juegos desde el 300 (stage
+// dosjuegos) y 1 desde el 600 (unjuego). La columna baja hasta terminar donde termina la de tres
+// (111 y 223 px), y su último juego termina como el 3 (las barras locales, 1.25 px antes que el
+// cuadro negro: en el de tres, la banda de abajo las tapa). Se llega con play y enseguida
+// goto('dosjuegos') o goto('unjuego'): goto solo no pone el gráfico al aire, y sin eso no pausa (y
+// webcg descarta el CG STOP); los primeros 12 frames del tramo de tres están vacíos. La salida de
+// cada tramo es su entrada al revés: el último juego primero.
+const OJ_TRAMO = { 3: 0, 2: 300, 1: 600 };
+const OJ_STAGE = { 3: 'play', 2: 'dosjuegos', 1: 'unjuego' };
+const OJ_SALIDA = { 3: 'salida', 2: 'salida2', 1: 'salida1' };
 // La secuencia viene en JPG y cada frame se comprime distinto: con el logo quieto, sus bordes
 // titilaban un poco (hasta 30 niveles en unos 25 px de un frame al otro). Desde el frame 78 de la
 // secuencia (al aire, el 93.5) el logo no se mueve hasta que el cuadro se va: queda ese JPG solo,
@@ -1344,7 +1365,9 @@ const OJ_FONDO = [[1417, 666, 1597.6, 756.5], [1417, 778, 1597.6, 867.5], [1417,
 // pinta: pasa a un Gaussian Blur, que sí. El box blur de radio r con n pasadas es un gaussiano de
 // sigma √(n·r·(r+1)/3), y Lottie pinta el Gaussian Blur con sigma = 0,3 × el Blurriness.
 const OJ_BLUR = (r, n) => Math.sqrt(n * r * (r + 1) / 3) / 0.3;
-if (hay('OTROS JUEGOS')) {
+// Un tramo: el gráfico con los primeros `juegos` juegos (de arriba abajo), preparado como si fuera
+// solo, desde el frame 0, con su entrada, su pausa y su salida.
+function otrosJuegos(juegos) {
     const d = load(path.join(SRC, 'OTROS JUEGOS/data.json'));
     const pan = layer(d, 'PANSECUENCE');
     const secuencia = d.assets.find(a => a.id === pan.refId);
@@ -1451,16 +1474,67 @@ if (hay('OTROS JUEGOS')) {
         if (!l.ef.length) delete l.ef;
     }
 
+    // ---- geometría en px de pantalla (en y), al final de la entrada: los recuadros son capas de forma
+    // con un rectángulo, sin rotaciones
+    const rectY = l => {
+        const g = l.shapes[0].it, rc = g.find(s => s.ty === 'rc'), tr = g.find(s => s.ty === 'tr');
+        if (l.shapes.length !== 1 || rc.s.a || rc.p.a || tr.p.a || tr.a.a || tr.s.a || tr.r.k) throw new Error(`${l.nm}: transform inesperado`);
+        return [-1, 1].map(lado => enPantallaY(d, l, tr.p.k[1] + (rc.p.k[1] + lado * rc.s.k[1] / 2 - tr.a.k[1]) * tr.s.k[1] / 100));
+    };
+    // Un recuadro que crece (o se achica) hacia arriba o hacia abajo, en px de pantalla.
+    const creceY = (l, arriba, abajo) => {
+        rectY(l);
+        const g = l.shapes[0].it, rc = g.find(s => s.ty === 'rc'), tr = g.find(s => s.ty === 'tr');
+        const sy = escalaY(d, l) * tr.s.k[1] / 100;   // px de pantalla por unidad del rectángulo
+        rc.s.k[1] += (arriba + abajo) / sy;
+        rc.p.k[1] += (abajo - arriba) / 2 / sy;
+    };
+    const espacio = n => n === 1 ? '' : ' ' + n;
+    const cuadro = n => layer(d, 'CUADRO SCORE' + espacio(n));
+    const fondos = [1, 2, 3].map(n => rectY(cuadro(n))[1]);      // donde termina cada cuadro negro
+    const localesDe = n => d.layers.filter(l => l.ty === 2 && new RegExp(`^\\.[A-Z]+LOCAL${n}_opacidad$`).test(l.nm)).map(l => d.layers[d.layers.indexOf(l) - 1]);
+    // Las barras locales del juego 3 terminan 1.25 px antes que su cuadro negro (el borde de abajo de
+    // la columna); las del 1 y el 2 siguen por debajo de la banda del juego de abajo.
+    const bajos3 = localesDe(3).map(m => rectY(m)[1]);
+    if (Math.max(...bajos3) - Math.min(...bajos3) > 0.01) throw new Error('juego 3: las barras locales no terminan todas a la misma altura');
+    const corte = fondos[2] - bajos3[0];
+
+    // ---- con menos juegos: fuera los de abajo, y el último termina como el juego 3
+    if (juegos < 3) {
+        const raices = new Set();
+        for (let n = juegos + 1; n <= 3; n++) {
+            raices.add(layer(d, 'RESULTADO ' + n));
+            raices.add(d.layers.find(l => l.ind === +Object.keys(nulos).find(k => nulos[k] === n)));
+            for (const k of ['.sede', '.inning', '.CARRERASVISITA', '.CARRERASLOCAL']) raices.add(layer(d, k + n));
+        }
+        const desciende = l => {
+            for (let c = l; c; c = d.layers.find(o => o.ind === c.parent)) if (raices.has(c)) return true;
+            return false;
+        };
+        const fuera = new Set(d.layers.filter(desciende));
+        d.layers.forEach((l, i) => { if (l.td && fuera.has(d.layers[i + 1])) fuera.add(l); });   // sus mattes
+        d.layers = d.layers.filter(l => !fuera.has(l));
+        for (const l of d.layers) {
+            const m = (l.cl || '').match(/(\d)(_opacidad)?$/);
+            if ((m && +m[1] > juegos) || (l.parent != null && !d.layers.some(o => o.ind === l.parent))) throw new Error(`${l.nm}: quedó del juego ${m && m[1]}`);
+        }
+        for (const m of localesDe(juegos)) {
+            creceY(m, 0, fondos[juegos - 1] - corte - rectY(m)[1]);
+            if (Math.abs(rectY(m)[1] - (fondos[juegos - 1] - corte)) > 0.01) throw new Error(`${m.nm}: no quedó a la altura del cuadro`);
+        }
+    }
+
     // ---- key: el fondo negro de las barras de cada juego, debajo de la última, y los recuadros que
     // crecen 1 px por debajo de las bandas
     const ultimoFrame = ls => Math.ceil(Math.max(...propiedadesAnimadas(ls.map(l => l.ks)).flatMap(p => p.k.map(k => k.t))));
     let ind = Math.max(...d.layers.map(l => l.ind));
-    for (let n = 1; n <= 3; n++) {
-        const espacio = n === 1 ? '' : ' ' + n;
+    for (let n = 1; n <= juegos; n++) {
         const suyas = d.layers.filter(l => l.ty === 2 && /^\.[A-Z]+(VISITA|LOCAL)\d_opacidad$/.test(l.nm) && l.nm.endsWith(n + '_opacidad'));
         const mattes = suyas.map(l => d.layers[d.layers.indexOf(l) - 1]);
         if (suyas.length !== 16 || mattes.some(m => !m.td)) throw new Error(`juego ${n}: barras o mattes inesperados`);
-        const [x0, y0, x1, y1] = OJ_FONDO[n - 1];
+        // el del último juego, hasta donde terminan sus barras (el borde de abajo de la columna)
+        const [x0, y0, x1] = OJ_FONDO[n - 1], y1 = n < juegos ? OJ_FONDO[n - 1][3] : Math.floor(fondos[n - 1] - corte);
+        if (n === 3 && y1 !== OJ_FONDO[2][3]) throw new Error(`fondo del juego 3: ${y1}`);
         const fondo = {
             ddd: 0, ind: ++ind, ty: 4, nm: 'fondo barras ' + n, sr: 1, ao: 0, bm: 0,
             ks: {
@@ -1475,31 +1549,29 @@ if (hay('OTROS JUEGOS')) {
                 ]
             }],
             // cuando ya entraron las barras (sus mattes) y el cuadro negro
-            ip: ultimoFrame([...mattes, layer(d, 'CUADRO SCORE' + espacio)]), op: d.layers[0].op, st: 0
+            ip: ultimoFrame([...mattes, cuadro(n)]), op: d.layers[0].op, st: 0
         };
         const ultima = Math.max(...suyas.map(l => d.layers.indexOf(l)));
         d.layers.splice(ultima + 1, 0, fondo);
     }
-    // Un recuadro (capa de forma con un rectángulo) que crece hacia arriba o hacia abajo, en px de
-    // pantalla, por debajo de la banda vecina. Sus parents, al 100 %.
-    const creceY = (nm, arriba, abajo) => {
-        const l = layer(d, nm), g = l.shapes[0].it;
-        const rc = g.find(s => s.ty === 'rc'), tr = g.find(s => s.ty === 'tr');
-        if (l.shapes.length !== 1 || rc.s.a || rc.p.a || tr.s.a || tr.r.k || l.ks.r.a || l.ks.r.k) throw new Error(`${nm}: transform inesperado`);
-        for (let c = d.layers.find(o => o.ind === l.parent); c; c = d.layers.find(o => o.ind === c.parent)) {
-            const [sx, sy] = ultimoValor(c.ks.s);
-            if (sx !== 100 || sy !== 100 || c.ks.r.k) throw new Error(`${nm}: parent ${c.nm} escalado o rotado`);
-        }
-        const sy = ultimoValor(l.ks.s)[1] / 100 * tr.s.k[1] / 100;   // px de pantalla por unidad
-        rc.s.k[1] += (arriba + abajo) / sy;
-        rc.p.k[1] += (abajo - arriba) / 2 / sy;
-    };
     if (layer(d, 'Capa de formas 7').parent !== layer(d, 'RESULTADO 1').ind) throw new Error('Capa de formas 7: ¿es la banda del juego 1?');
-    creceY('Capa de formas 7', 1, 0);   // la banda del juego 1, por debajo del título
-    // los cuadros negros, por debajo de la banda de su juego y de la del juego de abajo
-    creceY('CUADRO SCORE', 1, 1);
-    creceY('CUADRO SCORE 2', 1, 1);
-    creceY('CUADRO SCORE 3', 1, 0);
+    creceY(layer(d, 'Capa de formas 7'), 1, 0);   // la banda del juego 1, por debajo del título
+    // los cuadros negros, por debajo de la banda de su juego y de la del juego de abajo (el último, sólo
+    // hacia arriba: abajo es el borde de la columna)
+    for (let n = 1; n <= juegos; n++) creceY(cuadro(n), 1, n < juegos ? 1 : 0);
+
+    // ---- con menos juegos, la columna baja hasta terminar donde termina la de tres
+    if (juegos < 3) {
+        const dy = fondos[2] - fondos[juegos - 1];
+        if (Math.abs(dy - Math.round(dy)) > 0.01) throw new Error(`la columna bajaría ${dy} px: no es un número entero`);
+        for (const l of d.layers) {
+            if (l.parent != null) continue;
+            const p = l.ks.p;
+            if (p.s) throw new Error(`${l.nm}: posición separada`);
+            if (p.a) for (const k of p.k) { k.s[1] += Math.round(dy); if (k.e) k.e[1] += Math.round(dy); }
+            else p.k[1] += Math.round(dy);
+        }
+    }
 
     // ---- el tramo quieto del cuadro de PAN: la capa del frame OJ_QUIETO dura hasta el final de la
     // secuencia, y las de después se van, con sus imágenes (los JPG quedan en la carpeta)
@@ -1518,24 +1590,50 @@ if (hay('OTROS JUEGOS')) {
     if (pan.op >= OJ_PAUSA) throw new Error(`PANSECUENCE: termina en el ${pan.op}, después de la pausa`);
     const columna = d.layers.filter(l => l !== pan);
     const tiempos = propiedadesAnimadas(columna.map(l => [l.ks, l.shapes, l.t, l.masksProperties, l.ef])).flatMap(p => p.k.map(k => k.t));
-    if (Math.max(...tiempos) > OJ_ENTRADA + 0.5) throw new Error(`la columna anima hasta el ${Math.max(...tiempos)}: medir de nuevo OJ_ENTRADA`);
-    const FIN = OJ_PAUSA + OJ_ENTRADA;
+    const entrada = Math.round(Math.max(...tiempos));   // la del último juego
+    if (juegos === 3 && Math.max(...tiempos) > OJ_ENTRADA + 0.5) throw new Error(`la columna anima hasta el ${Math.max(...tiempos)}: medir de nuevo OJ_ENTRADA`);
+    const FIN = OJ_PAUSA + entrada;
     const vacio = Math.ceil(FIN - Math.min(...tiempos));   // el primer frame vacío: la raya gris sin ancho
     for (const l of columna) {
-        for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, OJ_ENTRADA, OJ_PAUSA);
+        for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, entrada, OJ_PAUSA);
     }
     for (const l of columna) {
         const ref = l.td ? d.layers[d.layers.indexOf(l) + 1] : l;   // los mattes, con la capa que matean
-        if (l.op < OJ_PAUSA || ref.ip > OJ_ENTRADA) throw new Error(`${l.nm}: ip ${l.ip}, op ${l.op}`);
+        if (l.op < OJ_PAUSA || ref.ip > entrada) throw new Error(`${l.nm}: ip ${l.ip}, op ${l.op}`);
         l.op = Math.min(FIN - Math.max(ref.ip, 1) + 0.001, vacio + 1);
     }
     for (const l of d.layers) l.ip = Math.max(l.ip, 1);
     d.op = vacio + 1;
     d.markers = [
-        { tm: 0, cm: 'play', dr: OJ_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
-        { tm: 0, cm: 'stop', dr: 1 },
-        { tm: OJ_PAUSA, cm: 'salida', dr: vacio + 1 - OJ_PAUSA }
+        { tm: 0, cm: OJ_STAGE[juegos], dr: OJ_PAUSA, payload: { name: OJ_STAGE[juegos], type: 'pause', order: 4 - juegos, stop: OJ_SALIDA[juegos] } },
+        { tm: OJ_PAUSA, cm: OJ_SALIDA[juegos], dr: vacio + 1 - OJ_PAUSA }
     ];
+    return d;
+}
+if (hay('OTROS JUEGOS')) {
+    // Los tres tramos en una timeline: el de 3 juegos desde el 0 y los otros, copias de sus capas (las
+    // mismas claves: un UPDATE llena los tres), corridos a OJ_TRAMO.
+    const [d, ...otros] = [3, 2, 1].map(otrosJuegos);
+    let ind = Math.max(...d.layers.map(l => l.ind));
+    for (const v of otros) {
+        const juegos = v.markers[0].payload.name === OJ_STAGE[2] ? 2 : 1, S = OJ_TRAMO[juegos];
+        if (S < d.op) throw new Error(`el tramo de ${juegos} empezaría en el ${S}, antes del final del anterior (${d.op})`);
+        if (v.assets.length !== d.assets.length) throw new Error('los tramos no usan las mismas imágenes');
+        const mapa = {};
+        for (const l of v.layers) mapa[l.ind] = ++ind;
+        for (const l of v.layers) {
+            l.ind = mapa[l.ind];
+            if (l.parent != null) l.parent = mapa[l.parent];
+            if (l.tp != null) l.tp = mapa[l.tp];
+            l.ip += S; l.op += S; l.st += S;
+            if (l.ty === 5 && l.t.d.k.length !== 1) throw new Error(`${l.nm}: texto animado`);
+            for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) for (const k of p.k) k.t += S;
+        }
+        d.layers.push(...v.layers);
+        for (const m of v.markers) d.markers.push(Object.assign(m, { tm: m.tm + S }));
+        d.op = v.op + S;
+    }
+    d.markers.splice(1, 0, { tm: 0, cm: 'stop', dr: 1 });
     const archivos = { 'LTEnergy-Regular': 'font/LTEnergy-Regular.ttf', 'ChakraPetch-Bold': 'font/ChakraPetch-Bold.ttf' };
     for (const f of d.fonts.list) {
         if (!archivos[f.fName]) throw new Error(`fuente ${f.fName}`);
