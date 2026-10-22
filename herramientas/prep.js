@@ -147,6 +147,15 @@ const LOGO = 'LOGO FINAL ATRAPA LA EMOCION_1.png';
 if (hay('SCOREBUG')) {
     const d = load(path.join(SRC, 'SCOREBUG/data.json'));
 
+    // Desde el segundo export del 2026-10-22, abajo de todo viene una foto de un estadio (un JPG de
+    // 2208 × 1242, sin alfa): el fondo con el que el diseñador ve la pizarra en AE. Al aire taparía
+    // el video entero: sale, con su asset (y su imagen no se copia).
+    for (const l of d.layers.filter(l => l.ty === 2 && /\.jpe?g$/i.test(d.assets.find(a => a.id === l.refId).p))) {
+        if (d.layers.indexOf(l) !== d.layers.length - 1 || l.parent) throw new Error(`${l.nm}: JPG que no es el fondo de abajo de todo`);
+        d.layers.splice(d.layers.indexOf(l), 1);
+        d.assets.splice(d.assets.findIndex(a => a.id === l.refId), 1);
+    }
+
     const raiz = layer(d, RAIZ.nm), rp = raiz.ks.p, rs = raiz.ks.s;
     if (rp.a || rs.a || rp.k[0] !== RAIZ.p[0] || rp.k[1] !== RAIZ.p[1] || rs.k[0] !== RAIZ.s || rs.k[1] !== RAIZ.s)
         throw new Error(`${RAIZ.nm}: p ${JSON.stringify(rp.k)} s ${JSON.stringify(rs.k)}, no los del export del 2026-10-17: medir y mover CORRE`);

@@ -69,11 +69,15 @@ pausa del marcador pasó del 53 al 58 (en el 53 quedaba quieto sobre la A) y la 
 quedan hasta 3 niveles de diferencia en una columna y, en el frame 25, el borde de 1 px de la caja
 de la derecha cuando empieza a abrirse.
 
+Outs: desde el segundo export del 2026-10-22 (`SCOREBUG_3.zip`) son del cian de los textos
+(`#00D9E2`); antes, magenta (`#EA0059`). Es lo único que cambió en ese export, que trae además el
+fondo de referencia del diseñador (ver la receta).
+
 Colores en NTSC compuesto (2026-10-17, con setup de 7,5 IRE): las 16 barras de equipo quedan
 legales (la más alta, Leones, 106 IRE; ninguna baja de −7). Pasan de 110 IRE, sin llegar a 120, el
 cian de los textos y la flecha del inning (`#00D9E2`, 113,5) y el amarillo de las bases (`#FCC107`,
 114,4): quedan así (Leon). En HD (Rec.709) todo es legal. Si hiciera falta bajarlos a 110:
-`#0BD4DD` y `#F4C11D`. El logo de ATRAPA LA EMOCIÓN (2026-10-22), en la pausa: lo más alto el
+`#0BD4DD` y `#F4C11D`. Los outs, del mismo cian desde el 2026-10-22. El logo de ATRAPA LA EMOCIÓN (2026-10-22), en la pausa: lo más alto el
 amarillo de las letras (`#FBC20D`, 113,7) y lo más bajo el magenta (`#EA0058`, −12,5). Durante el
 brillo, el cian de LA EMOCIÓN pasa de 120 por unos frames (del 21 al 49, hasta 126 en unos 40 px):
 en AE pasa lo mismo, es el Add.
@@ -369,6 +373,11 @@ buscar las capas por `nm` (los índices cambian) y comparar contra `git show HEA
   `Null 1` lo mismo que `CORRE`, les saca la clase `png` (no son claves) y pasa el brillo de Add
   (`bm` 16) a Screen (2), con `ln` `brillo` para el CSS. Falla si el brillo no es el Add mateado con
   el logo. El lint avisa de cualquier modo de fusión que Lottie no pinta (más de 15).
+- **Fondo de referencia:** desde el segundo export del 2026-10-22, abajo de todo viene una foto de
+  un estadio (`fauahncdwz67y2swnvml.jpg`, un JPG de 2208 × 1242 sin alfa): el fondo con el que el
+  diseñador ve la pizarra en AE. Al aire taparía el video entero: `prep.js` saca la capa y su asset,
+  y `img_17.jpg` no se copia. El lint avisa de un JPG en cualquier gráfico que no sea de pantalla
+  completa.
 - **Key:** la barra plateada de la izquierda del logo (`Shape Layer 5`) llega 0,45 px más a la
   izquierda que en el export del 2026-10-17 y ya no se toca con la caja: en el key de CasparCG
   quedaba una columna de 1 px al 87 % (x 101), de arriba abajo. Crece 1 px a la derecha, por debajo
@@ -380,8 +389,8 @@ buscar las capas por `nm` (los índices cambian) y comparar contra `git show HEA
   `prep.js` con los keyframes de la subida al revés (curvas invertidas); comprobado frame a frame
   contra la subida. El `stop` global está en el frame 0, que está vacío: un `stop` durante la
   entrada corta.
-- **Imágenes:** las 17 del export (`img_0` el logo, `img_1–16` las barras) van tal cual a
-  `score/images/`.
+- **Imágenes:** las 17 PNG del export (`img_0` el logo, `img_1–16` las barras) van tal cual a
+  `score/images/`; el JPG del fondo de referencia, no.
 
 Comparado frame a frame contra el export del 2026-10-17 (sin correr y con la V azul, con el texto
 del diseño): idéntico al píxel del 0 al 90, salvo la barra de Águilas local (su máscara).
@@ -390,7 +399,11 @@ El del 2026-10-22, contra el preparado anterior (`deepdiff.py` con `"Shape Layer
 "Shape Layer 5=Shape Layer 4"`: el diseñador las renumeró): cambian sólo el logo, su caja y sus dos
 barras plateadas (más altas, la de la izquierda corrida, y otras curvas en su entrada); las barras de
 equipo son las mismas imágenes, un índice más arriba. Sin el blend del brillo, todo lo que no es el
-logo queda idéntico al píxel al publicado, del 0 al 130.
+logo queda idéntico al píxel al publicado (cada frame renderizado en su propia carga, ver *QA*).
+
+El segundo del 2026-10-22 (`SCOREBUG_3.zip`), contra el primero: las mismas 17 imágenes y la misma
+fuente, y en el JSON sólo cambia el color de los dos outs, más el fondo de referencia. Preparado, es
+el anterior con los outs en cian; en el render cambian sólo los outs.
 
 **Defensiva**
 
@@ -631,6 +644,11 @@ idéntico al píxel del 0 al 221, salvo las columnas de 1 px del arreglo del key
   de velocidad, `10-4`, `1.000`, inning `10`, `1.000` en cada casillero del bateador) y textos en
   minúsculas (que salgan en mayúsculas).
 - Por `file://`, como lo abre CasparCG: Chromium con `--allow-file-access-from-files`.
+- Al comparar dos versiones al píxel: cada frame en su propia carga (`shot.mjs` con un solo frame),
+  o con tolerancia. En una misma carga, según los frames que se renderizaron antes, Chromium deja
+  hasta 43 niveles de diferencia en algunos bordes, también entre una versión y ella misma. En el
+  primer frame de una carga, una barra puede no haber cargado todavía: repetir. Y con PNG con alfa,
+  comparar el color además del alfa (en Pillow, `getbbox()` de una RGBA mira sólo el alfa).
 
 ### Herramientas
 
