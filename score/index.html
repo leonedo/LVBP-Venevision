@@ -12,6 +12,13 @@
             position: fixed;
         }
 
+        /* El brillo del logo va en Add en AE. Lottie no lo pinta: en el JSON va en Screen, y acá
+           en plus-lighter, que es el Add, en el grupo del matte, que es el que se funde
+           (herramientas/prep.js) */
+        g[mask]:has(> #brillo) {
+            mix-blend-mode: plus-lighter !important;
+        }
+
         body {
             overflow: hidden;
             margin: 0;

@@ -15,6 +15,8 @@ REPETIDAS = {g: re.compile(r'[A-Z]+_opacidad') for g in ('defensiva', 'ofensiva'
 PUERTAS = {g: 'g[id^="puerta"] > image' for g in ('defensiva', 'ofensiva')}
 # El escudo grande del lanzador, lo mismo: su 49 % va en el CSS.
 ESCUDOS = {'lanzador': 'g[id^="escudo"] > image'}
+# El brillo del logo del score: en el JSON va en Screen, y el CSS lo lleva al Add (plus-lighter).
+BRILLO = {'score': 'g[mask]:has(> #brillo)'}
 for g in GRAFICOS:
     d = json.load(open(REPO + g + '/data.json'))
     html = open(REPO + g + '/index.html').read()
@@ -97,12 +99,16 @@ for g in GRAFICOS:
         if len(esc) != 8: p(g, f'{len(esc)} escudos con ln escudo<SIGLAS> (van 8)')
         for l in esc:
             if l['ks']['o'].get('k') != 100: p(g, f'escudo {l["ln"]}: opacidad en la capa (va en el CSS)')
+    if g in BRILLO:
+        if BRILLO[g] not in html: p(g, 'index.html no le pone el Add al brillo del logo')
+        if not any(l.get('ln') == 'brillo' for l in d['layers']): p(g, 'ninguna capa con ln brillo')
     # efectos de AE que Lottie no pinta y prep.js pasa a otra cosa: el Gradient Ramp (el panel del
-    # lanzador) y el Hue/Saturation donde cambia lo que se ve (la V de Venevisión del score, la
-    # textura del lanzador; en las compuertas de la defensiva y la ofensiva sólo mueve el Tone, que
-    # no se ve)
+    # lanzador) y el Hue/Saturation donde cambia lo que se ve (la textura del lanzador; en las
+    # compuertas de la defensiva y la ofensiva sólo mueve el Tone, que no se ve)
     sin_pintar = {'ADBE Ramp'} | ({'ADBE HUE SATURATION'} if g in ('score', 'lanzador') else set())
     for l in d['layers']:
         for e in l.get('ef', []):
             if e.get('mn') in sin_pintar: p(g, f'{l["nm"]!r}: {e["mn"]} sin aplicar (Lottie no lo pinta)')
+        # Lottie pinta los modos de fusión del 0 al 15: Add (16) y los demás salen en Normal
+        if l.get('bm', 0) > 15: p(g, f'{l["nm"]!r}: modo de fusión {l["bm"]} (Lottie lo pinta en Normal)')
 print('\n'.join(problems) if problems else f'lint: sin problemas ({", ".join(GRAFICOS)})')

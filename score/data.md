@@ -132,17 +132,17 @@ is its own layer).
 
 | Name | Start (tm) | Duration (dr) | Payload |
 |------|-----------|--------------|---------|
-| `play` | 0 | 54 | — (the entry; it pauses in `marcador`) |
+| `play` | 0 | 59 | — (the entry; it pauses in `marcador`) |
 | `stop` | 0 | 1 | — (a `stop` during the entry, before `marcador`: it cuts) |
-| `marcador` | 48 | 6 | stage `pause`, order 1, `stop: "salida"` |
+| `marcador` | 53 | 6 | stage `pause`, order 1, `stop: "salida"` |
 | `jugadores` | 64 | 27 | stage `pause`, order 2, `stop: "salida_jugadores"` |
 | `sinjugadores` | 100 | 26 | stage `pause`, order 3, `stop: "salida"` |
-| `salida` | 54 | -54 | — (the entry played backwards) |
+| `salida` | 59 | -59 | — (the entry played backwards) |
 | `salida_jugadores` | 91 | -91 | — (the player bar goes down, then the entry backwards) |
 
 `next` walks the stages: `marcador` (board only) → `jugadores` (batter and pitcher bar up) →
 `sinjugadores` (bar down). To bring the bar up again, `goto('jugadores')`. The exit is the entry
-in reverse: `stop` from `marcador` or `sinjugadores` plays `salida` (1.8 s); from `jugadores`,
+in reverse: `stop` from `marcador` or `sinjugadores` plays `salida` (2 s); from `jugadores`,
 `salida_jugadores` first lowers the bar (3 s in all). Both release the layer when they end.
 
 ## Invocación directa desde CasparCG
