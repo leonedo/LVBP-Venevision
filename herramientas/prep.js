@@ -1,5 +1,5 @@
 // Prepara los exports del diseñador para CasparCG: la receta de "Cuando llega un export nuevo"
-// de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13), de la
+// de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13 y 22), de la
 // defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15), del bateador (LOWBAR BATEADOR,
 // 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18) y del lanzador (PITCHERS, 2026-10-21): si
 // el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
@@ -101,26 +101,6 @@ function alReves(prop, desde, hasta, inicio) {
     ks[ks.length - 1].h = 1;
     prop.k = ks.concat(rev);
 }
-// Hue/Saturation de AE que sólo mueve la Master Lightness (L): lo aplica a los rellenos y trazos
-// de la capa, que es lo que Lottie no hace, y lo saca. L > 0 va hacia el blanco, L < 0 al negro.
-function horneaClaridad(l) {
-    const i = (l.ef || []).findIndex(e => e.mn === 'ADBE HUE SATURATION');
-    if (i < 0) throw new Error(`${l.nm}: sin Hue/Saturation`);
-    const v = nm => l.ef[i].ef.find(x => x.nm === nm).v.k;
-    if (v('Master Hue') || v('Master Saturation') || v('Colorize')) throw new Error(`${l.nm}: Hue/Saturation con más que claridad`);
-    const L = v('Master Lightness') / 100;
-    const aclara = c => +(L > 0 ? c + (1 - c) * L : c * (1 + L)).toFixed(6);
-    const pinta = it => it.forEach(s => {
-        if (s.ty === 'fl' || s.ty === 'st') {
-            if (s.c.a) throw new Error(`${l.nm}: color animado`);
-            s.c.k = s.c.k.map((c, j) => j < 3 ? aclara(c) : c);
-        }
-        if (s.it) pinta(s.it);
-    });
-    pinta(l.shapes);
-    l.ef.splice(i, 1);
-    if (!l.ef.length) delete l.ef;
-}
 function propiedadesAnimadas(o, acc = []) {
     if (Array.isArray(o)) o.forEach(v => propiedadesAnimadas(v, acc));
     else if (o && typeof o === 'object') {
@@ -151,7 +131,7 @@ const SIGLAS = {
 };
 // Flujo (como el score de Meridiano): la entrada para en `marcador`, `next` sube la barra de
 // jugadores (`jugadores`) y la baja (`sinjugadores`). La salida es la entrada al revés.
-const ENTRADA = 54;                    // la entrada del marcador termina en el 53 (los outs)
+const ENTRADA = 59;                    // la entrada del marcador termina en el 58 (el brillo del logo)
 const SUBE = [64, 91];                 // la barra de jugadores sube del 65 al 90
 const BAJA = 100;                      // y baja (la subida al revés) del 100 al 125
 const OP = 130;
@@ -163,6 +143,7 @@ const BARRA = ['BARRA PITCHER', 'BARRA BATEADOR', '.lanzador', '.lanzamientos', 
 // prep.js falla: medir de nuevo la esquina (bbox del render en el frame 90) y mover CORRE.
 const RAIZ = { nm: 'Null 1', p: [962, 537.2], s: 134 };
 const CORRE = [2, 3];
+const LOGO = 'LOGO FINAL ATRAPA LA EMOCION_1.png';
 if (hay('SCOREBUG')) {
     const d = load(path.join(SRC, 'SCOREBUG/data.json'));
 
@@ -209,10 +190,40 @@ if (hay('SCOREBUG')) {
     const agui = layer(d, '.AGUILOCAL_opacidad');
     d.layers.splice(d.layers.indexOf(agui), 0, mascara);
 
-    // El logo de Venevisión llega azul (#194771) con un Hue/Saturation de Lightness +100 encima,
-    // que en AE lo vuelve blanco. Lottie no pinta ese efecto: al aire salía azul sobre el azul
-    // oscuro de su caja y casi no se veía. La claridad pasa a los rellenos y el efecto se saca.
-    horneaClaridad(layer(d, 'VVLOGO'));
+    // El logo (desde el export del 2026-10-22, el de ATRAPA LA EMOCIÓN, una imagen; antes la V de
+    // Venevisión, en vectores) no cuelga del Null 1, y tampoco su brillo: se corren igual que el
+    // nulo, para que queden en su caja. Son dos capas con la misma imagen, la de abajo la que se ve
+    // y la de arriba el matte del brillo, y llegan con la clase png (por el nombre): no son claves.
+    for (const l of d.layers) {
+        if (l.parent || l === raiz) continue;
+        const p = l.ks.p;
+        if (p.s) throw new Error(`${l.nm}: sin parent y con posición separada`);
+        if (p.a) for (const k of p.k) k.s = [k.s[0] + CORRE[0], k.s[1] + CORRE[1], k.s[2]];
+        else p.k = [p.k[0] + CORRE[0], p.k[1] + CORRE[1], p.k[2]];
+    }
+    const logo = d.layers.filter(l => l.nm === LOGO);
+    if (logo.length !== 2) throw new Error(`logo: ${logo.length} capas "${LOGO}" (van 2)`);
+    for (const l of logo) delete l.cl;
+    // El brillo va en Add (bm 16), que Lottie no pinta: lo dejaba en Normal, una mancha gris que
+    // cruzaba el logo. Pasa a Screen (bm 2), lo más parecido que Lottie pinta, y el index.html lo
+    // lleva al Add de verdad (plus-lighter) por su ln, donde el navegador lo tiene.
+    const brillo = layer(d, 'Shape Layer 8');
+    if (brillo.bm !== 16 || brillo.tt !== 1 || d.layers[d.layers.indexOf(brillo) - 1] !== logo[0])
+        throw new Error('Shape Layer 8: no es el brillo del logo (Add, mateado con el logo)');
+    brillo.bm = 2;
+    brillo.ln = 'brillo';
+    // Key: la barra plateada de la izquierda del logo (Shape Layer 5) llega 0,45 px más a la
+    // izquierda que en el export anterior y ya no se toca con la caja: en el key de CasparCG quedaba
+    // una columna de 1 px al 87 % (x 101), de arriba abajo de la caja, una línea finita de video al
+    // aire. Crece 1 px a la derecha, por debajo de la caja (como en el parcial).
+    const izq = layer(d, 'Shape Layer 5'), gi = izq.shapes[0].it, caja = layer(d, 'Shape Layer 3');
+    const rcI = gi.find(s => s.ty === 'rc'), trI = gi.find(s => s.ty === 'tr');
+    const sxI = new Set(izq.ks.s.a ? izq.ks.s.k.map(k => k.s[0]) : [izq.ks.s.k[0]]);
+    if (sxI.size !== 1 || rcI.s.a || rcI.p.a || trI.s.a || izq.parent !== raiz.ind || d.layers.indexOf(caja) > d.layers.indexOf(izq))
+        throw new Error('Shape Layer 5: no es la barra de la izquierda del logo, debajo de la caja');
+    const pxI = [...sxI][0] / 100 * trI.s.k[0] / 100 * RAIZ.s / 100; // px de pantalla por unidad
+    rcI.s.k[0] = +(rcI.s.k[0] + 1 / pxI).toFixed(3);
+    rcI.p.k[0] = +(rcI.p.k[0] + 1 / 2 / pxI).toFixed(3);
 
     // ---- textos de caja (textos-de-caja.md). Las cajas vienen de AE con lh 0.01: un texto que
     // no entra partía en líneas encimadas en vez de encoger. lh va a 1.2 del cuerpo, que no mueve
@@ -250,6 +261,13 @@ if (hay('SCOREBUG')) {
     vel.sz[0] = 30;                    // entra 100 (28.25)
     vel.ps[0] = fin - vel.sz[0];
     vel.t = vel.t.trim();              // "90 ": el espacio separaba de MPH a la izquierda
+
+    // La pausa del marcador va después del último keyframe de la entrada (todo menos la barra de
+    // jugadores): desde el export del 2026-10-22 es el brillo del logo, que pasa del 29 al 58, y
+    // en la pausa de antes (el 53) quedaba quieto a medio camino, sobre la A.
+    const barra = BARRA.map(nm => layer(d, nm));
+    const ultimo = Math.max(...propiedadesAnimadas(d.layers.filter(l => !barra.includes(l))).flatMap(p => p.k.map(k => k.t)));
+    if (ultimo > ENTRADA - 0.5) throw new Error(`la entrada termina en el ${ultimo}: mover ENTRADA`);
 
     // ---- la barra de jugadores baja: la subida al revés, del 100 al 125
     for (const nm of BARRA) {

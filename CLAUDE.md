@@ -14,7 +14,7 @@ suavizado de algunos bordes de letra). Las keys del UPDATE están en su `data.md
 
 | Carpeta | Qué es | Flujo | Salida |
 |---|---|---|---|
-| `score/` | Pizarra arriba a la izquierda: logo de Venevisión, barras de visita y local (escudo y siglas), carreras, inning con sus flechas, bases, conteo y outs; abajo, la barra de bateador (apellido, average, actuación) y lanzador (apellido, lanzamientos, velocidad) | `play` (0–54) → stages `marcador` → `jugadores` (la barra sube, 65–90) → `sinjugadores` (la barra baja, 100–125), los tres `pause` | `salida`: la entrada al revés (1,8 s); desde `jugadores`, `salida_jugadores` baja antes la barra (3 s) |
+| `score/` | Pizarra arriba a la izquierda: logo (ATRAPA LA EMOCIÓN), barras de visita y local (escudo y siglas), carreras, inning con sus flechas, bases, conteo y outs; abajo, la barra de bateador (apellido, average, actuación) y lanzador (apellido, lanzamientos, velocidad) | `play` (0–59) → stages `marcador` → `jugadores` (la barra sube, 65–90) → `sinjugadores` (la barra baja, 100–125), los tres `pause` | `salida`: la entrada al revés (2 s); desde `jugadores`, `salida_jugadores` baja antes la barra (3 s) |
 | `defensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el campo con las 9 posiciones (rótulo y apellido); arriba a la izquierda, la barra del equipo y DEFENSIVA. El frame 0 está vacío | stage `play` pause (0–53) | `salida`: la entrada al revés (1,8 s): las compuertas se cierran y termina en el frame vacío |
 | `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA. El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
 | `bateador/` | Barra baja del bateador, abajo a la izquierda: arriba, una barra negra con el split; a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87) | `salida`: la entrada al revés (2,9 s) |
@@ -23,7 +23,7 @@ suavizado de algunos bordes de letra). Las keys del UPDATE están en su `data.md
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
-`visita_vs_local`), del 2026-10-17; `defensiva.png` / `ofensiva.png` (Leones, con nombres de
+`visita_vs_local`), del 2026-10-22; `defensiva.png` / `ofensiva.png` (Leones, con nombres de
 ejemplo) y `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), las de la defensiva del
 2026-10-21 y las de la ofensiva del 2026-10-17; `bateador.png` / `lanzador.png` (Leones, con data de
 ejemplo) y `bateador_equipos.png` / `lanzador_equipos.png` (los 8 equipos, recortado al gráfico),
@@ -56,18 +56,29 @@ y 3 arriba de la zona segura de títulos (90 %: 96, 54); va corrida hasta ahí (
 ocupa x 96–975, y 54–158 con la barra de jugadores arriba. Las claves no cambiaron: el controlador
 le manda la misma data que al anterior.
 
-Logo: la V de Venevisión llega azul (`#194771`) con un Hue/Saturation de Lightness +100, que en AE
-la vuelve blanca. Lottie no pinta ese efecto y al aire salía azul sobre el azul oscuro de su caja
-(`#192B45`: 30 contra 22 IRE), casi invisible; pasaba igual con el export anterior. `prep.js` pasa la
-claridad a los rellenos (blanca) y saca el efecto.
+Logo: desde el export del 2026-10-22 es el de ATRAPA LA EMOCIÓN, una imagen (`images/img_0.png`),
+en lugar de la V de Venevisión en vectores; lo demás del score no cambió (comparado capa por capa y
+frame a frame, ver la receta). Su caja y las dos barras plateadas de los lados crecieron hasta el
+alto de la barra de jugadores (y 54–158): con la barra abajo, la caja queda colgando debajo de la
+pizarra. El logo entra girando en 3D (Lottie lo pinta sin perspectiva, casi igual), con una sombra
+blanca, y le pasa un brillo del 29 al 58 en Add, que Lottie no pinta (salía una mancha gris): el JSON
+lo lleva en Screen y el `index.html` en `plus-lighter`, que es el Add (`g[mask]:has(> #brillo)`; en
+CasparCG 2.5.1 sale igual que en Chromium, y donde no lo haya queda el Screen). Por el brillo, la
+pausa del marcador pasó del 53 al 58 (en el 53 quedaba quieto sobre la A) y la salida dura 2 s
+(antes 1,8). Con el blend en la página, Chromium compone el SVG de otra manera: fuera del logo
+quedan hasta 3 niveles de diferencia en una columna y, en el frame 25, el borde de 1 px de la caja
+de la derecha cuando empieza a abrirse.
 
 Colores en NTSC compuesto (2026-10-17, con setup de 7,5 IRE): las 16 barras de equipo quedan
 legales (la más alta, Leones, 106 IRE; ninguna baja de −7). Pasan de 110 IRE, sin llegar a 120, el
 cian de los textos y la flecha del inning (`#00D9E2`, 113,5) y el amarillo de las bases (`#FCC107`,
 114,4): quedan así (Leon). En HD (Rec.709) todo es legal. Si hiciera falta bajarlos a 110:
-`#0BD4DD` y `#F4C11D`.
+`#0BD4DD` y `#F4C11D`. El logo de ATRAPA LA EMOCIÓN (2026-10-22), en la pausa: lo más alto el
+amarillo de las letras (`#FBC20D`, 113,7) y lo más bajo el magenta (`#EA0058`, −12,5). Durante el
+brillo, el cian de LA EMOCIÓN pasa de 120 por unos frames (del 21 al 49, hasta 126 en unos 40 px):
+en AE pasa lo mismo, es el Add.
 
-Barras de equipo: son **imágenes** (`images/img_0–7` local, `img_8–15` visita, con el escudo como
+Barras de equipo: son **imágenes** (`images/img_1–8` local, `img_9–16` visita, con el escudo como
 marca de agua), una encima de otra en cada lado y todas visibles al arrancar: el controlador manda
 `1` a la que va y `0` a las otras siete, como en Meridiano. Que la clave sea `_opacidad` en una capa
 de imagen es lo que destapó el arreglo de *claves sólo CSS* de `index.js`: antes el número se
@@ -353,18 +364,33 @@ buscar las capas por `nm` (los índices cambian) y comparar contra `git show HEA
 - **Nulo raíz:** desde el export del 2026-10-17 todo cuelga de `Null 1` (p `[962, 537.2]`, s 134 %):
   `prep.js` lo corre `CORRE` (2, 3 px) hasta la zona segura de títulos. Si llega en otro lugar o a
   otra escala, falla: medir de nuevo la esquina (bbox del render en el frame 90) y mover `CORRE`.
-- **Logo:** la V de `VVLOGO` llega azul con un Hue/Saturation de Lightness +100 que Lottie no pinta:
-  `horneaClaridad()` lo pasa a los rellenos (blanca) y lo saca.
+- **Logo:** desde el export del 2026-10-22, `LOGO FINAL ATRAPA LA EMOCION_1.png` dos veces (la de
+  arriba es el matte del brillo, `Shape Layer 8`), sin parent: `prep.js` corre lo que no cuelga del
+  `Null 1` lo mismo que `CORRE`, les saca la clase `png` (no son claves) y pasa el brillo de Add
+  (`bm` 16) a Screen (2), con `ln` `brillo` para el CSS. Falla si el brillo no es el Add mateado con
+  el logo. El lint avisa de cualquier modo de fusión que Lottie no pinta (más de 15).
+- **Key:** la barra plateada de la izquierda del logo (`Shape Layer 5`) llega 0,45 px más a la
+  izquierda que en el export del 2026-10-17 y ya no se toca con la caja: en el key de CasparCG
+  quedaba una columna de 1 px al 87 % (x 101), de arriba abajo. Crece 1 px a la derecha, por debajo
+  de la caja (como en el parcial); en la entrada (frames 1–17) se ve 1 px más ancha.
 - **Markers:** los del diseñador (`start`, `hold`, `stop`) se reemplazan por los de la tabla de
-  arriba. La entrada del marcador termina en el 53 (los outs) y la barra sube del 65 al 90: si eso
-  cambia, mover `ENTRADA`, `SUBE` y `BAJA` en `prep.js`. La bajada de la barra (100–125) la arma
+  arriba. La entrada del marcador termina en el 58 (el brillo del logo; hasta el export del
+  2026-10-17, en el 53, los outs) y la barra sube del 65 al 90: si eso cambia, mover `ENTRADA`,
+  `SUBE` y `BAJA` en `prep.js` (falla si algún keyframe fuera de la barra pasa de `ENTRADA`). La bajada de la barra (100–125) la arma
   `prep.js` con los keyframes de la subida al revés (curvas invertidas); comprobado frame a frame
   contra la subida. El `stop` global está en el frame 0, que está vacío: un `stop` durante la
   entrada corta.
-- **Imágenes:** las 16 barras del export van tal cual a `score/images/`.
+- **Imágenes:** las 17 del export (`img_0` el logo, `img_1–16` las barras) van tal cual a
+  `score/images/`.
 
 Comparado frame a frame contra el export del 2026-10-17 (sin correr y con la V azul, con el texto
 del diseño): idéntico al píxel del 0 al 90, salvo la barra de Águilas local (su máscara).
+
+El del 2026-10-22, contra el preparado anterior (`deepdiff.py` con `"Shape Layer 7=Shape Layer 5"
+"Shape Layer 5=Shape Layer 4"`: el diseñador las renumeró): cambian sólo el logo, su caja y sus dos
+barras plateadas (más altas, la de la izquierda corrida, y otras curvas en su entrada); las barras de
+equipo son las mismas imágenes, un índice más arriba. Sin el blend del brillo, todo lo que no es el
+logo queda idéntico al píxel al publicado, del 0 al 130.
 
 **Defensiva**
 
