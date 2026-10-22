@@ -76,6 +76,10 @@ for g in GRAFICOS:
     for a in d['assets']:
         if 'p' in a:
             if not os.path.exists(REPO + g + '/' + a['u'] + a['p']): p(g, f'asset {a["u"]}{a["p"]} no existe')
+            # un JPG no tiene alfa: en un gráfico que va sobre el video, lo tapa (el fondo de
+            # referencia del diseñador en el score, prep.js). La defensiva y la ofensiva son de
+            # pantalla completa: ahí sí hay JPG.
+            if g not in ('defensiva', 'ofensiva') and re.search(r'\.jpe?g$', a['p'], re.I): p(g, f'asset {a["p"]}: JPG sin alfa, tapa el video')
     # data.md: cada clave del JSON documentada y cada clave documentada existe
     md_keys = set(re.findall(r'`([A-Za-z_][A-Za-z0-9_]*)`', md))
     for c in cls:
