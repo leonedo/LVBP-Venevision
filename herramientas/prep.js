@@ -1,14 +1,14 @@
 // Prepara los exports del diseñador para CasparCG: la receta de "Cuando llega un export nuevo"
 // de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13 y 22), de la
 // defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15), del bateador (LOWBAR BATEADOR,
-// 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18), del lanzador (PITCHERS, 2026-10-21) y del
-// 3 en línea (3 EN LINEA, 2026-10-22): si el diseñador cambia nombres de capas, falla diciendo cuál
-// no encuentra (no adivina).
+// 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18), del lanzador (PITCHERS, 2026-10-21), del
+// 3 en línea (3 EN LINEA, 2026-10-22) y de los otros juegos (OTROS JUEGOS, 2026-10-22): si el
+// diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
-//      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/. Los que no estén se
-//      saltean: alcanza con el zip que llegó.
+//      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/. Los que
+//      no estén se saltean: alcanza con el zip que llegó.
 //   2. Si llegó el 3 EN LINEA: python3 herramientas/tresenlinea.py "$EXPORTS/3 EN LINEA" . (sus
 //      imágenes: el recorte y los frames de la salida).
 //   3. node herramientas/prep.js $EXPORTS .
@@ -1296,4 +1296,253 @@ if (hay('3 EN LINEA')) {
     allCaps(d);
     vaciaTextos(d);
     save(path.join(REPO, 'tresenlinea/data.json'), d);
+}
+
+// ---------------------------------------------------------------- otros juegos
+// Cómo van los otros juegos de la jornada (el export es OTROS JUEGOS): una columna abajo a la
+// derecha, con el cuadro de Harina PAN arriba (una secuencia de JPG: un precomp de 138 frames de
+// 316 × 200), el título ASÍ VAN y tres resultados, cada uno con la sede, las barras de visita y local
+// (imágenes apiladas con su máscara, como en el score) con el nombre del equipo, las carreras y el
+// inning con sus flechas. Las claves, las del score y el parcial donde dicen lo mismo, con el número
+// del juego al final (1 arriba, 3 abajo): <SIGLAS>VISITA1_opacidad, NOMBREVISITA1, CARRERASVISITA1,
+// inning1, INNINGarriba1_opacidad… Propias: sede1–3 (EN CARACAS) y titulo (ASÍ VAN).
+// Cajas medidas en el frame 140 con las fuentes cargadas.
+const OJ_CUADRO = 1596.6;              // empieza el cuadro negro de las carreras: ahí termina lo que se ve de la barra
+const OJ_MARGEN = 5;                   // el nombre, desde donde empieza (x 1509.1) hasta 5 px antes del cuadro negro
+// La sede, centrada sobre el eje del texto del diseño (x 1579.5), 8 px adentro de la banda azul
+// (x 1415.7–1732.1). EN PUERTO LA CRUZ mide 144.
+const OJ_SEDE = 289;
+// El inning, centrado sobre el eje del 10 del diseño (x 1702.4), 4 px antes del borde del cuadro negro
+// (x 1732). El título, 8 px adentro de la caja azul (316 px; ASÍ VAN mide 190 en pantalla).
+const OJ_INNING = 51;
+const OJ_TITULO = 300;
+const OJ_LW = { '10': 25.026562499999997, 'EN CARACAS': 90.79874999999998 };
+// Flujo: el cuadro de PAN entra por la derecha (11–23), abre sus puertas y arma el logo; debajo entra
+// la columna (27–95: la raya gris, el ASÍ VAN y los tres juegos, uno detrás del otro) y el cuadro se va
+// por la derecha (157–164). La entrada para en el 165, el primer frame sin el cuadro. El export no trae
+// salida (su STOP, 167–197, no anima nada): es la entrada de la columna al revés, sin el cuadro, como
+// en el 3 en línea (2,3 s). Una capa que entraba en el frame t se va en el OJ_PAUSA + OJ_ENTRADA − t.
+const OJ_ENTRADA = 95;                 // la entrada de la columna termina en el 95 (las flechas y las carreras del juego 3)
+const OJ_PAUSA = 166;                  // play 0–166: queda en el 165
+// La secuencia viene en JPG y cada frame se comprime distinto: con el logo quieto, sus bordes
+// titilaban un poco (hasta 30 niveles en unos 25 px de un frame al otro). Desde el frame 78 de la
+// secuencia (al aire, el 93.5) el logo no se mueve hasta que el cuadro se va: queda ese JPG solo,
+// como el tramo quieto del parcial. Con una secuencia sin compresión, null.
+const OJ_QUIETO = 78;
+// Key: los recuadros se tocan borde con borde, y en el key de CasparCG quedaban filas y columnas de
+// 1 px al 54–94 %: entre el título y la primera banda, entre cada banda y su juego, entre el cuadro
+// negro y la banda de abajo, entre la barra y el cuadro negro, y entre la visita y la local. Ahí las
+// barras no alcanzan: los PNG traen la primera y la última fila (y columna) semitransparentes, y la
+// visita y la local se tocan con esas filas. Debajo de las barras de cada juego va un fondo negro
+// (OJ_FONDO, en px de pantalla: desde adentro del borde izquierdo de las barras, por debajo de la
+// banda de arriba, del cuadro negro y de la banda de abajo), que se ve sólo por esos bordes; las barras
+// son oscuras arriba y el cuadro es negro. Aparece cuando terminan de entrar las barras y el cuadro
+// del juego. La primera banda crece 1 px hacia arriba, por debajo del título, y cada cuadro negro 1 px
+// hacia arriba y hacia abajo (el del juego 3, sólo hacia arriba), por debajo de las bandas.
+const OJ_FONDO = [[1417, 666, 1597.6, 756.5], [1417, 778, 1597.6, 867.5], [1417, 889, 1597.6, 977]];
+// Los textos entran letra por letra con un Fast Box Blur (radio 4 → 0, 3 iteraciones), que Lottie no
+// pinta: pasa a un Gaussian Blur, que sí. El box blur de radio r con n pasadas es un gaussiano de
+// sigma √(n·r·(r+1)/3), y Lottie pinta el Gaussian Blur con sigma = 0,3 × el Blurriness.
+const OJ_BLUR = (r, n) => Math.sqrt(n * r * (r + 1) / 3) / 0.3;
+if (hay('OTROS JUEGOS')) {
+    const d = load(path.join(SRC, 'OTROS JUEGOS/data.json'));
+    const pan = layer(d, 'PANSECUENCE');
+    const secuencia = d.assets.find(a => a.id === pan.refId);
+    if (!secuencia || secuencia.layers.length !== 138 || pan.st !== 0) throw new Error('PANSECUENCE: secuencia inesperada');
+
+    // ---- de qué juego es cada capa. Las barras y los nombres del 2 y del 3 cuelgan de dos nulos que se
+    // llaman igual (Null 1); las barras del 1, de nada.
+    const nulos = {};
+    for (let n = 1; n <= 3; n++) {
+        const p = layer(d, '.EQUIPOVISITANTE' + n).parent;
+        const nulo = d.layers.find(l => l.ind === p);
+        if (n > 1 && (!nulo || nulo.nm !== 'Null 1')) throw new Error(`EQUIPOVISITANTE${n}: parent ${p}`);
+        if (n > 1) nulos[p] = n;
+    }
+    const juego = l => l.parent == null ? 1 : nulos[l.parent] || (() => { throw new Error(`${l.nm}: ¿de qué juego?`); })();
+
+    // ---- las barras: las 8 de cada fila, una encima de otra, todas visibles al arrancar, como en el
+    // score. La fila de arriba es la visita. La de Leones visita del juego 1 llega como una segunda
+    // BARRALEONESLOCAL, con la imagen de la local: pasa a la de la visita (la de los juegos 2 y 3).
+    const barras = d.layers.filter(l => l.ty === 2 && /^\.BARRA[A-Z]+(LOCAL|VISITA)$/.test(l.nm));
+    const filas = {};
+    for (const l of barras) {
+        if (l.ks.p.a) throw new Error(`${l.nm}: posición animada`);
+        (filas[juego(l)] = filas[juego(l)] || new Set()).add(l.ks.p.k[1]);
+    }
+    const corregidas = [];
+    for (const l of barras) {
+        const n = juego(l), ys = [...filas[n]].sort((a, b) => a - b);
+        if (ys.length !== 2) throw new Error(`juego ${n}: ${ys.length} filas de barras`);
+        const [, equipo, rotulo] = l.nm.match(/^\.BARRA([A-Z]+?)(LOCAL|VISITA)$/);
+        if (!SIGLAS[equipo]) throw new Error(`equipo desconocido ${equipo}`);
+        const lado = l.ks.p.k[1] === ys[0] ? 'VISITA' : 'LOCAL';
+        if (lado !== rotulo) corregidas.push({ l, quien: equipo + rotulo + n });
+        l.nm = `.${SIGLAS[equipo]}${lado}${n}_opacidad`;
+        l.cl = l.nm.slice(1);
+    }
+    if (corregidas.map(c => c.quien).join() !== 'LEONESLOCAL1') throw new Error(`barras con el lado cambiado: ${corregidas.map(c => c.quien).join() || 'ninguna'} (se esperaba la de Leones visita del juego 1)`);
+    const leoVisita = layer(d, '.LEOVISITA2_opacidad').refId;
+    if (leoVisita === layer(d, '.LEOLOCAL1_opacidad').refId) throw new Error('Leones visita: la misma imagen que la local');
+    corregidas[0].l.refId = leoVisita;
+    for (let n = 1; n <= 3; n++) for (const s of Object.values(SIGLAS)) for (const lado of ['VISITA', 'LOCAL']) layer(d, `.${s}${lado}${n}_opacidad`);
+
+    // ---- textos
+    const fuente = f => d.fonts.list.find(x => x.fName === f) || (() => { throw new Error(`fuente ${f}`); })();
+    for (let n = 1; n <= 3; n++) {
+        const espacio = n === 1 ? '' : ' ' + n;   // el inning y las flechas del 1 no llevan número
+        rename(d, '.SEDE' + n, 'sede' + n);
+        rename(d, '.EQUIPOVISITANTE' + n, 'NOMBREVISITA' + n);
+        rename(d, '.EQUIPOLOCAL' + n, 'NOMBRELOCAL' + n);
+        rename(d, 'CARRERAVISITA' + n, 'CARRERASVISITA' + n);   // llega sin el punto: sin clase
+        rename(d, '.CARRERALOCAL' + n, 'CARRERASLOCAL' + n);
+        rename(d, '.INNINGS' + espacio, 'inning' + n);
+        // ▲ y ▼: las dos llegan con la clase PARTE (con espacio en el nombre), y en los tres juegos
+        const alta = layer(d, '.PARTE ALTA' + espacio), baja = layer(d, '.PARTE BAJA' + espacio);
+        if (alta.parent !== baja.parent || alta.ks.p.k[1] >= baja.ks.p.k[1]) throw new Error(`flechas del juego ${n}: ¿cuál es la de arriba?`);
+        rename(d, '.PARTE ALTA' + espacio, `INNINGarriba${n}_opacidad`);
+        rename(d, '.PARTE BAJA' + espacio, `INNINGabajo${n}_opacidad`);
+
+        // la sede: de la izquierda a centrada sobre su eje, con el ancho de la banda
+        const sede = doc(d, '.sede' + n), lSede = layer(d, '.sede' + n);
+        if (sede.t !== 'EN CARACAS') throw new Error(`sede${n}: "${sede.t}": medir de nuevo OJ_LW`);
+        centrar(sede, OJ_LW['EN CARACAS']);
+        anchoCentrado(sede, OJ_SEDE / escalaX(d, lSede));
+        // los nombres, desde donde empiezan hasta antes del cuadro negro: más largos pasaban por debajo
+        for (const lado of ['VISITA', 'LOCAL']) {
+            const l = layer(d, `.NOMBRE${lado}${n}`), s = doc(d, `.NOMBRE${lado}${n}`);
+            if (s.j !== 0) throw new Error(`NOMBRE${lado}${n}: j ${s.j}`);
+            s.sz[0] = +((OJ_CUADRO - OJ_MARGEN - enPantalla(d, l, s.ps[0])) / escalaX(d, l)).toFixed(2);
+        }
+        // el inning: de la izquierda a centrado sobre su eje
+        const inning = doc(d, '.inning' + n);
+        if (inning.t !== '10') throw new Error(`inning${n}: "${inning.t}": medir de nuevo OJ_LW`);
+        centrar(inning, OJ_LW['10']);
+        anchoCentrado(inning, OJ_INNING / escalaX(d, layer(d, '.inning' + n)));
+    }
+    rename(d, '.ASÍ VAN', 'titulo');
+    anchoCentrado(doc(d, '.titulo'), OJ_TITULO / escalaX(d, layer(d, '.titulo')));
+    // Las cajas vienen de AE con lh 0.01 (la sede y los nombres): lh a 1.2 del cuerpo. El alto, como en
+    // el bateador: entra una línea al cuerpo del diseño (su ascent, más 2) y no dos hasta un 40 % del
+    // cuerpo, para que un texto largo encoja en vez de partir en dos líneas chicas.
+    for (const l of d.layers) if (l.ty === 5) for (const k of l.t.d.k) {
+        if (!k.s.sz) throw new Error(`${l.nm}: no es de caja`);
+        k.s.lh = 1.2 * k.s.s;
+        k.s.sz[1] = +(fuente(k.s.f).ascent * k.s.s / 100 + 2).toFixed(2);
+    }
+
+    // ---- el Fast Box Blur de los textos, a Gaussian Blur
+    for (const l of d.layers) {
+        l.ef = (l.ef || []).map(e => {
+            if (e.mn !== 'ADBE Box Blur2') return e;
+            const [radio, pasadas, dimensiones] = e.ef;
+            if (pasadas.v.k !== 3 || dimensiones.v.k !== 1 || !radio.v.a) throw new Error(`${l.nm}: Fast Box Blur inesperado`);
+            const v = clone(radio.v);
+            const max = Math.max(...v.k.map(k => k.s[0]));
+            for (const k of v.k) k.s = [+(k.s[0] * OJ_BLUR(max, pasadas.v.k) / max).toFixed(3)];
+            return {
+                ty: 29, nm: 'Gaussian Blur', np: 5, mn: 'ADBE Gaussian Blur 2', ix: e.ix, en: 1, ef: [
+                    { ty: 0, nm: 'Blurriness', mn: 'ADBE Gaussian Blur 2-0001', ix: 1, v },
+                    { ty: 7, nm: 'Blur Dimensions', mn: 'ADBE Gaussian Blur 2-0002', ix: 2, v: { a: 0, k: 1, ix: 2 } },
+                    { ty: 7, nm: 'Repeat Edge Pixels', mn: 'ADBE Gaussian Blur 2-0003', ix: 3, v: { a: 0, k: 0, ix: 3 } }
+                ]
+            };
+        });
+        if (!l.ef.length) delete l.ef;
+    }
+
+    // ---- key: el fondo negro de las barras de cada juego, debajo de la última, y los recuadros que
+    // crecen 1 px por debajo de las bandas
+    const ultimoFrame = ls => Math.ceil(Math.max(...propiedadesAnimadas(ls.map(l => l.ks)).flatMap(p => p.k.map(k => k.t))));
+    let ind = Math.max(...d.layers.map(l => l.ind));
+    for (let n = 1; n <= 3; n++) {
+        const espacio = n === 1 ? '' : ' ' + n;
+        const suyas = d.layers.filter(l => l.ty === 2 && /^\.[A-Z]+(VISITA|LOCAL)\d_opacidad$/.test(l.nm) && l.nm.endsWith(n + '_opacidad'));
+        const mattes = suyas.map(l => d.layers[d.layers.indexOf(l) - 1]);
+        if (suyas.length !== 16 || mattes.some(m => !m.td)) throw new Error(`juego ${n}: barras o mattes inesperados`);
+        const [x0, y0, x1, y1] = OJ_FONDO[n - 1];
+        const fondo = {
+            ddd: 0, ind: ++ind, ty: 4, nm: 'fondo barras ' + n, sr: 1, ao: 0, bm: 0,
+            ks: {
+                o: { a: 0, k: 100 }, r: { a: 0, k: 0 }, p: { a: 0, k: [(x0 + x1) / 2, (y0 + y1) / 2, 0] },
+                a: { a: 0, k: [0, 0, 0] }, s: { a: 0, k: [100, 100, 100] }
+            },
+            shapes: [{
+                ty: 'gr', nm: 'fondo', it: [
+                    { ty: 'rc', d: 1, s: { a: 0, k: [x1 - x0, y1 - y0] }, p: { a: 0, k: [0, 0] }, r: { a: 0, k: 0 } },
+                    { ty: 'fl', c: { a: 0, k: [0, 0, 0, 1] }, o: { a: 0, k: 100 }, r: 1, bm: 0 },
+                    { ty: 'tr', p: { a: 0, k: [0, 0] }, a: { a: 0, k: [0, 0] }, s: { a: 0, k: [100, 100] }, r: { a: 0, k: 0 }, o: { a: 0, k: 100 }, sk: { a: 0, k: 0 }, sa: { a: 0, k: 0 } }
+                ]
+            }],
+            // cuando ya entraron las barras (sus mattes) y el cuadro negro
+            ip: ultimoFrame([...mattes, layer(d, 'CUADRO SCORE' + espacio)]), op: d.layers[0].op, st: 0
+        };
+        const ultima = Math.max(...suyas.map(l => d.layers.indexOf(l)));
+        d.layers.splice(ultima + 1, 0, fondo);
+    }
+    // Un recuadro (capa de forma con un rectángulo) que crece hacia arriba o hacia abajo, en px de
+    // pantalla, por debajo de la banda vecina. Sus parents, al 100 %.
+    const creceY = (nm, arriba, abajo) => {
+        const l = layer(d, nm), g = l.shapes[0].it;
+        const rc = g.find(s => s.ty === 'rc'), tr = g.find(s => s.ty === 'tr');
+        if (l.shapes.length !== 1 || rc.s.a || rc.p.a || tr.s.a || tr.r.k || l.ks.r.a || l.ks.r.k) throw new Error(`${nm}: transform inesperado`);
+        for (let c = d.layers.find(o => o.ind === l.parent); c; c = d.layers.find(o => o.ind === c.parent)) {
+            const [sx, sy] = ultimoValor(c.ks.s);
+            if (sx !== 100 || sy !== 100 || c.ks.r.k) throw new Error(`${nm}: parent ${c.nm} escalado o rotado`);
+        }
+        const sy = ultimoValor(l.ks.s)[1] / 100 * tr.s.k[1] / 100;   // px de pantalla por unidad
+        rc.s.k[1] += (arriba + abajo) / sy;
+        rc.p.k[1] += (abajo - arriba) / 2 / sy;
+    };
+    if (layer(d, 'Capa de formas 7').parent !== layer(d, 'RESULTADO 1').ind) throw new Error('Capa de formas 7: ¿es la banda del juego 1?');
+    creceY('Capa de formas 7', 1, 0);   // la banda del juego 1, por debajo del título
+    // los cuadros negros, por debajo de la banda de su juego y de la del juego de abajo
+    creceY('CUADRO SCORE', 1, 1);
+    creceY('CUADRO SCORE 2', 1, 1);
+    creceY('CUADRO SCORE 3', 1, 0);
+
+    // ---- el tramo quieto del cuadro de PAN: la capa del frame OJ_QUIETO dura hasta el final de la
+    // secuencia, y las de después se van, con sus imágenes (los JPG quedan en la carpeta)
+    const capas = secuencia.layers;
+    capas.forEach((c, k) => { if (c.nm !== `PAN_${String(k).padStart(5, '0')}.png`) throw new Error(`PANSECUENCE: capa ${k} ${c.nm}`); });
+    if (OJ_QUIETO) {
+        const fuera = capas.slice(OJ_QUIETO + 1);
+        capas[OJ_QUIETO].op = capas[capas.length - 1].op;
+        secuencia.layers = capas.slice(0, OJ_QUIETO + 1);
+        const usadas = new Set(secuencia.layers.map(c => c.refId));
+        d.assets = d.assets.filter(a => usadas.has(a.id) || !fuera.some(c => c.refId === a.id));
+    }
+
+    // ---- timeline: la salida es la entrada de la columna al revés, sin el cuadro de PAN, que para la
+    // pausa ya se fue
+    if (pan.op >= OJ_PAUSA) throw new Error(`PANSECUENCE: termina en el ${pan.op}, después de la pausa`);
+    const columna = d.layers.filter(l => l !== pan);
+    const tiempos = propiedadesAnimadas(columna.map(l => [l.ks, l.shapes, l.t, l.masksProperties, l.ef])).flatMap(p => p.k.map(k => k.t));
+    if (Math.max(...tiempos) > OJ_ENTRADA + 0.5) throw new Error(`la columna anima hasta el ${Math.max(...tiempos)}: medir de nuevo OJ_ENTRADA`);
+    const FIN = OJ_PAUSA + OJ_ENTRADA;
+    const vacio = Math.ceil(FIN - Math.min(...tiempos));   // el primer frame vacío: la raya gris sin ancho
+    for (const l of columna) {
+        for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, OJ_ENTRADA, OJ_PAUSA);
+    }
+    for (const l of columna) {
+        const ref = l.td ? d.layers[d.layers.indexOf(l) + 1] : l;   // los mattes, con la capa que matean
+        if (l.op < OJ_PAUSA || ref.ip > OJ_ENTRADA) throw new Error(`${l.nm}: ip ${l.ip}, op ${l.op}`);
+        l.op = Math.min(FIN - Math.max(ref.ip, 1) + 0.001, vacio + 1);
+    }
+    for (const l of d.layers) l.ip = Math.max(l.ip, 1);
+    d.op = vacio + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: OJ_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: OJ_PAUSA, cm: 'salida', dr: vacio + 1 - OJ_PAUSA }
+    ];
+    const archivos = { 'LTEnergy-Regular': 'font/LTEnergy-Regular.ttf', 'ChakraPetch-Bold': 'font/ChakraPetch-Bold.ttf' };
+    for (const f of d.fonts.list) {
+        if (!archivos[f.fName]) throw new Error(`fuente ${f.fName}`);
+        f.fPath = archivos[f.fName];
+    }
+    allCaps(d);
+    // Los textos arrancan vacíos, como en el bateador, salvo el título: si no llega, queda ASÍ VAN.
+    for (const l of d.layers) if (l.ty === 5 && l.cl && l.cl !== 'titulo') for (const k of l.t.d.k) k.s.t = '';
+    save(path.join(REPO, 'otrosjuegos/data.json'), d);
 }

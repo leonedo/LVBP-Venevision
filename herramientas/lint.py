@@ -17,6 +17,8 @@ PUERTAS = {g: 'g[id^="puerta"] > image' for g in ('defensiva', 'ofensiva')}
 ESCUDOS = {'lanzador': 'g[id^="escudo"] > image'}
 # El brillo del logo del score: en el JSON va en Screen, y el CSS lo lleva al Add (plus-lighter).
 BRILLO = {'score': 'g[mask]:has(> #brillo)'}
+# El precomp que puede llevar JPG (un cuadro opaco): el de Harina PAN de los otros juegos.
+JPG_PRECOMP = {'otrosjuegos': 'PANSECUENCE'}
 for g in GRAFICOS:
     d = json.load(open(REPO + g + '/data.json'))
     html = open(REPO + g + '/index.html').read()
@@ -78,8 +80,11 @@ for g in GRAFICOS:
             if not os.path.exists(REPO + g + '/' + a['u'] + a['p']): p(g, f'asset {a["u"]}{a["p"]} no existe')
             # un JPG no tiene alfa: en un gráfico que va sobre el video, lo tapa (el fondo de
             # referencia del diseñador en el score, prep.js). La defensiva y la ofensiva son de
-            # pantalla completa: ahí sí hay JPG.
-            if g not in ('defensiva', 'ofensiva') and re.search(r'\.jpe?g$', a['p'], re.I): p(g, f'asset {a["p"]}: JPG sin alfa, tapa el video')
+            # pantalla completa: ahí sí hay JPG. En los otros juegos, el cuadro de Harina PAN (su
+            # precomp) es un rectángulo opaco en todos sus frames: ahí también.
+            jpg_ok = g in ('defensiva', 'ofensiva') or (g in JPG_PRECOMP and all(
+                l.get('refId') != a['id'] for l in d['layers'] + [l for c in comps.values() if c.get('nm') != JPG_PRECOMP[g] for l in c['layers']]))
+            if not jpg_ok and re.search(r'\.jpe?g$', a['p'], re.I): p(g, f'asset {a["p"]}: JPG sin alfa, tapa el video')
     # data.md: cada clave del JSON documentada y cada clave documentada existe
     md_keys = set(re.findall(r'`([A-Za-z_][A-Za-z0-9_]*)`', md))
     for c in cls:
@@ -107,9 +112,10 @@ for g in GRAFICOS:
         if BRILLO[g] not in html: p(g, 'index.html no le pone el Add al brillo del logo')
         if not any(l.get('ln') == 'brillo' for l in d['layers']): p(g, 'ninguna capa con ln brillo')
     # efectos de AE que Lottie no pinta y prep.js pasa a otra cosa: el Gradient Ramp (el panel del
-    # lanzador) y el Hue/Saturation donde cambia lo que se ve (la textura del lanzador; en las
-    # compuertas de la defensiva y la ofensiva sólo mueve el Tone, que no se ve)
-    sin_pintar = {'ADBE Ramp'} | ({'ADBE HUE SATURATION'} if g in ('score', 'lanzador') else set())
+    # lanzador), el Fast Box Blur (los textos de los otros juegos, a Gaussian Blur) y el
+    # Hue/Saturation donde cambia lo que se ve (la textura del lanzador; en las compuertas de la
+    # defensiva y la ofensiva sólo mueve el Tone, que no se ve)
+    sin_pintar = {'ADBE Ramp', 'ADBE Box Blur2'} | ({'ADBE HUE SATURATION'} if g in ('score', 'lanzador') else set())
     for l in d['layers']:
         for e in l.get('ef', []):
             if e.get('mn') in sin_pintar: p(g, f'{l["nm"]!r}: {e["mn"]} sin aplicar (Lottie no lo pinta)')
