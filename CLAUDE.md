@@ -6,12 +6,14 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Siete gráficos, en LT Energy: el score y el parcial con `font/LTEnergyVFVF.ttf` (fuente
+proyecto*). Ocho gráficos, en LT Energy: el score y el parcial con `font/LTEnergyVFVF.ttf` (fuente
 variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva, el
-bateador, el lanzador y el 3 en línea con `font/LTEnergy-Regular.ttf`, la estática que mandó el
-diseñador con sus primeros exports (los del 2026-10-18 traen la variable: mide igual, y en el render
-difiere en el suavizado de algunos bordes de letra; el del 3 en línea, del 2026-10-22, otra vez la
-estática). Las keys del UPDATE están en su `data.md`.
+bateador, el lanzador, el 3 en línea y los otros juegos con `font/LTEnergy-Regular.ttf`, la estática
+que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable: mide igual, y
+en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y los otros
+juegos, del 2026-10-22, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
+(`font/ChakraPetch-Bold.ttf`, libre, de Google Fonts) en el título y las carreras. Las keys del
+UPDATE están en su `data.md`.
 
 | Carpeta | Qué es | Flujo | Salida |
 |---|---|---|---|
@@ -22,6 +24,7 @@ estática). Las keys del UPDATE están en su `data.md`.
 | `lanzador/` | El lanzador (el export es PITCHERS), en la mitad izquierda: un panel del color del equipo con su escudo grande, de arriba abajo en el borde izquierdo; la barra del equipo con el nombre y el apellido (dos líneas) y el número, y debajo una barra negra con el split; la mano de lanzar y 6 estadísticas (rótulo y valor) sobre una textura gris. El frame 0 está vacío | stage `play` pause (0–110) | `salida`: la entrada al revés (3,7 s) |
 | `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, casi centrado (35 px a la izquierda): barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de Pepsi (fijo: una secuencia de PNG). El frame 0 está vacío | stage `play` pause (0–222): la pizarra entra hasta el 41, el cuadro de Pepsi hasta el 73 y le pasa un brillo del 181 al 220 | `salida`: el cuadro de Pepsi sale como lo animó el diseñador y después la pizarra, su entrada al revés (3,9 s) |
 | `tresenlinea/` | Los tres que vienen al bate (el export es 3 EN LINEA), abajo a la derecha: un panel de Empire Keeway entra con sus logos y se va, y queda la caja, la banda naranja con el 3 EN LÍNEA y el recuadro azul con los tres nombres (todo una secuencia de PNG, salvo los nombres). El frame 0 está vacío | stage `play` pause (0–197): la caja crece del 16 al 43, los nombres aparecen del 40 al 60 y el panel se va del 177 al 193 | `salida`: los nombres y la caja, su entrada al revés, sin el panel (1,5 s) |
+| `otrosjuegos/` | Cómo van los otros juegos (el export es OTROS JUEGOS; el título, ASÍ VAN), una columna abajo a la derecha: arriba, un cuadro de Harina PAN entra, arma su logo y se va (una secuencia de JPG); debajo, el título y tres juegos, cada uno con la sede, las barras de visita y local (escudo y nombre), las carreras y el inning con sus flechas. El frame 0 está vacío | stage `play` pause (0–166): el cuadro entra del 11 al 23, la columna del 27 al 95 (un juego detrás del otro) y el cuadro se va del 157 al 164 | `salida`: la columna, su entrada al revés, sin el cuadro (2,3 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
@@ -33,7 +36,10 @@ las del bateador del 2026-10-18 y las del lanzador del 2026-10-21; `parcial.png`
 con el ejemplo de su `data.md`, Magallanes y Cardenales) y `parcial_equipos.png` (los 56 cruces
 `visita_vs_local`, recortado a la pizarra), del 2026-10-18; `tresenlinea.png` (pantalla completa con
 el ejemplo de su `data.md`, en la pausa) y `tresenlinea_panel.png` (en el 120, con el panel), del
-2026-10-22. Si un gráfico cambia, hay que
+2026-10-22; `otrosjuegos.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa),
+`otrosjuegos_panel.png` (en el 120, con el cuadro de Harina PAN) y `otrosjuegos_equipos.png` (8
+casos que ponen cada equipo en las 6 filas, recortado al gráfico), del 2026-10-22. Si un gráfico
+cambia, hay que
 regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último frame de la entrada). No
 entran al zip (`.gitattributes`).
 
@@ -43,6 +49,7 @@ animan nada) ni la bajada de la barra de jugadores del score: son la animación 
 como en todos los gráficos de Meridiano. Si el diseñador manda una salida propia, reemplaza a ésta:
 el cuadro de Pepsi del parcial trae la suya, y la pizarra sale después, al revés. En el 3 en línea
 (su `stop`, 210–240, tampoco anima) la entrada al revés traería de vuelta el panel: sale la caja sola.
+En los otros juegos (su `STOP`, 167–197, tampoco), lo mismo: sale la columna, sin el cuadro de PAN.
 
 **Score.** Claves: las del score de LVBP-Meridiano donde dicen lo mismo, para que el controlador le mande a
 los dos la misma data: `conteobolasystrikes`, `outs`, `inning`, `INNINGarriba_opacidad` /
@@ -382,14 +389,83 @@ Colores en NTSC compuesto (2026-10-22, con setup de 7,5 IRE, en todos los colore
 todo legal; lo más alto, un naranja claro del panel (103,4 IRE), y lo más bajo, su azul (−1,1). En
 HD (Rec.709), también.
 
+**Otros juegos.** Cómo van los otros juegos de la jornada; el export es OTROS JUEGOS, y la carpeta,
+`otrosjuegos` (el título dice ASÍ VAN). Una columna abajo a la derecha (x 1415–1732): arriba, un
+cuadro de Harina PAN (una secuencia de JPG) entra por la derecha, abre sus puertas, arma su logo y se
+va por la derecha; debajo, una raya gris, el título y tres juegos, cada uno con la sede en una banda
+azul, las barras de visita (arriba) y local con el nombre del equipo y, en un cuadro negro, las
+carreras y el inning con sus flechas. Meridiano no tiene uno así. Claves: las del score y el parcial
+donde dicen lo mismo, con el número del juego al final (1 arriba, 3 abajo): `<SIGLAS>VISITA1_opacidad`
+/ `<SIGLAS>LOCAL1_opacidad`, `CARRERASVISITA1` / `CARRERASLOCAL1`, `inning1`,
+`INNINGarriba1_opacidad` / `INNINGabajo1_opacidad` y, del parcial, `NOMBREVISITA1` / `NOMBRELOCAL1`
+(el nombre escrito sobre la barra). Propias: `sede1`…`sede3` (el texto entero: EN CARACAS) y `titulo`
+(ASÍ VAN). Los textos arrancan vacíos, como en el bateador, salvo el título: si no llega, queda ASÍ
+VAN. Siempre se ven los tres juegos: no hay clave para apagar uno, y un día con menos juegos queda un
+lugar con la banda y el cuadro vacíos.
+
+Barras de equipo: como en el score, imágenes apiladas, las 8 de cada fila con su máscara, todas
+visibles al arrancar: el controlador manda `1` a la que va y `0` a las otras siete, en cada fila. Sin
+data queda Leones en todas. Son como las del score, pero no los mismos archivos. La de Leones visita
+del juego 1 llegaba como otra `BARRALEONESLOCAL`, con la imagen de la local: va con la de la visita (la
+de los juegos 2 y 3).
+
+Textos: en mayúsculas. Los nombres, desde donde empiezan en el diseño (x 1509) hasta 5 px antes del
+cuadro negro: más largos pasaban por debajo de él. Entran al cuerpo del diseño (18) hasta TIBURONES;
+MAGALLANES y CARDENALES bajan a 15. La sede, centrada sobre el eje del texto del diseño, con el ancho
+de la banda: EN PUERTO LA CRUZ entra. El inning, centrado sobre el eje del 10 (entra `F`, y `FINAL`
+más chico); las carreras ya llegaban centradas, y entran 3 cifras. El título encoge dentro de su caja.
+La sede y los nombres entran letra por letra con un Fast Box Blur (radio 4 a 0), que Lottie no pinta:
+va un Gaussian Blur equivalente (`OJ_BLUR` en `prep.js`), y entran desenfocados como en AE.
+
+Cuadro de Harina PAN: fijo, sin claves. Una secuencia de 138 JPG de 316 × 200 a 25 fps en el gráfico a
+29,97 (cada uno dura 1,2 frames: uno de cada seis se repite, como en AE). Sin alfa, pero el cuadro es
+un rectángulo opaco en todos sus frames (las puertas azules del principio son del diseño): el lint
+deja pasar JPG sólo en ese precomp. Desde el frame 78 de la secuencia (al aire, del 93,5 hasta que se
+va) el logo está quieto, y como cada JPG se comprime distinto, sus bordes titilaban un poco (hasta 30
+niveles en unos 25 px de un frame al otro): queda ese JPG solo (`OJ_QUIETO`), como el tramo quieto del
+parcial. La capa del cuadro termina en el 164, cuando le quedan 11 px en pantalla: no se nota el corte.
+
+Salida: el export no trae, y la entrada al revés traería de vuelta el cuadro. Es la entrada de la
+columna al revés, sin el cuadro, como en el 3 en línea: el juego 3 primero, después el 2 y el 1, el
+título y la raya (2,3 s).
+
+Key: los recuadros se tocan borde con borde, y en el key de CasparCG quedaban filas y columnas de 1 px
+al 54–94 %: entre el título y la primera banda, entre cada banda y su juego, entre el cuadro negro y
+la banda de abajo, entre la barra y el cuadro negro, y entre la visita y la local, una línea finita de
+video al aire. Las barras no alcanzan a cubrirlas: los PNG traen la primera y la última fila
+semitransparentes, la visita y la local se tocan con esas filas, y la máscara de Tigres local termina
+1,3 px antes del cuadro negro. Debajo de las barras de cada juego va un fondo negro (`OJ_FONDO`), que
+se ve sólo por esos bordes (las barras son oscuras arriba y el cuadro es negro) y aparece cuando
+terminan de entrar las barras y el cuadro; la primera banda crece 1 px hacia arriba, por debajo del
+título, y los cuadros negros 1 px hacia arriba y hacia abajo (el del juego 3, sólo hacia arriba), por
+debajo de las bandas. Con los 8 equipos en las 6 filas, el key es 255 en toda la columna salvo los
+bordes de afuera: la izquierda de las barras (el borde del PNG), la derecha del título (0,5 px más
+angosto que las bandas) y abajo, donde las barras terminan 1,25 px antes que el cuadro negro. Una
+fila con todas las barras en 0 muestra el fondo negro.
+
+En CasparCG (1080p29.97, render por CPU) la entrada usa un núcleo y no repite frames: sólo los de la
+cadencia de la secuencia, cuando nada más se mueve (el 25 y el 49).
+
+No se pinta el CC Light Sweep de la raya gris de arriba: está quieto (sin keyframes) y por su centro
+pasaría como un brillo fino sobre la raya. Sin una captura de AE no se sabe cómo se ve: pendiente con
+el diseñador, si importa.
+
+Colores en NTSC compuesto (2026-10-22, con setup de 7,5 IRE): las barras de los 8 equipos quedan
+legales (la más alta, Leones, 106,1; la más baja, Cardenales, −6,5); el cian de la sede y las flechas
+es el del score (113,5). En el cuadro de PAN, el amarillo de la marca (`#FEC200`) da 116 IRE en más de
+medio cuadro, y la compresión del JPG lleva algunos píxeles a 119,7 (uno a 120,6 en un frame de la
+entrada); el azul baja a −16,3, legal hasta −20. Quedan así, como el cian y el amarillo del score. En
+HD (Rec.709) todo es legal.
+
 ### Cuando llega un export nuevo del diseñador
 
 El score llega como `SCOREBUG.zip` (carpeta `SCOREBUG/` con `data.json`, `images/` y `FONT/`), la
 defensiva como `DEFENSIVA.rar` y la ofensiva como `OFENSIVA.rar` (carpetas `DEFENSIVA/` y
 `OFENSIVA/`; el `.rar` se abre con `unar`), el bateador como `LOWBAR_BATEADOR.zip` (antes `.rar`;
 carpeta `LOWBAR BATEADOR/`, con espacio), el parcial como `FINAL_DE_INNING.zip` (carpeta `FINAL DE
-INNING/`), el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`) y el 3 en línea como
-`3_EN_LINEA.zip` (carpeta `3 EN LINEA/`). La receta de los siete es `herramientas/prep.js`, que
+INNING/`), el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`), el 3 en línea como
+`3_EN_LINEA.zip` (carpeta `3 EN LINEA/`) y los otros juegos como `OTROS_JUEGOS.zip` (carpeta `OTROS
+JUEGOS/`). La receta de los ocho es `herramientas/prep.js`, que
 prepara los que encuentre (las imágenes del 3 en línea, antes, `herramientas/tresenlinea.py`):
 buscar las capas por `nm` (los índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
 
@@ -716,6 +792,57 @@ llegaban): idéntico al píxel en 27 frames del 0 al 196. La salida, contra la e
 (debajo del panel, desde la y 772): idéntica del 17 al 44; del 45 al 61, con la imagen fija contra
 los frames de la secuencia, difieren los bordes tramados.
 
+**Otros juegos**
+
+- **Clases:** `.EQUIPOVISITANTE<n>` / `.EQUIPOLOCAL<n>` → `NOMBREVISITA<n>` / `NOMBRELOCAL<n>`;
+  `CARRERAVISITA<n>` (sin el punto: sin clase) y `.CARRERALOCAL<n>` → `CARRERASVISITA<n>` /
+  `CARRERASLOCAL<n>`; `.INNINGS`, `.INNINGS 2` y `.INNINGS 3` (los tres con la clase `INNINGS`) →
+  `inning1`…`3`; `.PARTE ALTA` / `.PARTE BAJA` (y con ` 2`, ` 3`: las seis con la clase `PARTE`) →
+  `INNINGarriba<n>_opacidad` / `INNINGabajo<n>_opacidad`; `.SEDE<n>` → `sede<n>`; `.ASÍ VAN` (clase
+  `AS`) → `titulo`; las barras `.BARRA<EQUIPO><LOCAL|VISITA>` (los mismos nombres en los tres juegos)
+  → `<SIGLAS><LOCAL|VISITA><n>_opacidad`. El juego de cada barra sale de su parent (las del 2 y el 3
+  cuelgan de dos nulos que se llaman igual, `Null 1`; las del 1, de nada) y el lado, de su fila (la de
+  arriba es la visita). Las `mascara N` (sus mattes) y los nulos quedan como vienen.
+- **Barra de Leones visita del juego 1:** llega como una segunda `BARRALEONESLOCAL`, en la fila de la
+  visita y con la imagen de la local: pasa a `LEOVISITA1_opacidad`, con la imagen de la visita.
+  `prep.js` falla si hay otra barra con el lado cambiado, o ninguna: si el diseñador la arregla, sacar
+  la corrección.
+- **Fuentes:** `fPath` llega como `OTROS JUEGOS / FONT` (LT Energy) y vacío (Chakra Petch): pasan a
+  `font/LTEnergy-Regular.ttf` (el mismo archivo que el del bateador) y `font/ChakraPetch-Bold.ttf`. El
+  export trae la familia entera de Chakra Petch: se usa sólo la Bold.
+- **All Caps:** llega apagado: `prep.js` lo prende.
+- **Textos de caja:** ya llegan de caja; la sede y los nombres, con `lh` 0.01 (va 1.2 del cuerpo).
+  Medidos en el frame 140 con las fuentes cargadas: los nombres, desde donde empiezan hasta 5 px
+  antes del cuadro negro (x 1596.6, `OJ_CUADRO`); la sede, de la izquierda a centrada sobre su eje (Lw
+  de EN CARACAS 90.7987), a 289 (8 px adentro de la banda); el inning, de la izquierda a centrado sobre
+  el eje del 10 (Lw 25.0266), a 51 (4 px antes del borde del cuadro); el título, a 300 px de pantalla
+  (8 px adentro de su caja; la capa va al 124 %). Las carreras quedan con su caja. El alto de todas, el
+  ascent del cuerpo más 2, con el de su fuente.
+- **Fast Box Blur:** el de la sede y los nombres pasa a Gaussian Blur (`OJ_BLUR`). El lint avisa de un
+  Fast Box Blur sin convertir.
+- **Cuadro de PAN:** desde el frame `OJ_QUIETO` (78) de la secuencia, un solo JPG: la capa de ese
+  frame dura hasta el final y las de después salen del JSON con sus imágenes (`img_79`–`137` quedan en
+  la carpeta sin usar). Con una secuencia sin compresión, `null`.
+- **Key:** el fondo negro de las barras de cada juego (`OJ_FONDO`, en px de pantalla, debajo de la
+  última barra del juego), la primera banda (`Capa de formas 7`) 1 px más alta y los cuadros negros
+  (`CUADRO SCORE`, ` 2`, ` 3`) 1 px más altos (ver *Key* arriba). Si la columna se mueve, medir de
+  nuevo `OJ_FONDO`.
+- **Markers y timeline:** `START` (0–30) y `STOP` (167–197) del diseñador → `play` 0–166 (pausa en el
+  165, el primer frame sin el cuadro de PAN: `OJ_PAUSA`), `salida` 166–235 y `stop` en el 0. La columna
+  suma su entrada al revés (`alReves`) desde el 166: una capa que entraba en el frame t se va en el
+  261 − t, y el 234 (la raya gris sin ancho) es el primer frame vacío. La entrada de la columna termina
+  en el 95 (`OJ_ENTRADA`): `prep.js` falla si algo de la columna anima después. Las capas que arrancan
+  en el 0 pasan al 1.
+- **Textos vacíos:** al final, todos salvo `titulo`.
+- **Imágenes:** las 154 del export van tal cual a `otrosjuegos/images/` (`img_0`–`137`, los JPG de la
+  secuencia; `img_138`–`153`, las barras).
+
+Comparado frame a frame contra el export (del 0 al 165, con todas las barras prendidas y el texto del
+diseño): idéntico salvo el desenfoque de los textos mientras entran, el escudo de Leones visita del
+juego 1 (la imagen corregida), el cuadro de PAN desde el 95 (el JPG quieto) y las filas de 1 px del
+arreglo del key (la 643 y, en el cuadro negro, la 667, la 779 y la 890). La salida, contra la entrada
+al revés: idéntica (hasta 1 nivel).
+
 ### QA
 
 - Juzgar con el runtime real y la fuente cargada (`<gráfico>/index.html` en el browser o con
@@ -729,6 +856,11 @@ los frames de la secuencia, difieren los bordes tramados.
   repita frames: se graba la salida del canal (`ADD 1-901 FILE "<ruta>.nut" -filter:v
   crop=480:528:1440:552 -codec:v rawvideo`, `REMOVE 1-901` al terminar) y se cuentan los frames
   iguales al anterior (la secuencia trae iguales el 23 y del 169 al 176).
+- Otros juegos: los 8 equipos en las 6 filas (8 casos que los rotan), textos largos (nombres, sedes,
+  `FINAL` en el inning), entrada frame a frame contra el export, la salida contra la entrada al revés,
+  data al aire, `stop` en la pausa y a mitad de la entrada, y que el layer se suelte; en CasparCG, el
+  key con los 8 casos (sin filas ni columnas a menos de 255 adentro de la columna) y que la entrada no
+  repita frames (como en el 3 en línea, `crop=400:720:1400:300`).
 - Defensiva, ofensiva, bateador y lanzador: los 8 equipos (barra, color de las puertas, del fondo o
   del panel, y escudo), y sin equipo; entrada frame a frame, cambio de equipo al aire, `stop` en la
   pausa y a mitad de la entrada, y que el layer se suelte. El bateador y el lanzador, además, el key
