@@ -6,7 +6,7 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Nueve gráficos, en LT Energy: el score y el parcial con `font/LTEnergyVFVF.ttf` (fuente
+proyecto*). Diez gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
 variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva, el
 bateador, el lanzador, el 3 en línea, los otros juegos y el prevenido con `font/LTEnergy-Regular.ttf`,
 la estática que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable:
@@ -23,6 +23,7 @@ UPDATE están en su `data.md`.
 | `bateador/` | Barra baja del bateador, abajo a la izquierda: arriba, una barra negra con el split; a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87) | `salida`: la entrada al revés (2,9 s) |
 | `lanzador/` | El lanzador (el export es PITCHERS), en la mitad izquierda: un panel del color del equipo con su escudo grande, de arriba abajo en el borde izquierdo; la barra del equipo con el nombre y el apellido (dos líneas) y el número, y debajo una barra negra con el split; la mano de lanzar y 6 estadísticas (rótulo y valor) sobre una textura gris. El frame 0 está vacío | stage `play` pause (0–110) | `salida`: la entrada al revés (3,7 s) |
 | `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, casi centrado (35 px a la izquierda): barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de Pepsi (fijo: una secuencia de PNG). El frame 0 está vacío | stage `play` pause (0–222): la pizarra entra hasta el 41, el cuadro de Pepsi hasta el 73 y le pasa un brillo del 181 al 220 | `salida`: el cuadro de Pepsi sale como lo animó el diseñador y después la pizarra, su entrada al revés (3,9 s) |
+| `parcialsinpublicidad/` | El parcial sin el cuadro de Pepsi ni sus dos rayas grises, centrado (x 507–1411): la misma pizarra, con las mismas claves (el controlador elige con o sin publicidad por el template). Lo arma `prep.js` desde el parcial preparado. El frame 0 está vacío | stage `play` pause (0–42): la pizarra entra hasta el 41 | `salida`: la entrada al revés (1,4 s) |
 | `tresenlinea/` | Los tres que vienen al bate (el export es 3 EN LINEA), abajo a la derecha: un panel de Empire Keeway entra con sus logos y se va, y queda la caja, la banda naranja con el 3 EN LÍNEA y el recuadro azul con los tres nombres (todo una secuencia de PNG, salvo los nombres). El frame 0 está vacío | stage `play` pause (0–197): la caja crece del 16 al 43, los nombres aparecen del 40 al 60 y el panel se va del 177 al 193 | `salida`: los nombres y la caja, su entrada al revés, sin el panel (1,5 s) |
 | `otrosjuegos/` | Cómo van los otros juegos (el export es OTROS JUEGOS; el título, ASÍ VAN), una columna abajo a la derecha: arriba, un cuadro de Harina PAN entra, arma su logo y se va (una secuencia de JPG); debajo, el título y tres juegos, cada uno con la sede, las barras de visita y local (escudo y nombre), las carreras y el inning con sus flechas. El frame 0 está vacío | `play` lo pone al aire vacío (pausa en el 0); el controlador elige con un `goto`: `tresjuegos` (100–266), `dosjuegos` (400–566) o `unjuego` (700–866), el mismo gráfico con 3, 2 o 1 juegos. En cada uno, desde el `goto`, el cuadro entra del 11 al 23, la columna del 27 al 95 (un juego detrás del otro) y el cuadro se va del 157 al 164 | `salida`: la columna, su entrada al revés, sin el cuadro (2,3 s); `salida2` (1,9 s) y `salida1` (1,3 s) |
 | `prevenido/` | El bateador en el círculo (el export es PREVENIDO AL BATE), abajo a la derecha: un panel de LMV entra girando, muestra su logo con un brillo y se va (una secuencia de PNG); debajo, la barra negra con el PREVENIDO AL BATE y el recuadro azul con el nombre. El frame 0 está vacío | stage `play` pause (0–170): la barra entra del 23 al 32, el título del 31 al 39, el recuadro y el nombre del 33 al 48, y el panel se va del 151 al 168 | `salida`: la barra, el título, el recuadro y el nombre, su entrada al revés, sin el panel (0,9 s) |
@@ -35,7 +36,9 @@ ejemplo) y `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), las
 ejemplo) y `bateador_equipos.png` / `lanzador_equipos.png` (los 8 equipos, recortado al gráfico),
 las del bateador del 2026-10-18 y las del lanzador del 2026-10-21; `parcial.png` (pantalla completa
 con el ejemplo de su `data.md`, Magallanes y Cardenales) y `parcial_equipos.png` (los 56 cruces
-`visita_vs_local`, recortado a la pizarra), del 2026-10-18; `tresenlinea.png` (pantalla completa con
+`visita_vs_local`, recortado a la pizarra), del 2026-10-18; `parcialsinpublicidad.png` (pantalla
+completa con el mismo ejemplo, en la pausa; los equipos son los de `parcial_equipos.png`), del
+2026-10-23; `tresenlinea.png` (pantalla completa con
 el ejemplo de su `data.md`, en la pausa) y `tresenlinea_panel.png` (en el 120, con el panel), del
 2026-10-22; `otrosjuegos.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa),
 `otrosjuegos_panel.png` (en el 120, con el cuadro de Harina PAN), `otrosjuegos_equipos.png` (8
@@ -50,7 +53,8 @@ No hay video de referencia del diseñador, y ningún export trae salida (los mar
 90–120, de la defensiva, 60–90, de la ofensiva y el bateador, 90–120, y del lanzador, 120–150, no
 animan nada) ni la bajada de la barra de jugadores del score: son la animación de entrada al revés,
 como en todos los gráficos de Meridiano. Si el diseñador manda una salida propia, reemplaza a ésta:
-el cuadro de Pepsi del parcial trae la suya, y la pizarra sale después, al revés. En el 3 en línea
+el cuadro de Pepsi del parcial trae la suya, y la pizarra sale después, al revés (en el parcial sin
+publicidad, la pizarra sola). En el 3 en línea
 (su `stop`, 210–240, tampoco anima) la entrada al revés traería de vuelta el panel: sale la caja sola.
 En los otros juegos (su `STOP`, 167–197, tampoco), lo mismo: sale la columna, sin el cuadro de PAN.
 En el prevenido (su `STOP`, 180–210, tampoco), también: sale la caja, sin el panel de LMV.
@@ -342,6 +346,33 @@ score (113,5 y 114,4 IRE): quedan así, como allá. En la secuencia de Pepsi (20
 es el blanco (100 IRE) y el azul de Pepsi baja a −14,2 IRE, legal hasta −20; si hiciera falta subirlo
 a −7, `#1032FF` (en los PNG del diseñador). En HD (Rec.709) todo es legal.
 
+**Parcial sin publicidad.** El parcial sin el cuadro de Pepsi, como gráfico aparte (Leon,
+2026-10-23): el controlador elige con o sin publicidad por el template (`parcial` o
+`parcialsinpublicidad`) y les manda la misma data. Un gráfico aparte y no una clave en el parcial:
+con el cuadro oculto por opacidad, los tiempos seguían siendo los del parcial (la pausa a los 7,4 s
+y, al `stop`, 2,5 s quieto mientras sale un cuadro que no se ve, antes de que salga la pizarra); un
+segundo stage en el mismo gráfico, como en los otros juegos, le pedía al controlador un `goto` pegado
+al `play`.
+
+No tiene export: `prep.js` lo arma siempre desde el parcial preparado (`parcial/data.json`), con sus
+imágenes (las 8 barras) y su fuente, así que los dos no se separan: un cambio del parcial pasa a éste
+la próxima vez que se corre `prep.js`, con o sin exports. Saca el cuadro de Pepsi y sus dos rayas
+grises (la de la izquierda, `MARCO DE PUBLICIDAD 3`, entra con la pizarra, pero es parte del marco
+de la publicidad: sin ella la columna de los bateadores termina en el azul), y la columna de los
+bateadores vuelve a su ancho del diseño (en el parcial crece 1 px por debajo de la raya; acá ése es
+el borde de afuera). Centrado (Leon, entre ése y el mismo lugar del parcial): todo va 196 px a la
+derecha y la pizarra pasa de x 311–1215 a 507–1411.
+
+Flujo: la entrada es la de la pizarra del parcial, con la pausa en el 41 (1,4 s), y la salida, la
+misma que en el parcial después del cuadro, la entrada al revés, adelantada del 296 al 42: 1,4 s.
+Claves, textos, barras y colores: los del parcial.
+
+Comparado frame a frame contra el parcial (del 0 al 41, fuera del cuadro de Pepsi y corrido 196 px):
+idéntico salvo el suavizado del borde de arriba y de abajo de las barras, en unos 120 px de la zona
+del escudo (hasta 44 niveles, también con cada frame en su propia carga: Chromium las pinta distinto
+en otra x). La salida, contra la entrada al revés: idéntica (hasta 2 niveles). En CasparCG, el key
+es 255 en toda la pizarra salvo los bordes de afuera, y el `CG STOP` suelta el layer a los 1,4 s.
+
 **3 en línea.** Los tres que vienen al bate; el export es 3 EN LINEA, y la carpeta, `tresenlinea`
 (Leon, 2026-10-22). Abajo a la derecha, un panel de Empire Keeway entra, pasa sus logos con un brillo
 y se va por la derecha; debajo crece la caja: la columna y la banda naranjas con el título 3 EN
@@ -538,8 +569,9 @@ defensiva como `DEFENSIVA.rar` y la ofensiva como `OFENSIVA.rar` (carpetas `DEFE
 carpeta `LOWBAR BATEADOR/`, con espacio), el parcial como `FINAL_DE_INNING.zip` (carpeta `FINAL DE
 INNING/`), el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`), el 3 en línea como
 `3_EN_LINEA.zip` (carpeta `3 EN LINEA/`), los otros juegos como `OTROS_JUEGOS.zip` (carpeta `OTROS
-JUEGOS/`) y el prevenido como `PREVENIDO_AL_BATE.zip` (carpeta `PREVENIDO AL BATE/`). La receta de los
-nueve es `herramientas/prep.js`, que prepara los que encuentre (las imágenes del 3 en línea y del
+JUEGOS/`) y el prevenido como `PREVENIDO_AL_BATE.zip` (carpeta `PREVENIDO AL BATE/`); el parcial sin
+publicidad no tiene export, sale del parcial. La receta de los diez es `herramientas/prep.js`, que
+prepara los que encuentre, y el parcial sin publicidad siempre (las imágenes del 3 en línea y del
 prevenido, antes, `herramientas/tresenlinea.py` y `herramientas/prevenido.py`):
 buscar las capas por `nm` (los índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
 
@@ -834,6 +866,25 @@ Comparado frame a frame contra el export del 2026-10-18 (sin data, con su `op` l
 idéntico al píxel del 0 al 221, salvo las columnas de 1 px del arreglo del key (x 714–715, 998–999 y
 1215–1216) y el tramo quieto (77–171, en el cuadro de Pepsi).
 
+**Parcial sin publicidad**
+
+- **Sin export:** corre siempre, después del parcial, sobre `parcial/data.json`. Falla si cambió la
+  timeline del parcial (`PAR_PAUSA`, `PAR_FIN`) o si el cuadro de Pepsi es parent o matte de otra
+  capa.
+- **Fuera:** `PEPSI LOGO` (con el precomp y las imágenes de la secuencia) y `MARCO DE PUBLICIDAD 3` y
+  `4` (`PSP_RAYAS`). Quedan las 8 barras, que se copian de `parcial/images/` con los mismos nombres
+  (`img_262`–`269`), y la fuente, de `parcial/font/`.
+- **Key:** `Capa de formas 4` (los bateadores), 1 px más angosta a la derecha: deshace el arreglo del
+  parcial, que la hacía crecer por debajo de la raya.
+- **Centrado:** `PSP_CORRE` (196 px) en las capas sin parent (`Nulo 23`, las posiciones y las barras
+  de la visita). Falla si `Nulo 23` no llega a `PSP_NULO`: medir de nuevo la pizarra (bbox del render
+  en el 41) y mover `PSP_CORRE`, en px enteros.
+- **Markers y timeline:** `play` 0–42 (pausa en el 41, `PSP_PAUSA`), `salida` 42–84 y `stop` en el 0.
+  Los keyframes y el `op` de la salida de la pizarra (desde el 296) se adelantan `PSP_ADELANTA`
+  (254); falla si hay un keyframe entre el 41 y el 296.
+- **`index.html` y `data.md`:** copias de los del parcial, a mano: el título; la publicidad, la
+  posición y los markers en el `data.md`.
+
 **3 en línea**
 
 - **Imágenes, antes que `prep.js`:** `python3 herramientas/tresenlinea.py "$EXPORTS/3 EN LINEA" .`
@@ -977,6 +1028,9 @@ la entrada al revés (debajo del panel): idéntica (hasta 1 nivel).
   `next` y `stop` desde cada stage, y que el layer se suelte.
 - Parcial: lo mismo que el score con su único stage, y el key en CasparCG (`casparcg-ctl
   snapshot`): sin columnas a menos de 255 entre los recuadros.
+- Parcial sin publicidad: la entrada contra la del parcial (corrida `PSP_CORRE`, fuera del cuadro de
+  Pepsi), la salida contra la entrada al revés, data al aire, `stop` en la pausa y a mitad de la
+  entrada, y que el layer se suelte; en CasparCG, el key.
 - 3 en línea: entrada frame a frame, la salida contra la entrada al revés, data al aire, `stop` en
   la pausa y a mitad de la entrada, y que el layer se suelte; en CasparCG, el key y que la entrada no
   repita frames: se graba la salida del canal (`ADD 1-901 FILE "<ruta>.nut" -filter:v
@@ -1050,8 +1104,9 @@ equipo: si el editor lo regenera, reponerlas desde *Este repo*. El de la defensi
 editor (audit y guardado, 2026-10-15), pero se reescribió a mano en el mismo formato: el generador
 del MCP pone las capas de imagen con clase `_opacidad` también entre las imágenes, con una ruta de
 ejemplo en el payload, y `index.js` no les reemplaza la imagen (ver *claves sólo CSS*). Si el editor
-lo regenera, reponerlo desde git. El del bateador, el del parcial y el del lanzador se escribieron
-a mano en ese formato, sin pasar por el editor.
+lo regenera, reponerlo desde git. El del bateador, el del parcial, el del parcial sin publicidad (una
+copia del del parcial) y el del lanzador se escribieron a mano en ese formato, sin pasar por el
+editor.
 
 ## Convenciones del Lottie
 

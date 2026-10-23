@@ -11,6 +11,7 @@ carpeta con su `index.html`, su `data.json` y su `data.md` (las claves del UPDAT
 | `bateador/` | Barra baja del bateador: el split en una barra negra, escudo del equipo, nombre, número, posición y 4 estadísticas |
 | `lanzador/` | El lanzador, en la mitad izquierda: panel con el color y el escudo del equipo, nombre y apellido, número, el split en una barra negra, mano de lanzar y 6 estadísticas |
 | `parcial/` | Score de fin de inning: barras de los dos equipos, C H E, inning, los tres que vienen al bate y el cuadro de Pepsi (una secuencia de PNG) |
+| `parcialsinpublicidad/` | El mismo score de fin de inning sin el cuadro de Pepsi, centrado; con la misma data: el controlador elige con o sin publicidad por el template |
 | `tresenlinea/` | 3 en línea, abajo a la derecha: los tres que vienen al bate, con el panel de Empire Keeway (una secuencia de PNG) |
 | `otrosjuegos/` | Otros juegos (ASÍ VAN), abajo a la derecha: cómo van los otros juegos de la jornada (sede, equipos, carreras e inning), con el cuadro de Harina PAN (una secuencia de JPG); `play` y un `goto('tresjuegos')`, `goto('dosjuegos')` o `goto('unjuego')` según cuántos juegos haya |
 | `prevenido/` | Prevenido al bate, abajo a la derecha: el bateador en el círculo (el nombre bajo PREVENIDO AL BATE), con el panel de LMV (una secuencia de PNG) |
