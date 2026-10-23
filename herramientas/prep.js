@@ -9,14 +9,15 @@
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
 //      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/,
-//      PREVENIDO AL BATE/. Los que no estén se saltean: alcanza con el zip que llegó.
+//      PREVENIDO AL BATE/. Los que no estén se saltean: alcanza con el zip que llegó. El parcial sin
+//      publicidad no tiene export: sale del parcial preparado, y se arma siempre.
 //   2. Si llegó el 3 EN LINEA: python3 herramientas/tresenlinea.py "$EXPORTS/3 EN LINEA" . (sus
 //      imágenes: el recorte y los frames de la salida). Si llegó el PREVENIDO AL BATE: python3
 //      herramientas/prevenido.py "$EXPORTS/PREVENIDO AL BATE" . (el recorte de sus imágenes).
 //   3. node herramientas/prep.js $EXPORTS .
 //   4. git diff, herramientas/lint.py y QA con el runtime real (CLAUDE.md).
 // Las fuentes, las imágenes (salvo las del 3 en línea y el prevenido) y los index.html no los toca: se
-// copian a mano la primera vez.
+// copian a mano la primera vez. El parcial sin publicidad copia del parcial sus imágenes y su fuente.
 const fs = require('fs');
 const path = require('path');
 
@@ -1217,6 +1218,82 @@ if (hay('FINAL DE INNING')) {
     d.fonts.list[0].fPath = 'font/LTEnergyVFVF.ttf';
     allCaps(d);
     save(path.join(REPO, 'parcial/data.json'), d);
+}
+
+// ---------------------------------------------------------------- parcial sin publicidad
+// El parcial sin el cuadro de Pepsi, como gráfico aparte (Leon, 2026-10-23): el controlador elige el
+// template y le manda la misma data. No tiene export: sale del parcial ya preparado, así que corre
+// siempre (también sin exports en SRC) y los dos no se separan. Sin el cuadro (PEPSI LOGO), sin sus
+// dos rayas grises (MARCO DE PUBLICIDAD 3, la de la izquierda, que entra con la pizarra, y 4) y
+// centrado en la pantalla. La entrada es la de la pizarra, que termina en el 41, y la salida, la
+// misma que en el parcial después del cuadro: la entrada de la pizarra al revés, que pasa del 296 al
+// 42 (1,4 s).
+const PSP_PAUSA = PAR_PIZARRA + 1;     // play 0–42: queda en el 41, con la pizarra completa
+const PSP_ADELANTA = PAR_FIN_PEPSI - PSP_PAUSA; // la salida de la pizarra, 254 frames antes
+// Sin las rayas, la pizarra ocupa x 311–1215 (bbox del render en el 41): corrida 196 px, x 507–1411,
+// queda centrada. Un px entero: el render es el del parcial, corrido.
+const PSP_CORRE = 196;
+const PSP_NULO = [894.231, 755.192];   // dónde llega Nulo 23: si cambia, medir de nuevo PSP_CORRE
+const PSP_RAYAS = ['MARCO DE PUBLICIDAD 3', 'MARCO DE PUBLICIDAD 4'];
+if (fs.existsSync(path.join(REPO, 'parcial/data.json'))) {
+    const d = load(path.join(REPO, 'parcial/data.json'));
+    const m = Object.fromEntries(d.markers.map(x => [x.cm, x]));
+    if (m.play.dr !== PAR_PAUSA || m.salida.tm !== PAR_PAUSA || d.op !== PAR_FIN + 1) throw new Error('parcial: timeline inesperada');
+    d.nm = 'FINAL DE INNING SIN PUBLICIDAD VV';
+
+    // ---- el cuadro de Pepsi y sus rayas, con la secuencia y sus imágenes
+    const fuera = [layer(d, 'PEPSI LOGO'), ...PSP_RAYAS.map(nm => layer(d, nm))];
+    if (d.layers.some(l => fuera.some(f => f.ind === l.parent)) || fuera.some(l => l.td || l.tt)) throw new Error('parcial sin publicidad: el cuadro de Pepsi es parent o matte');
+    d.layers = d.layers.filter(l => !fuera.includes(l));
+    const usadas = new Set(d.layers.map(l => l.refId).filter(Boolean));
+    d.assets = d.assets.filter(a => usadas.has(a.id));
+    if (d.assets.length !== usadas.size || d.assets.some(a => a.layers)) throw new Error('parcial sin publicidad: assets inesperados');
+
+    // ---- la columna de los bateadores crecía 1 px a la derecha, por debajo de la raya del cuadro de
+    // Pepsi (el key del parcial): sin la raya, ése es el borde de afuera y vuelve a su ancho
+    const nulo = layer(d, 'Nulo 23'), col = layer(d, 'Capa de formas 4'), g = col.shapes[0].it;
+    const rc = g.find(s => s.ty === 'rc'), tr = g.find(s => s.ty === 'tr');
+    const sx = new Set(col.ks.s.a ? col.ks.s.k.map(k => k.s[0]) : [col.ks.s.k[0]]);
+    if (sx.size !== 1 || rc.s.a || rc.p.a || tr.s.a || col.parent !== nulo.ind || nulo.ks.s.a) throw new Error('Capa de formas 4: transform inesperado');
+    const px = [...sx][0] / 100 * tr.s.k[0] / 100 * nulo.ks.s.k[0] / 100; // px de pantalla por unidad
+    rc.s.k[0] -= 1 / px;
+    rc.p.k[0] -= 0.5 / px;
+
+    // ---- centrada: todo lo que no cuelga de nada (Nulo 23, las posiciones y las barras de la visita)
+    if (nulo.ks.p.a || nulo.ks.p.k[0] !== PSP_NULO[0] || nulo.ks.p.k[1] !== PSP_NULO[1]) throw new Error(`Nulo 23: p ${JSON.stringify(nulo.ks.p.k)}: medir de nuevo PSP_CORRE`);
+    for (const l of d.layers.filter(l => l.parent == null)) {
+        const p = l.ks.p;
+        if (p.a || p.s) throw new Error(`${l.nm}: posición animada o separada`);
+        p.k = [p.k[0] + PSP_CORRE, ...p.k.slice(1)];
+    }
+
+    // ---- timeline: la salida de la pizarra (desde el 296) pasa a empezar en la pausa
+    for (const p of propiedadesAnimadas(d.layers)) for (const k of p.k) {
+        if (k.t > PAR_PIZARRA + 0.5 && k.t < PAR_FIN_PEPSI - 0.5) throw new Error(`keyframe en el ${k.t}, entre la entrada y la salida de la pizarra`);
+        if (k.t >= PAR_FIN_PEPSI - 0.5) k.t -= PSP_ADELANTA;
+    }
+    for (const l of d.layers) {
+        if (l.op < PAR_FIN_PEPSI) throw new Error(`${l.nm}: op ${l.op}, termina antes de la salida`);
+        l.op -= PSP_ADELANTA;
+    }
+    d.op -= PSP_ADELANTA;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: PSP_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: PSP_PAUSA, cm: 'salida', dr: d.op - PSP_PAUSA }
+    ];
+
+    // ---- las imágenes (las barras) y la fuente, las del parcial
+    const dst = path.join(REPO, 'parcialsinpublicidad');
+    for (const a of d.assets) {
+        fs.mkdirSync(path.join(dst, a.u), { recursive: true });
+        fs.copyFileSync(path.join(REPO, 'parcial', a.u, a.p), path.join(dst, a.u, a.p));
+    }
+    for (const f of d.fonts.list) {
+        fs.mkdirSync(path.join(dst, path.dirname(f.fPath)), { recursive: true });
+        fs.copyFileSync(path.join(REPO, 'parcial', f.fPath), path.join(dst, f.fPath));
+    }
+    save(path.join(dst, 'data.json'), d);
 }
 
 // ---------------------------------------------------------------- 3 en línea
