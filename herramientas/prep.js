@@ -2,19 +2,21 @@
 // de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13 y 22), de la
 // defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15), del bateador (LOWBAR BATEADOR,
 // 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18), del lanzador (PITCHERS, 2026-10-21), del
-// 3 en línea (3 EN LINEA, 2026-10-22) y de los otros juegos (OTROS JUEGOS, 2026-10-22): si el
-// diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
+// 3 en línea (3 EN LINEA, 2026-10-22), de los otros juegos (OTROS JUEGOS, 2026-10-22) y del prevenido
+// (PREVENIDO AL BATE, 2026-10-23): si el diseñador cambia nombres de capas, falla diciendo cuál no
+// encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
-//      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/. Los que
-//      no estén se saltean: alcanza con el zip que llegó.
+//      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/,
+//      PREVENIDO AL BATE/. Los que no estén se saltean: alcanza con el zip que llegó.
 //   2. Si llegó el 3 EN LINEA: python3 herramientas/tresenlinea.py "$EXPORTS/3 EN LINEA" . (sus
-//      imágenes: el recorte y los frames de la salida).
+//      imágenes: el recorte y los frames de la salida). Si llegó el PREVENIDO AL BATE: python3
+//      herramientas/prevenido.py "$EXPORTS/PREVENIDO AL BATE" . (el recorte de sus imágenes).
 //   3. node herramientas/prep.js $EXPORTS .
 //   4. git diff, herramientas/lint.py y QA con el runtime real (CLAUDE.md).
-// Las fuentes, las imágenes (salvo las del 3 en línea) y los index.html no los toca: se copian a mano
-// la primera vez.
+// Las fuentes, las imágenes (salvo las del 3 en línea y el prevenido) y los index.html no los toca: se
+// copian a mano la primera vez.
 const fs = require('fs');
 const path = require('path');
 
@@ -135,6 +137,23 @@ function enPantallaY(d, l, y) {
     return y;
 }
 const escalaY = (d, l) => enPantallaY(d, l, 1) - enPantallaY(d, l, 0);
+// Dónde empieza y dónde termina en pantalla un recuadro (eje 0, x; 1, y): una capa de forma con un
+// rectángulo, sin rotaciones ni animación en el grupo (la de la capa, con su último valor).
+function rectangulo(d, l, eje) {
+    const g = l.shapes[0].it, rc = g.find(s => s.ty === 'rc'), tr = g.find(s => s.ty === 'tr');
+    if (l.shapes.length !== 1 || rc.s.a || rc.p.a || tr.p.a || tr.a.a || tr.s.a || tr.r.k) throw new Error(`${l.nm}: transform inesperado`);
+    const aPantalla = eje ? enPantallaY : enPantalla;
+    return [-1, 1].map(lado => aPantalla(d, l, tr.p.k[eje] + (rc.p.k[eje] + lado * rc.s.k[eje] / 2 - tr.a.k[eje]) * tr.s.k[eje] / 100));
+}
+const rectanguloY = (d, l) => rectangulo(d, l, 1);
+// Un recuadro que crece (o se achica) hacia arriba o hacia abajo, en px de pantalla.
+function creceRectanguloY(d, l, arriba, abajo) {
+    rectanguloY(d, l);
+    const g = l.shapes[0].it, rc = g.find(s => s.ty === 'rc'), tr = g.find(s => s.ty === 'tr');
+    const sy = escalaY(d, l) * tr.s.k[1] / 100;   // px de pantalla por unidad del rectángulo
+    rc.s.k[1] += (arriba + abajo) / sy;
+    rc.p.k[1] += (abajo - arriba) / 2 / sy;
+}
 
 // ---------------------------------------------------------------- score
 // Escudos: las siglas de los escudos del score de LVBP-Meridiano, para que el controlador mande
@@ -1478,21 +1497,9 @@ function otrosJuegos(juegos) {
         if (!l.ef.length) delete l.ef;
     }
 
-    // ---- geometría en px de pantalla (en y), al final de la entrada: los recuadros son capas de forma
-    // con un rectángulo, sin rotaciones
-    const rectY = l => {
-        const g = l.shapes[0].it, rc = g.find(s => s.ty === 'rc'), tr = g.find(s => s.ty === 'tr');
-        if (l.shapes.length !== 1 || rc.s.a || rc.p.a || tr.p.a || tr.a.a || tr.s.a || tr.r.k) throw new Error(`${l.nm}: transform inesperado`);
-        return [-1, 1].map(lado => enPantallaY(d, l, tr.p.k[1] + (rc.p.k[1] + lado * rc.s.k[1] / 2 - tr.a.k[1]) * tr.s.k[1] / 100));
-    };
-    // Un recuadro que crece (o se achica) hacia arriba o hacia abajo, en px de pantalla.
-    const creceY = (l, arriba, abajo) => {
-        rectY(l);
-        const g = l.shapes[0].it, rc = g.find(s => s.ty === 'rc'), tr = g.find(s => s.ty === 'tr');
-        const sy = escalaY(d, l) * tr.s.k[1] / 100;   // px de pantalla por unidad del rectángulo
-        rc.s.k[1] += (arriba + abajo) / sy;
-        rc.p.k[1] += (abajo - arriba) / 2 / sy;
-    };
+    // ---- geometría en px de pantalla (en y), al final de la entrada (rectY, creceY)
+    const rectY = l => rectanguloY(d, l);
+    const creceY = (l, arriba, abajo) => creceRectanguloY(d, l, arriba, abajo);
     const espacio = n => n === 1 ? '' : ' ' + n;
     const cuadro = n => layer(d, 'CUADRO SCORE' + espacio(n));
     const fondos = [1, 2, 3].map(n => rectY(cuadro(n))[1]);      // donde termina cada cuadro negro
@@ -1655,4 +1662,114 @@ if (hay('OTROS JUEGOS')) {
     // Los textos arrancan vacíos, como en el bateador, salvo el título: si no llega, queda ASÍ VAN.
     for (const l of d.layers) if (l.ty === 5 && l.cl && l.cl !== 'titulo') for (const k of l.t.d.k) k.s.t = '';
     save(path.join(REPO, 'otrosjuegos/data.json'), d);
+}
+
+// ---------------------------------------------------------------- prevenido
+// El bateador en el círculo (el export es PREVENIDO AL BATE): abajo a la derecha, un panel de LMV (una
+// secuencia de PNG: un precomp de 170 frames) gira, muestra su logo con un brillo y se va por la
+// derecha; debajo entran una barra negra con el título PREVENIDO AL BATE y el recuadro azul con el
+// nombre, que aparece letra por letra (un animador de opacidad). Las claves, las del prevenido de
+// LVBP-Meridiano: jugador (el nombre) y titulo, para que el controlador les mande a los dos la misma
+// data. Las imágenes las recorta antes herramientas/prevenido.py (PRE_RECORTE).
+const PRE_RECORTE = [1441, 547, 479, 533]; // x, y, ancho y alto en pantalla (RECORTE de prevenido.py)
+const PRE_MARGEN = 8;                  // el nombre y el título, 8 px adentro de su recuadro (centrados donde estaban)
+// Flujo: el panel entra girando (3–20), la barra crece a lo ancho (23–32), el título entra por la
+// derecha (31–39), el recuadro azul crece hacia abajo (33–45) y aparece el nombre (36–48); el panel
+// se va por la derecha (151–168) y la entrada para en el 169, sin él. El export no trae salida (su
+// STOP, 180–210, no anima nada), y la entrada al revés traería de vuelta el panel: es la entrada de la
+// barra, el título, el recuadro y el nombre al revés, sin el panel, como en el 3 en línea. Los ip de
+// la secuencia traen unos decimales de más: en el frame entero k se ve su frame k − 1.
+const PRE_PAUSA = 170;                 // play 0–170: queda en el 169, el primer frame sin el panel
+const PRE_ENTRADA = 48;                // la entrada de la caja termina en el 48 (el nombre)
+// Los PNG de la secuencia vienen reducidos a una paleta con tramado, y cada frame se trama distinto:
+// con el logo quieto, el panel hervía. En los frames 112–150 de la secuencia (al aire, del 113 al 151,
+// antes de que se vaya) el logo no se mueve (medido con desenfoque contra el 136: lo que cambia es el
+// tramado; del 125 al 150 el export ya trae casi siempre la misma imagen), y se ve un solo PNG, el
+// primero, como en el parcial. Con PNG de color completo, null.
+const PRE_QUIETO = [112, 151];
+if (hay('PREVENIDO AL BATE')) {
+    const d = load(path.join(SRC, 'PREVENIDO AL BATE/data.json'));
+    const panel = layer(d, 'lmv logo');
+    const secuencia = d.assets.find(a => a.id === panel.refId);
+    if (!secuencia || secuencia.layers.length !== 170 || panel.st !== 0) throw new Error('lmv logo: secuencia inesperada');
+
+    // ---- el recorte, como en el 3 en línea
+    const [rx, ry, rw, rh] = PRE_RECORTE;
+    for (const a of d.assets) {
+        if (!a.p) continue;
+        if (a.u !== 'images/' || a.w !== 1920 || a.h !== 1080) throw new Error(`${a.p}: ${a.w} × ${a.h} en ${a.u}`);
+        const [w, h] = medidasPng(path.join(REPO, 'prevenido/images', a.p));
+        if (w !== rw || h !== rh) throw new Error(`${a.p}: ${w} × ${h}: correr antes herramientas/prevenido.py`);
+        a.w = rw;
+        a.h = rh;
+    }
+    for (const l of secuencia.layers) {
+        const { a, p } = l.ks;
+        if (l.ty !== 2 || a.a || p.a || a.k[0] !== 960 || a.k[1] !== 540 || p.k[0] !== 960 || p.k[1] !== 540) throw new Error(`${l.nm}: transform inesperado`);
+        a.k = [0, 0, 0];
+        p.k = [rx, ry, 0];
+    }
+
+    // ---- el tramo quieto: la capa del primer frame dura hasta el final; las otras se van, con sus imágenes
+    if (PRE_QUIETO) {
+        const capa = k => secuencia.layers.find(c => c.ip <= k + 0.5 && k + 0.5 < c.op);
+        const [k0, k1] = PRE_QUIETO;
+        const primera = capa(k0), fuera = new Set();
+        for (let k = k0 + 1; k < k1; k++) fuera.add(capa(k));
+        primera.op = capa(k1 - 1).op;
+        secuencia.layers = secuencia.layers.filter(c => !fuera.has(c));
+        const usadas = new Set(secuencia.layers.map(c => c.refId));
+        d.assets = d.assets.filter(a => usadas.has(a.id) || ![...fuera].some(c => c.refId === a.id));
+    }
+
+    // ---- los textos: centrados donde los puso el diseño, hasta PRE_MARGEN antes del borde más cercano
+    // de su recuadro (el título, de la barra negra; el nombre, del recuadro azul); el alto, el ascent
+    // del cuerpo más 2, como en el bateador
+    const barra = layer(d, 'Capa de formas 1'), caja = layer(d, 'Capa de formas 2');
+    for (const [nm, recuadro, clave] of [['PREVENIDO AL BATE', barra, 'titulo'], ['.PREVENIDO', caja, 'jugador']]) {
+        const l = layer(d, nm), s = doc(d, nm);
+        const [x0, x1] = rectangulo(d, recuadro, 0);
+        const centro = enPantalla(d, l, s.ps[0] + s.sz[0] / 2);
+        anchoCentrado(s, (2 * Math.min(centro - x0, x1 - centro) - 2 * PRE_MARGEN) / escalaX(d, l));
+        s.sz[1] = +(d.fonts.list[0].ascent * s.s / 100 + 2).toFixed(2);
+        rename(d, nm, clave);
+    }
+
+    // ---- key: el último renglón del panel (y 755) llega al 60 % y la barra negra lo cubre apenas
+    // (empieza en la 755.9): mientras está el panel quedaba una línea de video al aire. La barra crece
+    // 1 px hacia arriba, por debajo del panel. Y la barra y el recuadro azul se tocan borde con borde
+    // (809.6 y 809.5): el recuadro crece 1 px hacia arriba, por debajo de la barra.
+    creceRectanguloY(d, barra, 1, 0);
+    creceRectanguloY(d, caja, 1, 0);
+
+    // ---- timeline: los markers del diseñador (START 0–30, STOP 180–210) no sirven. La salida es la
+    // entrada de la caja al revés desde la pausa: una capa que entraba en el frame t se va en el
+    // FIN − t, del 170 (el nombre completo) al 195 (la barra sin ancho, vacío); 0,9 s.
+    const FIN = PRE_PAUSA + PRE_ENTRADA;
+    const resto = d.layers.filter(l => l !== panel);
+    const tiempos = [];
+    for (const l of resto) for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) {
+        tiempos.push(p.k[0].t);
+        alReves(p, 0, PRE_ENTRADA, PRE_PAUSA);
+    }
+    const vacio = Math.ceil(FIN - Math.min(...tiempos));
+    for (const l of resto) {
+        // los mattes, con la capa que matean; un ip con decimales (el del título, 31.0000012) se ve
+        // desde el frame siguiente
+        const ref = l.td ? d.layers[d.layers.indexOf(l) + 1] : l;
+        l.op = Math.min(FIN - Math.ceil(Math.max(ref.ip, 1)) + 0.001, vacio + 1);
+    }
+    if (Math.round(panel.op) > PRE_PAUSA) throw new Error(`lmv logo: termina en el ${panel.op}, después de la pausa`);
+    for (const l of d.layers) l.ip = Math.max(l.ip, 1);
+    d.op = vacio + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: PRE_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: PRE_PAUSA, cm: 'salida', dr: vacio + 1 - PRE_PAUSA }
+    ];
+    d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
+    allCaps(d);
+    // Los textos arrancan vacíos, como en el bateador, salvo el título: si no llega, queda PREVENIDO AL BATE.
+    for (const l of d.layers) if (l.ty === 5 && l.cl && l.cl !== 'titulo') for (const k of l.t.d.k) k.s.t = '';
+    save(path.join(REPO, 'prevenido/data.json'), d);
 }
