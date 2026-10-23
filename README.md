@@ -13,6 +13,7 @@ carpeta con su `index.html`, su `data.json` y su `data.md` (las claves del UPDAT
 | `parcial/` | Score de fin de inning: barras de los dos equipos, C H E, inning, los tres que vienen al bate y el cuadro de Pepsi (una secuencia de PNG) |
 | `tresenlinea/` | 3 en línea, abajo a la derecha: los tres que vienen al bate, con el panel de Empire Keeway (una secuencia de PNG) |
 | `otrosjuegos/` | Otros juegos (ASÍ VAN), abajo a la derecha: cómo van los otros juegos de la jornada (sede, equipos, carreras e inning), con el cuadro de Harina PAN (una secuencia de JPG); `play` y un `goto('tresjuegos')`, `goto('dosjuegos')` o `goto('unjuego')` según cuántos juegos haya |
+| `prevenido/` | Prevenido al bate, abajo a la derecha: el bateador en el círculo (el nombre bajo PREVENIDO AL BATE), con el panel de LMV (una secuencia de PNG) |
 
 El resto de este README es el de la base, [HTML-templates](https://github.com/leonedo/HTML-templates):
 plantilla para gráficos Lottie en CasparCG usando webcg-framework, con un state machine **multi-etapa** que permite gráficos secuenciales (entrada → loop1 → pausa → loop2 → salida) controlados desde CasparCG.
