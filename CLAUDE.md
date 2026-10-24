@@ -127,7 +127,8 @@ centrado entre las flechas. Los números pasan de 13 a 19 px de alto y quedan a 
 ancho sobra: del `1` al `99`, y hasta `100`, entran al tamaño nuevo (`18` mide 23 px y `100`, 37, en
 el negro que va de la x 753 a la tercera base, en la 821). Las letras son más altas que los
 números: una `F` queda a 1 px de la flecha de arriba, y `FINAL` encoge y queda pegada a ella (sólo
-con esa flecha prendida).
+con esa flecha prendida). En CasparCG 2.5.1 (2026-10-24) sale donde en Chromium, con el key en 255
+alrededor.
 
 **Defensiva.** Claves: las de la defensiva de LVBP-Meridiano, para que el controlador le mande a
 las dos la misma data: `jugador<posición>` el apellido (`jugadorcatcher`, `jugadorlanzador`,
@@ -625,8 +626,17 @@ compresión del JPG lleva 49 px de sus bordes a más de 120 (hasta 128,2), como 
 los otros juegos. Lo más bajo, el magenta (−18,1 en los bordes del JPG, legal hasta −20). Están en
 los JPG del diseñador: bajarlos es recomprimirlos. En HD (Rec.709), todo legal.
 
-No se probó todavía en CasparCG (2026-10-24): por `file://` en Chromium, con
-`--allow-file-access-from-files`, carga igual que por http.
+En CasparCG 2.5.1 (2026-10-24, 1080p29.97, render por CPU, sin GPU): con el ejemplo de su `data.md`,
+la pausa sale como `posiciones.png`, con LT Energy y las imágenes de `_assets/`. Fuera de los textos
+no hay diferencias de más de 40 niveles; en los textos, el suavizado de los bordes de las letras, que
+CasparCG pinta distinto que Chromium (sin corrimientos). El `CG STOP` suelta el layer en la pausa y a
+mitad de la entrada (a los 3 s). Pero la entrada se atrasa: cada tanto repite un frame y salta el
+siguiente, de 6 a 8 de sus unos 63 frames (grabando con `crop=480:528:640:320`; con un `scale` del
+canal entero, que también gasta CPU, de 7 a 14), casi todos del 53 al 67, cuando aparecen letra por
+letra los nombres y los números, con CasparCG en 1,6 a 2 núcleos. Pasó igual en las cinco grabaciones,
+no sólo en la primera carga; en Chromium no se repite ninguno, y en el mismo entorno el 3 en línea, los
+otros juegos y el prevenido no repiten. Pendiente (Leon, 2026-10-24): probarla en su máquina con
+Windows y GPU cuando se haga el lado de las apps; hasta entonces no se toca.
 
 ### Imágenes: `_assets/`
 
@@ -656,8 +666,8 @@ defensiva (llegó aparte, como PNG) sale del `defensiva/data.json` preparado.
 
 ⚠ Depende de que `data_file` en el `index.html` no lleve barra: Lottie usa `u + p`, relativo a la
 página, sólo sin `assetsPath`. Es la primera vez que un gráfico de este repo carga imágenes fuera de
-su carpeta (los scripts ya salían con `../index.js`): no se probó todavía en CasparCG, ni en el 2.5/2.6
-ni en el 2.3 de la app legacy.
+su carpeta (los scripts ya salían con `../index.js`). En CasparCG 2.5.1 carga (2026-10-24, por
+`file://`: el score y la tabla de posiciones); falta probarlo en el 2.6 y en el 2.3 de la app legacy.
 
 ### Cuando llega un export nuevo del diseñador
 
