@@ -87,11 +87,14 @@ for g in GRAFICOS:
     for a in d['assets']:
         if 'p' in a:
             if not os.path.exists(REPO + g + '/' + a['u'] + a['p']): p(g, f'asset {a["u"]}{a["p"]} no existe')
+            # todas las imágenes, en _assets/ (herramientas/consolidar.mjs, después de prep.js)
+            if a['u'] != '../_assets/': p(g, f'asset {a["u"]}{a["p"]} fuera de _assets/: correr herramientas/consolidar.mjs')
             # un JPG no tiene alfa: en un gráfico que va sobre el video, lo tapa (el fondo de
-            # referencia del diseñador en el score, prep.js). La defensiva y la ofensiva son de
-            # pantalla completa: ahí sí hay JPG. En los otros juegos, el cuadro de Harina PAN (su
-            # precomp) es un rectángulo opaco en todos sus frames: ahí también.
-            jpg_ok = g in ('defensiva', 'ofensiva') or (g in JPG_PRECOMP and all(
+            # referencia del diseñador en el score, prep.js). La defensiva, la ofensiva y la tabla de
+            # posiciones son de pantalla completa (la tabla, opaca desde su primer frame): ahí sí hay
+            # JPG. En los otros juegos, el cuadro de Harina PAN (su precomp) es un rectángulo opaco en
+            # todos sus frames: ahí también.
+            jpg_ok = g in ('defensiva', 'ofensiva', 'posiciones') or (g in JPG_PRECOMP and all(
                 l.get('refId') != a['id'] for l in d['layers'] + [l for c in comps.values() if c.get('nm') != JPG_PRECOMP[g] for l in c['layers']]))
             if not jpg_ok and re.search(r'\.jpe?g$', a['p'], re.I): p(g, f'asset {a["p"]}: JPG sin alfa, tapa el video')
     # data.md: cada clave del JSON documentada y cada clave documentada existe

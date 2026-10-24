@@ -2,22 +2,26 @@
 // de CLAUDE.md, ejecutable. Escrito sobre los exports del score (SCOREBUG, 2026-10-13 y 22), de la
 // defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15), del bateador (LOWBAR BATEADOR,
 // 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18), del lanzador (PITCHERS, 2026-10-21), del
-// 3 en línea (3 EN LINEA, 2026-10-22), de los otros juegos (OTROS JUEGOS, 2026-10-22) y del prevenido
-// (PREVENIDO AL BATE, 2026-10-23): si el diseñador cambia nombres de capas, falla diciendo cuál no
-// encuentra (no adivina).
+// 3 en línea (3 EN LINEA, 2026-10-22), de los otros juegos (OTROS JUEGOS, 2026-10-22), del prevenido
+// (PREVENIDO AL BATE, 2026-10-23) y de la tabla de posiciones (TABLA DE POSICIONES, 2026-10-22): si
+// el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
 //      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/,
-//      PREVENIDO AL BATE/. Los que no estén se saltean: alcanza con el zip que llegó. El parcial sin
-//      publicidad no tiene export: sale del parcial preparado, y se arma siempre.
-//   2. Si llegó el 3 EN LINEA: python3 herramientas/tresenlinea.py "$EXPORTS/3 EN LINEA" . (sus
-//      imágenes: el recorte y los frames de la salida). Si llegó el PREVENIDO AL BATE: python3
-//      herramientas/prevenido.py "$EXPORTS/PREVENIDO AL BATE" . (el recorte de sus imágenes).
+//      PREVENIDO AL BATE/, TABLA DE POSICIONES/. Los que no estén se saltean: alcanza con el zip que
+//      llegó. El parcial sin publicidad no tiene export: sale del parcial preparado, y se arma siempre.
+//   2. Las imágenes de cada export que llegó, a <gráfico>/images/ (se copian tal cual; consolidar.mjs
+//      las pasa después a _assets/ y borra la carpeta). Si llegó el 3 EN LINEA: python3
+//      herramientas/tresenlinea.py "$EXPORTS/3 EN LINEA" . (sus imágenes: el recorte y los frames de
+//      la salida). Si llegó el PREVENIDO AL BATE: python3 herramientas/prevenido.py "$EXPORTS/PREVENIDO
+//      AL BATE" . (el recorte de sus imágenes).
 //   3. node herramientas/prep.js $EXPORTS .
-//   4. git diff, herramientas/lint.py y QA con el runtime real (CLAUDE.md).
-// Las fuentes, las imágenes (salvo las del 3 en línea y el prevenido) y los index.html no los toca: se
-// copian a mano la primera vez. El parcial sin publicidad copia del parcial sus imágenes y su fuente.
+//   4. node herramientas/consolidar.mjs (las imágenes, a _assets/).
+//   5. git diff, herramientas/lint.py y QA con el runtime real (CLAUDE.md).
+// Las fuentes y los index.html no los toca: se copian a mano la primera vez. Las imágenes que un
+// gráfico toma de otro (la textura de las puertas, los escudos de las compuertas, la barra de Bravos,
+// las barras del parcial sin publicidad) no se copian: su asset apunta a la de ese gráfico.
 const fs = require('fs');
 const path = require('path');
 
@@ -373,6 +377,14 @@ const relleno = (gris, ix) => ({
 });
 // Ancho y alto de un PNG (su IHDR).
 const medidasPng = f => { const b = fs.readFileSync(f); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
+// Una imagen que ya usa otro gráfico preparado: su mismo asset, con la ruta vista desde éste. Si ya
+// está en _assets/ (../_assets/) es la misma ruta; si ese gráfico se preparó en esta corrida, todavía
+// está en su images/, y consolidar.mjs la junta con la de él.
+function imagenDe(grafico, a) {
+    if (!a || !a.p) throw new Error(`${grafico}: imagen sin asset`);
+    return { w: a.w, h: a.h, u: a.u.startsWith('../') ? a.u : `../${grafico}/${a.u}`, p: a.p, e: 0 };
+}
+const capaImagen = (d, l) => d.assets.find(a => a.id === l.refId);
 
 // El equipo: una clave, <SIGLAS>_opacidad, prende su barra (arriba), las dos mitades del escudo de
 // las compuertas y las dos pantallas de color de las puertas (`extra` capas por equipo, ya
@@ -456,7 +468,7 @@ const DEF_POSICIONES = [
     ['.rightfield', 'RF', 'rightfield', 115.3]
 ];
 // La compuerta de Águilas no vino en el export del 2026-10-15: llegó aparte, como PNG (ver abajo).
-const AGUI_PUERTA = 'images/compuerta_aguilas.png';
+const AGUI_PUERTA = 'image_compuerta_aguilas';
 if (hay('DEFENSIVA')) {
     const d = load(path.join(SRC, 'DEFENSIVA/data.json'));
 
@@ -476,14 +488,14 @@ if (hay('DEFENSIVA')) {
     }
     rename(d, 'DEFENSIVA 2', 'titulo');
 
-    // ---- la compuerta de Águilas llegó aparte (un PNG, 2026-10-15), copiado a mano a
-    // defensiva/images/compuerta_aguilas.png. Si el export no la trae, se arma con las dos capas de
-    // la de Caribes (casi del mismo tamaño): mismo lugar y escala, centrada en su imagen, y la
+    // ---- la compuerta de Águilas llegó aparte (un PNG, 2026-10-15): su asset es el de la defensiva
+    // preparada (defensiva/data.json, ya en _assets/). Si el export no la trae, se arma con las dos
+    // capas de la de Caribes (casi del mismo tamaño): mismo lugar y escala, centrada en su imagen, y la
     // máscara corrida lo que se corre el centro, para que el corte entre las puertas caiga igual.
-    const aguiPng = path.join(REPO, 'defensiva', AGUI_PUERTA);
-    if (!d.layers.some(l => /^\.COMPUERTAAGUI/.test(l.nm)) && fs.existsSync(aguiPng)) {
-        const [w, h] = medidasPng(aguiPng);
-        d.assets.push({ id: 'image_compuerta_aguilas', w, h, u: 'images/', p: path.basename(AGUI_PUERTA), e: 0 });
+    const aguiAsset = load(path.join(REPO, 'defensiva/data.json')).assets.find(a => a.id === AGUI_PUERTA);
+    if (!d.layers.some(l => /^\.COMPUERTAAGUI/.test(l.nm)) && aguiAsset) {
+        const { w, h } = aguiAsset;
+        d.assets.push(clone(aguiAsset));
         let ind = Math.max(...d.layers.map(l => l.ind));
         for (const lado of ['IZQ', 'DER']) {
             const ref = layer(d, '.COMPUERTAANZ' + lado);
@@ -515,10 +527,7 @@ if (hay('DEFENSIVA')) {
     const of = load(path.join(REPO, 'ofensiva/data.json'));
     const ofLado = { [of.layers.find(l => l.nm === 'movimientopuertaizq').ind]: 'izq', [of.layers.find(l => l.nm === 'movimientopuertader').ind]: 'der' };
     const degradado = l => l.shapes[0].it.find(s => s.ty === 'gf');
-    const texPng = path.join(REPO, 'defensiva/images/texturapuertas.png');
-    if (!fs.existsSync(texPng)) throw new Error('falta defensiva/images/texturapuertas.png (la textura de las puertas de la ofensiva)');
-    const [tw, th] = medidasPng(texPng);
-    d.assets.push({ id: 'image_texturapuertas', w: tw, h: th, u: 'images/', p: 'texturapuertas.png', e: 0 });
+    d.assets.push({ id: 'image_texturapuertas', ...imagenDe('ofensiva', capaImagen(of, of.layers.find(l => l.cl === 'texturapuertaizq'))) });
     let indPuerta = Math.max(...d.layers.map(l => l.ind));
     for (const lado of ['der', 'izq']) {
         const base = layer(d, 'puerta' + lado);
@@ -584,7 +593,7 @@ if (hay('DEFENSIVA')) {
 const OF_NOMBRE = [474, 34];
 const OF_MANAGER = [382, 31];
 // Los escudos de las compuertas que no vinieron en el export (sólo trae el de Águilas): los PNG
-// blancos de la defensiva, copiados a mano a ofensiva/images.
+// blancos de la defensiva preparada (defensiva/data.json), con estos id.
 const OF_ESCUDOS = {
     ANZ: 'compuerta_caribes.png', BRAVOS: 'compuerta_bravos.png', CARD: 'compuerta_cardenales.png',
     LEO: 'compuerta_leones.png', MAGA: 'compuerta_magallanes.png', TIBUS: 'compuerta_tiburones.png',
@@ -669,14 +678,14 @@ if (hay('OFENSIVA')) {
         }
     }
     // Los escudos que faltan, con las capas del de Águilas (el único del export).
+    const def = load(path.join(REPO, 'defensiva/data.json'));
     let ind = Math.max(...d.layers.map(l => l.ind));
     for (const [sig, png] of Object.entries(OF_ESCUDOS)) {
         if (d.layers.some(l => { const m = l.nm.match(/^\.COMPUERTA([A-Z]+?)(?:IZQ|DER)$/); return m && PUERTA[m[1]] === sig; })) continue;
-        const file = path.join(REPO, 'ofensiva/images', png);
-        if (!fs.existsSync(file)) continue;    // equipoEnPuertas avisa
-        const [w, h] = medidasPng(file);
+        const escudo = def.layers.find(l => l.ln === `puerta${sig}izq`);
+        if (!escudo) continue;                 // equipoEnPuertas avisa
         const id = 'image_' + png.replace(/\.png$/, '');
-        d.assets.push({ id, w, h, u: 'images/', p: png, e: 0 });
+        const { w, h } = d.assets[d.assets.push({ id, ...imagenDe('defensiva', capaImagen(def, escudo)) }) - 1];
         for (const p of ['IZQ', 'DER']) {
             const ref = layer(d, '.COMPUERTAAGUI' + p);
             const c = escudoClonado(ref, w, h, id);
@@ -906,9 +915,9 @@ const LAN_STATS = [['.GANADOSYPERDIDOS', 'NUMEROSDEGANADOSYPERDIDOS'], ['.EFECTI
 const LAN_ROTULOS_DESDE = 636.4;
 const LAN_COLUMNA = 733.2;
 const ENTRADA_LAN = 110;               // la entrada termina en el 109 (el último rótulo)
-// La barra de Bravos no vino: es la del bateador (la misma serie de barras), con las medidas de
-// las otras, que escalan con el ancho de su imagen (el ancla y la máscara).
-const LAN_BARRA_BRAVOS = 'images/barra_bravos.png';
+// La barra de Bravos no vino: es la del bateador preparado (bateador/data.json; la misma serie de
+// barras), con las medidas de las otras, que escalan con el ancho de su imagen (el ancla y la máscara).
+const LAN_BARRA_BRAVOS = 'bateador';
 if (hay('PITCHERS')) {
     const d = load(path.join(SRC, 'PITCHERS/data.json'));
     const local = (l, X) => (X - enPantalla(d, l, 0)) / escalaX(d, l);
@@ -1002,7 +1011,11 @@ if (hay('PITCHERS')) {
 
     // ---- la barra de Bravos
     const ref = layer(d, '.BARRAAGUILAS'), refA = d.assets.find(a => a.id === ref.refId);
-    const [bw, bh] = medidasPng(path.join(REPO, 'lanzador', LAN_BARRA_BRAVOS));
+    const bat = load(path.join(REPO, LAN_BARRA_BRAVOS, 'data.json'));
+    const barraBat = bat.layers.filter(l => l.cl === 'BRAVOS_opacidad' && l.ty === 2 && !l.tt);
+    if (barraBat.length !== 1) throw new Error(`${LAN_BARRA_BRAVOS}: ${barraBat.length} barras de Bravos`);
+    const barraBravos = imagenDe(LAN_BARRA_BRAVOS, capaImagen(bat, barraBat[0]));
+    const [bw, bh] = [barraBravos.w, barraBravos.h];
     if (d.layers.some(l => (l.nm || '').trim() === '.BARRABRAVOS')) throw new Error('la barra de Bravos ya viene en el export: sacar LAN_BARRA_BRAVOS');
     if (refA.w !== 512 || refA.h !== bh) throw new Error('barras: medidas inesperadas');
     const k = bw / refA.w, bravos = clone(ref);
@@ -1012,7 +1025,7 @@ if (hay('PITCHERS')) {
     bravos.refId = 'image_barra_bravos';
     bravos.ks.a.k[0] = r2(ref.ks.a.k[0] * k);
     for (const v of bravos.masksProperties[0].pt.k.v) v[0] = r2(v[0] * k);
-    d.assets.push({ id: bravos.refId, w: bw, h: bh, u: 'images/', p: path.basename(LAN_BARRA_BRAVOS), e: 0 });
+    d.assets.push({ id: bravos.refId, ...barraBravos });
     d.layers.splice(d.layers.indexOf(layer(d, '.BARRACARDENALES')) + 1, 0, bravos);
 
     // ---- el equipo: cada clave prende el panel de color, su escudo grande (en overlay) y la barra
@@ -1283,12 +1296,9 @@ if (fs.existsSync(path.join(REPO, 'parcial/data.json'))) {
         { tm: PSP_PAUSA, cm: 'salida', dr: d.op - PSP_PAUSA }
     ];
 
-    // ---- las imágenes (las barras) y la fuente, las del parcial
+    // ---- las imágenes (las barras), las del parcial; la fuente, una copia de la suya
     const dst = path.join(REPO, 'parcialsinpublicidad');
-    for (const a of d.assets) {
-        fs.mkdirSync(path.join(dst, a.u), { recursive: true });
-        fs.copyFileSync(path.join(REPO, 'parcial', a.u, a.p), path.join(dst, a.u, a.p));
-    }
+    d.assets = d.assets.map(a => ({ id: a.id, ...imagenDe('parcial', a) }));
     for (const f of d.fonts.list) {
         fs.mkdirSync(path.join(dst, path.dirname(f.fPath)), { recursive: true });
         fs.copyFileSync(path.join(REPO, 'parcial', f.fPath), path.join(dst, f.fPath));
@@ -1849,4 +1859,160 @@ if (hay('PREVENIDO AL BATE')) {
     // Los textos arrancan vacíos, como en el bateador, salvo el título: si no llega, queda PREVENIDO AL BATE.
     for (const l of d.layers) if (l.ty === 5 && l.cl && l.cl !== 'titulo') for (const k of l.t.d.k) k.s.t = '';
     save(path.join(REPO, 'prevenido/data.json'), d);
+}
+
+// ---------------------------------------------------------------- posiciones
+// La tabla de posiciones (el export es TABLA DE POSICIONES), a pantalla completa. El fondo, el título
+// POSICIONES, los rótulos de las columnas, el recuadro magenta de los números y el cuadro de GoGo
+// Royal son una secuencia de JPG (un precomp de 150 frames de 1920 × 1080, opaca desde el primero);
+// encima, 8 filas, cada una con la barra del equipo (una imagen con su escudo de marca de agua), el
+// nombre en una caja negra y JJ, JG, JP, AVE y DIF. Las claves, las de la tabla de IVC en LVBP-Stats
+// (Leon, 2026-10-24), para que el controlador arme las dos igual: equipo<n>, JJequipo<n>,
+// JGequipo<n>, JPequipo<n>, AVEequipo<n> y DIFequipo<n>, del 1 (arriba) al 8. La barra de cada fila,
+// como en el score: las 8 apiladas, <SIGLAS><n>_opacidad (IVC manda la ruta de un logo).
+// Flujo: del 0 al 11, el gris quieto; el fondo entra del 12 al 64, las barras bajan del 29 al 44, las
+// cajas negras crecen del 38 al 49, los nombres aparecen letra por letra del 41 al 66 y los números
+// del 60 al 70, mientras suben (60–75). El export no trae salida (su stop, 120–150, no anima nada): es
+// la entrada al revés (Leon, 2026-10-24), que termina en el gris y corta al video, como entra.
+const POS_PAUSA = 76;                  // play 0–76: queda en el 75
+const POS_ENTRADA = 75;                // la entrada termina en el 75 (los números)
+const POS_MARGEN = 8;                  // las cajas de los textos, 8 px antes de su caja negra o de la columna vecina
+const POS_FONDO = 1425;                // el borde derecho del recuadro magenta (de la secuencia): el tope de DIF
+// Las columnas, de izquierda a derecha: el nm de sus capas (.<columna>EQUIPO<n>) y su clave.
+const POS_COLUMNAS = [['JJ', 'JJequipo'], ['JG', 'JGequipo'], ['JP', 'JPequipo'], ['AV', 'AVEequipo'], ['DIF', 'DIFequipo']];
+if (hay('TABLA DE POSICIONES')) {
+    const d = load(path.join(SRC, 'TABLA DE POSICIONES/data.json'));
+    const FIN = POS_PAUSA + POS_ENTRADA;   // lo que la entrada muestra en el frame t, la salida lo muestra en el FIN − t
+    const vacio = FIN;                     // el espejo del frame 0, vacío
+    const filas = [1, 2, 3, 4, 5, 6, 7, 8];
+    if (d.layers.some(l => l.td || l.tt)) throw new Error('posiciones: mattes inesperados');
+
+    // ---- el nombre de la fila 8 llega colgado del Nulo 22 (el de los números) y no de nada, como los
+    // otros siete: entraba 19 px más abajo, colgando de su caja negra, y subía con los números (60–75).
+    // Queda donde termina, sin parent.
+    const nulo = layer(d, 'Nulo 22'), eq8 = layer(d, '.EQUIPO8');
+    if (eq8.parent !== nulo.ind || ['p', 's', 'r'].some(k => eq8.ks[k].a) || eq8.ks.r.k || nulo.ks.s.a || nulo.ks.r.k)
+        throw new Error('.EQUIPO8: no cuelga del Nulo 22 como en el export del 2026-10-22');
+    const [ex, ey] = eq8.ks.p.k;
+    eq8.ks.p.k = [+enPantalla(d, nulo, ex).toFixed(3), +enPantallaY(d, nulo, ey).toFixed(3), 0];
+    eq8.ks.s.k = [0, 1, 2].map(i => i < 2 ? eq8.ks.s.k[i] * nulo.ks.s.k[i] / 100 : eq8.ks.s.k[i]);
+    delete eq8.parent;
+
+    // ---- los números: cada columna llega con un x y cada fila con un y, salvo algunos corridos a ojo
+    // (hasta 2,5 unidades, 3 px: el JJ de la fila 4): van todos al de la mayoría.
+    const moda = xs => { const n = new Map(); for (const x of xs) n.set(x, (n.get(x) || 0) + 1); return [...n].sort((a, b) => b[1] - a[1])[0][0]; };
+    const celda = (col, n) => layer(d, `.${col}EQUIPO${n}`);
+    for (const [col] of POS_COLUMNAS) {
+        const x = moda(filas.map(n => celda(col, n).ks.p.k[0]));
+        for (const n of filas) celda(col, n).ks.p.k[0] = x;
+    }
+    for (const n of filas) {
+        const y = moda(POS_COLUMNAS.map(([col]) => celda(col, n).ks.p.k[1]));
+        for (const [col] of POS_COLUMNAS) celda(col, n).ks.p.k[1] = y;
+    }
+
+    // ---- textos de caja (textos-de-caja.md), medidos con la entrada terminada. Los nombres, centrados
+    // donde estaban, hasta POS_MARGEN antes del borde más cercano de su caja negra (en el export, la
+    // caja pasaba 11 px de cada lado). Los números, centrados en su columna, hasta POS_MARGEN antes de la
+    // columna vecina (repartido: 8 px entre dos cajas), de la caja negra (JJ) o del final del recuadro
+    // magenta (DIF). El alto, el ascent del cuerpo más 2, como en el bateador; lh, 1.2 del cuerpo (llega
+    // en 0.01).
+    const ascent = d.fonts.list[0].ascent / 100;
+    const cajas = {};
+    for (const l of d.layers) {
+        const m = (l.nm || '').trim().match(/^BARRA EQUIPO (\d)\D+LUGAR$/);
+        if (m) cajas[m[1]] = l;
+    }
+    for (const n of filas) {
+        const l = layer(d, `.EQUIPO${n}`), s = doc(d, `.EQUIPO${n}`), caja = cajas[n];
+        if (!caja) throw new Error(`sin la caja negra de la fila ${n}`);
+        const [x0, x1] = rectangulo(d, caja, 0), [y0, y1] = rectanguloY(d, caja);
+        const centro = enPantalla(d, l, s.ps[0] + s.sz[0] / 2), medio = enPantallaY(d, l, s.ps[1] + s.sz[1] / 2);
+        if (!(x0 < centro && centro < x1 && y0 < medio && medio < y1)) throw new Error(`.EQUIPO${n}: fuera de la caja negra de su fila`);
+        anchoCentrado(s, (2 * Math.min(centro - x0, x1 - centro) - 2 * POS_MARGEN) / escalaX(d, l));
+    }
+    const centros = POS_COLUMNAS.map(([col]) => { const l = celda(col, 1), s = doc(d, l.nm); return enPantalla(d, l, s.ps[0] + s.sz[0] / 2); });
+    const finCaja = rectangulo(d, cajas[1], 0)[1];
+    POS_COLUMNAS.forEach(([col], i) => {
+        const izq = i ? (centros[i] - centros[i - 1] - POS_MARGEN) / 2 : centros[i] - finCaja - POS_MARGEN;
+        const der = i < centros.length - 1 ? (centros[i + 1] - centros[i] - POS_MARGEN) / 2 : POS_FONDO - centros[i] - POS_MARGEN;
+        for (const n of filas) anchoCentrado(doc(d, `.${col}EQUIPO${n}`), 2 * Math.min(izq, der) / escalaX(d, celda(col, n)));
+    });
+    for (const l of d.layers) if (l.ty === 5) for (const k of l.t.d.k) {
+        k.s.sz[1] = +(ascent * k.s.s + 2).toFixed(2);
+        k.s.lh = 1.2 * k.s.s;
+    }
+    for (const n of filas) {
+        rename(d, `.EQUIPO${n}`, `equipo${n}`);
+        for (const [col, clave] of POS_COLUMNAS) rename(d, `.${col}EQUIPO${n}`, clave + n);
+    }
+
+    // ---- las barras: la de cada equipo llega en una fila (Águilas arriba … Tigres abajo). En cada fila
+    // van las 8 apiladas, con la del diseño arriba: el controlador manda 1 a la que va y 0 a las otras
+    // siete, como en el score. Cada barra conserva su x y su ancla (las imágenes miden de 400 a 405 px
+    // de ancho, y el diseñador las alineó una por una) y toma la y de la fila. Las filas, en el orden de
+    // capas del diseño.
+    const barras = d.layers.filter(l => /^\.BARRA[A-Z]+$/.test(l.nm));
+    if (barras.length !== 8 || barras.some(b => !SIGLAS[b.cl.slice(5)] || b.ks.p.a)) throw new Error(`barras: ${barras.map(b => b.nm)}`);
+    let ind = Math.max(...d.layers.map(l => l.ind));
+    [...barras].sort((a, b) => a.ks.p.k[1] - b.ks.p.k[1]).forEach((fila, i) => {
+        const n = i + 1;
+        const nuevas = [fila, ...barras.filter(b => b !== fila)].map(b => {
+            const c = clone(b), clave = `${SIGLAS[b.cl.slice(5)]}${n}_opacidad`;
+            Object.assign(c, { ind: ++ind, nm: '.' + clave, cl: clave });
+            c.ks.p.k = [b.ks.p.k[0], fila.ks.p.k[1], b.ks.p.k[2]];
+            return c;
+        });
+        d.layers.splice(d.layers.indexOf(fila), 1, ...nuevas);
+    });
+
+    // ---- la salida: todo menos el fondo, su entrada al revés desde la pausa (una capa que entraba en el
+    // frame t se va en el FIN − t)
+    const base = layer(d, 'BASE TABLA DE POSICIONES');
+    for (const l of d.layers) {
+        if (l === base) continue;
+        for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, POS_ENTRADA, POS_PAUSA);
+        l.op = Math.min(FIN - Math.ceil(Math.max(l.ip, 1)) + 0.001, vacio + 1);
+    }
+
+    // ---- el fondo. Los JPG iguales (los frames 0–8 y 65–149 son cada uno el mismo archivo: 93 de 150)
+    // quedan en una sola capa, y las otras salen con sus imágenes. La salida son los mismos tramos al
+    // revés: en el frame entero k se ve la imagen k − 1 (los ip traen unos decimales de más, como en el 3
+    // en línea), así que la imagen k va en la salida de FIN − k − 1 a FIN − k.
+    const secuencia = d.assets.find(a => a.id === base.refId);
+    if (!secuencia || secuencia.layers.length !== 150 || base.ip !== 0 || base.st !== 0) throw new Error('BASE TABLA DE POSICIONES: secuencia inesperada');
+    const jpg = c => { const a = capaImagen(d, c); return fs.readFileSync(path.join(SRC, 'TABLA DE POSICIONES', a.u, a.p)); };
+    const tramos = [];
+    for (const c of [...secuencia.layers].sort((a, b) => a.ip - b.ip)) {
+        const t = tramos[tramos.length - 1], buf = jpg(c);
+        if (t && Math.abs(c.ip - t.capa.op) > 0.01) throw new Error(`${c.nm}: la secuencia tiene un hueco`);
+        if (t && buf.equals(t.buf)) t.capa.op = c.op;
+        else tramos.push({ capa: c, buf });
+    }
+    const quedan = new Set(tramos.map(t => t.capa));
+    const fuera = new Set(secuencia.layers.filter(c => !quedan.has(c)).map(c => c.refId));
+    secuencia.layers = secuencia.layers.filter(c => quedan.has(c));
+    d.assets = d.assets.filter(a => !fuera.has(a.id));
+    let indSeq = Math.max(...secuencia.layers.map(c => c.ind));
+    for (const { capa } of tramos) {
+        const [a, b] = [Math.round(capa.ip), Math.round(capa.op)];
+        capa.op = Math.min(capa.op, POS_PAUSA);
+        const ip = Math.max(FIN - b, POS_PAUSA), op = FIN - a;
+        if (ip < op) secuencia.layers.push(Object.assign(clone(capa), { ind: ++indSeq, ip, op, st: ip }));
+    }
+    base.op = vacio;
+
+    // ---- timeline: el frame 0 queda vacío (todas las capas desde el 1), como en los otros gráficos
+    for (const l of d.layers) l.ip = Math.max(l.ip, 1);
+    d.op = vacio + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: POS_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: POS_PAUSA, cm: 'salida', dr: vacio + 1 - POS_PAUSA }
+    ];
+    if (d.fonts.list.length !== 1 || d.fonts.list[0].fName !== 'LTEnergy-Regular') throw new Error('posiciones: fuentes inesperadas');
+    d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
+    allCaps(d);
+    vaciaTextos(d);
+    save(path.join(REPO, 'posiciones/data.json'), d);
 }
