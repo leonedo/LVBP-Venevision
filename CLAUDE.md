@@ -32,7 +32,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
-`visita_vs_local`), del 2026-10-22; `defensiva.png` / `ofensiva.png` (Leones, con nombres de
+`visita_vs_local`), del 2026-10-24; `defensiva.png` / `ofensiva.png` (Leones, con nombres de
 ejemplo) y `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), las de la defensiva del
 2026-10-21 y las de la ofensiva del 2026-10-17; `bateador.png` / `lanzador.png` (Leones, con data de
 ejemplo) y `bateador_equipos.png` / `lanzador_equipos.png` (los 8 equipos, recortado al gráfico),
@@ -119,6 +119,15 @@ Lottie). `bateador` y `lanzador` son sólo el apellido: al tamaño del diseño e
 el bateador (`CASTILLO` baja de 21 a 20, `RODRÍGUEZ` a 17) y 8 en el lanzador (`RODRÍGUEZ` a 19);
 más largos encogen dentro de su lugar. Siglas, carreras e inning van centrados sobre el eje del
 texto del diseño; la velocidad, alineada a la derecha contra `MPH`.
+
+Inning: más grande que en el diseño (Leon, 2026-10-24, sin que pise nada). La capa va al 140 %
+(Leon, entre 130 y 140) y crece desde su ancla, que el diseño puso en el centro del `10`: queda
+centrado entre las flechas. Los números pasan de 13 a 19 px de alto y quedan a 2 px de cada flecha
+(entre las dos hay 23; al 130 %, a 3, y al 150 %, el `10` quedaba a 1 px de la de arriba). A lo
+ancho sobra: del `1` al `99`, y hasta `100`, entran al tamaño nuevo (`18` mide 23 px y `100`, 37, en
+el negro que va de la x 753 a la tercera base, en la 821). Las letras son más altas que los
+números: una `F` queda a 1 px de la flecha de arriba, y `FINAL` encoge y queda pegada a ella (sólo
+con esa flecha prendida).
 
 **Defensiva.** Claves: las de la defensiva de LVBP-Meridiano, para que el controlador le mande a
 las dos la misma data: `jugador<posición>` el apellido (`jugadorcatcher`, `jugadorlanzador`,
@@ -696,6 +705,9 @@ pasa a `_assets/` (ver *Imágenes: `_assets/`*).
   a centrados sobre el eje del texto del diseño (Lw medidos: `10` 8.3422, `00` 26.0547, `TIG`
   32.1412). Con el texto del diseño, el resultado es idéntico al píxel al export en 15 frames. Los
   px de esta receta son del score al 100 %: al 134 % del `Null 1`, multiplicarlos por 1,34.
+- **Inning:** la capa al 140 % (`INNING_ESCALA`), desde su ancla (`INNING_ANCLA`, el centro del
+  `10` del diseño). Falla si el ancla llega en otro lugar o con la escala animada: medir de nuevo el
+  centro del `10` y la distancia a las flechas.
 - **Nulo raíz:** desde el export del 2026-10-17 todo cuelga de `Null 1` (p `[962, 537.2]`, s 134 %):
   `prep.js` lo corre `CORRE` (2, 3 px) hasta la zona segura de títulos. Si llega en otro lugar o a
   otra escala, falla: medir de nuevo la esquina (bbox del render en el frame 90) y mover `CORRE`.
