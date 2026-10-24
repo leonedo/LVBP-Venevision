@@ -126,7 +126,7 @@ side. The keys are the ones of the LVBP-Meridiano score (`AGUI`, `ANZ` Caribes, 
 Text sizes: `bateador` and `lanzador` take the surname only. At the design size (21) fit about 7
 letters for the batter (`CASTILLO` goes to 20, `RODRÍGUEZ` to 17) and 8 for the pitcher
 (`RODRÍGUEZ` 19); longer ones shrink within their place. `velocidad` is the number alone (`MPH`
-is its own layer).
+is its own layer). `inning` fits two digits (extra innings), and even `100`, at full size.
 
 ## Markers
 

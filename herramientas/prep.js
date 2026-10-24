@@ -182,6 +182,13 @@ const BARRA = ['BARRA PITCHER', 'BARRA BATEADOR', '.lanzador', '.lanzamientos', 
 const RAIZ = { nm: 'Null 1', p: [962, 537.2], s: 134 };
 const CORRE = [2, 3];
 const LOGO = 'LOGO FINAL ATRAPA LA EMOCION_1.png';
+// El inning, más grande (Leon, 2026-10-24, sin que pise nada): la capa va al 140 % y crece desde
+// su ancla, que el diseño puso en el centro del 10, así que queda centrado entre las flechas. El 10
+// pasa de 13 a 19 px de alto y queda a 2 px de cada flecha (entre las dos hay 23; al 150 %, a 1 px
+// de la de arriba). A lo ancho sobra: 10 o 18 miden 23 px, en el negro de x 753 a la tercera base
+// (x 821). Si el ancla llega en otro lugar, falla: medir de nuevo el centro del 10.
+const INNING_ESCALA = 1.4;
+const INNING_ANCLA = [-17.503, -15.02];
 if (hay('SCOREBUG')) {
     const d = load(path.join(SRC, 'SCOREBUG/data.json'));
 
@@ -280,6 +287,10 @@ if (hay('SCOREBUG')) {
     // que un inning de un dígito, unas carreras de un dígito o unas siglas más anchas no queden
     // corridas. Lw medidos con LT Energy (10, 00, TIG).
     centrar(doc(d, '.inning'), 8.3422);
+    const inn = layer(d, '.inning'), ia = inn.ks.a, is = inn.ks.s;
+    if (ia.a || is.a || ia.k[0] !== INNING_ANCLA[0] || ia.k[1] !== INNING_ANCLA[1] || is.k[0] !== is.k[1])
+        throw new Error(`inning: ancla ${JSON.stringify(ia.k)} escala ${JSON.stringify(is.k)}: medir de nuevo INNING_ANCLA`);
+    is.k = [+(is.k[0] * INNING_ESCALA).toFixed(4), +(is.k[1] * INNING_ESCALA).toFixed(4), is.k[2]];
     centrar(doc(d, '.CARRERASVISITA'), 26.0547);
     centrar(doc(d, '.CARRERASLOCAL'), 26.0547);
     centrar(doc(d, '.EQUIPOVISITA'), 32.1412);
