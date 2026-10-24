@@ -6,14 +6,15 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Diez gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
+proyecto*). Once gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
 variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva, el
-bateador, el lanzador, el 3 en línea, los otros juegos y el prevenido con `font/LTEnergy-Regular.ttf`,
+bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido y la tabla de posiciones con `font/LTEnergy-Regular.ttf`,
 la estática que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable:
 mide igual, y en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y
-los otros juegos, del 2026-10-22, y el del prevenido, del 2026-10-23, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
+los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
 (`font/ChakraPetch-Bold.ttf`, libre, de Google Fonts) en el título y las carreras. Las keys del
-UPDATE están en su `data.md`.
+UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una vez cada una (ver
+*Imágenes: `_assets/`*).
 
 | Carpeta | Qué es | Flujo | Salida |
 |---|---|---|---|
@@ -27,6 +28,7 @@ UPDATE están en su `data.md`.
 | `tresenlinea/` | Los tres que vienen al bate (el export es 3 EN LINEA), abajo a la derecha: un panel de Empire Keeway entra con sus logos y se va, y queda la caja, la banda naranja con el 3 EN LÍNEA y el recuadro azul con los tres nombres (todo una secuencia de PNG, salvo los nombres). El frame 0 está vacío | stage `play` pause (0–197): la caja crece del 16 al 43, los nombres aparecen del 40 al 60 y el panel se va del 177 al 193 | `salida`: los nombres y la caja, su entrada al revés, sin el panel (1,5 s) |
 | `otrosjuegos/` | Cómo van los otros juegos (el export es OTROS JUEGOS; el título, ASÍ VAN), una columna abajo a la derecha: arriba, un cuadro de Harina PAN entra, arma su logo y se va (una secuencia de JPG); debajo, el título y tres juegos, cada uno con la sede, las barras de visita y local (escudo y nombre), las carreras y el inning con sus flechas. El frame 0 está vacío | `play` lo pone al aire vacío (pausa en el 0); el controlador elige con un `goto`: `tresjuegos` (100–266), `dosjuegos` (400–566) o `unjuego` (700–866), el mismo gráfico con 3, 2 o 1 juegos. En cada uno, desde el `goto`, el cuadro entra del 11 al 23, la columna del 27 al 95 (un juego detrás del otro) y el cuadro se va del 157 al 164 | `salida`: la columna, su entrada al revés, sin el cuadro (2,3 s); `salida2` (1,9 s) y `salida1` (1,3 s) |
 | `prevenido/` | El bateador en el círculo (el export es PREVENIDO AL BATE), abajo a la derecha: un panel de LMV entra girando, muestra su logo con un brillo y se va (una secuencia de PNG); debajo, la barra negra con el PREVENIDO AL BATE y el recuadro azul con el nombre. El frame 0 está vacío | stage `play` pause (0–170): la barra entra del 23 al 32, el título del 31 al 39, el recuadro y el nombre del 33 al 48, y el panel se va del 151 al 168 | `salida`: la barra, el título, el recuadro y el nombre, su entrada al revés, sin el panel (0,9 s) |
+| `posiciones/` | La tabla de posiciones (el export es TABLA DE POSICIONES), a pantalla completa y opaca: el fondo, el título POSICIONES, los rótulos de las columnas, el recuadro magenta de los números y el cuadro de GoGo Royal (una secuencia de JPG); encima, 8 filas, cada una con la barra del equipo (con su escudo), el nombre en una caja negra y JJ, JG, JP, AVE y DIF. El frame 0 está vacío; desde el 1, el gris del diseño tapa el video | stage `play` pause (0–76): el gris quieto hasta el 11, el fondo entra del 12 al 64, las barras bajan del 29 al 44, los nombres aparecen del 41 al 66 y los números del 60 al 75 | `salida`: la entrada al revés, que termina en el gris y corta al video (2,5 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
@@ -45,7 +47,9 @@ el ejemplo de su `data.md`, en la pausa) y `tresenlinea_panel.png` (en el 120, c
 casos que ponen cada equipo en las 6 filas, recortado al gráfico) y `otrosjuegos_dosjuegos.png` /
 `otrosjuegos_unjuego.png` (los tramos de 2 y 1 juegos, en su pausa), del 2026-10-22; `prevenido.png`
 (pantalla completa con el ejemplo de su `data.md`, en la pausa) y `prevenido_panel.png` (en el 100,
-con el panel), del 2026-10-23. Si un gráfico cambia, hay que
+con el panel), del 2026-10-23; `posiciones.png` (pantalla completa con el ejemplo de su `data.md`, en
+la pausa) y `posiciones_equipos.png` (8 casos que ponen cada equipo en las 8 filas, recortado a la
+tabla), del 2026-10-24. Si un gráfico cambia, hay que
 regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último frame de la entrada). No
 entran al zip (`.gitattributes`).
 
@@ -57,7 +61,9 @@ el cuadro de Pepsi del parcial trae la suya, y la pizarra sale después, al rev�
 publicidad, la pizarra sola). En el 3 en línea
 (su `stop`, 210–240, tampoco anima) la entrada al revés traería de vuelta el panel: sale la caja sola.
 En los otros juegos (su `STOP`, 167–197, tampoco), lo mismo: sale la columna, sin el cuadro de PAN.
-En el prevenido (su `STOP`, 180–210, tampoco), también: sale la caja, sin el panel de LMV.
+En el prevenido (su `STOP`, 180–210, tampoco), también: sale la caja, sin el panel de LMV. En la
+tabla de posiciones (su `stop`, 120–150, tampoco) es la entrada al revés entera: el fondo, una
+secuencia de JPG opaca, vuelve hasta el gris del principio, y de ahí corta al video, como entra.
 
 **Score.** Claves: las del score de LVBP-Meridiano donde dicen lo mismo, para que el controlador le mande a
 los dos la misma data: `conteobolasystrikes`, `outs`, `inning`, `INNINGarriba_opacidad` /
@@ -133,7 +139,7 @@ azules.
 Puertas: el export las trae azules para todos, y ese azul es justo el de Magallanes en la ofensiva,
 que salió de esta defensiva: la ofensiva es la versión nueva de la idea, con una puerta de color por
 equipo y una textura de líneas encima. Para que las dos queden iguales (Leon, 2026-10-15), `prep.js`
-le pone a cada puerta, encima, la textura (`images/texturapuertas.png`, en *multiply*) y las ocho
+le pone a cada puerta, encima, la textura (la de la ofensiva, en *multiply*) y las ocho
 pantallas de color, hijas de la puerta, con su forma y su máscara. Los degradados y la textura salen
 de la ofensiva preparada (`ofensiva/data.json`): si cambian allá, la defensiva los toma la próxima
 vez que se prepare.
@@ -148,8 +154,9 @@ blanco), que Lottie sí pinta con un filtro SVG, como las sombras: el escudo da 
 diseño, pero sin relieve. Lo eligió Leon el 2026-10-15 entre el blanco al 49 % y al 30 %; si el
 diseñador manda los PNG con los efectos aplicados, se saca (`GRIS_PUERTA = null` en `prep.js` y el
 chequeo del Fill en el lint). Con las puertas de color, el de Tigres va al 95 %, como en la ofensiva
-(ver ahí). La compuerta de Águilas no vino en el export: llegó aparte, como PNG
-(`images/compuerta_aguilas.png`, 2026-10-15), y `prep.js` le arma las dos capas con las de Caribes.
+(ver ahí). La compuerta de Águilas no vino en el export: llegó aparte, como PNG (2026-10-15; su
+asset, `image_compuerta_aguilas`, sigue en el `defensiva/data.json` preparado), y `prep.js` le arma
+las dos capas con las de Caribes.
 
 Textos: en mayúsculas, como en el score. Los apellidos van como se los manda el controlador a
 Meridiano (`F.RODRIGUEZ`), en cuerpo 25, el de los rótulos (el export los trae en 20: Leon,
@@ -172,7 +179,7 @@ mandarlo siempre, o queda al aire el `NOMBRE APELLIDO` del diseño.
 
 Equipo: cada clave prende cinco capas, la barra, las dos pantallas de las puertas y las dos mitades
 del escudo; sin equipo, las puertas no se ven. El export sólo trae el escudo de Águilas: los otros
-siete son los PNG blancos de la defensiva (`images/compuerta_<equipo>.png`), con las capas del de
+siete son los PNG blancos de la defensiva (los mismos archivos), con las capas del de
 Águilas (decidido con Leon, 2026-10-15). Las puertas de Tigres son de un azul casi negro, que el
 *color dodge* casi no puede aclarar: con el gris de los demás (72,5 %) su escudo casi no se veía
 (en AE pasaría lo mismo). Su escudo va al 95 % (`GRIS_EQUIPO` en `prep.js`) y se ve como el de
@@ -264,8 +271,8 @@ enteras hasta el borde izquierdo. Los colores, los del diseñador (Leon, 2026-10
 del bateador, salvo Tigres, azul acá y casi negro allá. El 49 % del escudo va en el CSS de su
 `<image>` (`g[id^="escudo"] > image`, por el `ln` `escudo<SIGLAS>`), como el de las compuertas: el
 UPDATE escribe su `opacity` en la capa y lo pisaría con un 1 (el escudo salía al 100 % y el panel,
-mucho más claro). La barra de Bravos no vino en el export: es la del bateador
-(`images/barra_bravos.png`, la misma serie de barras).
+mucho más claro). La barra de Bravos no vino en el export: es la del bateador (la misma imagen, de
+la misma serie de barras).
 
 Textos: en mayúsculas. El nombre y el apellido, cada uno en su caja: entran unas 9 letras en cada
 línea (`ALEXANDER`, `RODRÍGUEZ`; `MONASTERIOS` baja de 55 a 44), y cada línea encoge por su lado.
@@ -355,7 +362,7 @@ segundo stage en el mismo gráfico, como en los otros juegos, le pedía al contr
 al `play`.
 
 No tiene export: `prep.js` lo arma siempre desde el parcial preparado (`parcial/data.json`), con sus
-imágenes (las 8 barras) y su fuente, así que los dos no se separan: un cambio del parcial pasa a éste
+imágenes (las 8 barras, las mismas del parcial) y una copia de su fuente, así que los dos no se separan: un cambio del parcial pasa a éste
 la próxima vez que se corre `prep.js`, con o sin exports. Saca el cuadro de Pepsi y sus dos rayas
 grises (la de la izquierda, `MARCO DE PUBLICIDAD 3`, entra con la pizarra, pero es parte del marco
 de la publicidad: sin ella la columna de los bateadores termina en el azul), y la columna de los
@@ -561,6 +568,88 @@ Colores en NTSC compuesto (2026-10-23, con setup de 7,5 IRE): todo legal. Lo má
 logo de LMV (119,1 IRE en unos 110 px, del 51 al 53; fuera del brillo, hasta 111,5) y el cian del
 título (`#01D4E7`, 112,1); lo más bajo, el azul del recuadro (6,2). En HD (Rec.709), también.
 
+**Posiciones.** La tabla de posiciones; el export es TABLA DE POSICIONES, y la carpeta, `posiciones`
+(Leon, 2026-10-24). A pantalla completa y opaca: el fondo, el título POSICIONES con el logo de ATRAPA
+LA EMOCIÓN, los rótulos de las columnas (JJ JG JP AVE DIF), el recuadro magenta de los números y el
+cuadro de GoGo Royal son una secuencia de JPG (un precomp de 150 frames de 1920 × 1080); encima van 8
+filas, cada una con la barra del equipo (una imagen con su escudo de marca de agua), el nombre en una
+caja negra y los cinco números. Meridiano no tiene una, y en LVBP-Stats la del VV es `NoDisponible`.
+Claves: las de la tabla de IVC en LVBP-Stats (`muestraIVC.muestraTablaPosiciones`), para que el
+controlador arme las dos igual: `equipo<n>`, `JJequipo<n>`, `JGequipo<n>`, `JPequipo<n>`,
+`AVEequipo<n>` y `DIFequipo<n>`, del 1 (arriba) al 8 (Leon, 2026-10-24). IVC manda además
+`logo_equipo<n>`, la ruta de un logo: acá la barra de cada fila va como en el score, las 8 apiladas,
+`<SIGLAS><n>_opacidad` (`LEO1_opacidad`…), todas visibles al arrancar; el controlador manda `1` a la
+que va y `0` a las otras siete, en cada fila. Sin data, cada fila muestra el equipo del diseño
+(Águilas, Bravos, Cardenales, Caribes, Leones, Magallanes, Tiburones y Tigres, de arriba abajo), que
+va arriba de su pila. Los textos arrancan vacíos, como en el bateador.
+
+Textos: en mayúsculas. El nombre, el corto (`LEONES`, la columna `nombre_equipo`): IVC manda el
+completo (`nombre_completo_equipo`), que acá encoge mucho (`LEONES DEL CARACAS` al 57 %). Al tamaño
+del diseño entran hasta `MAGALLANES` y `CARDENALES`; aparecen letra por letra (un animador de
+opacidad), del 41 al 66. Los números: JJ, JG y JP entran con 3 cifras, AVE con `1.000` y DIF con
+`10.5`; DIF como lo manda IVC (`--`, el primero).
+
+Fila 8: su nombre llegaba colgado del `Nulo 22` (el de los números) y no de nada, como los otros
+siete: entraba 19 px más abajo, colgando de su caja negra, y subía con los números (60–75). Queda
+donde termina, sin parent. Los números llegaban corridos a ojo, hasta 3 px (la columna JJ, en la fila
+4): cada columna va al x y cada fila al y de la mayoría.
+
+Fondo: de los 150 JPG, 93 son el mismo archivo que el del frame anterior (el gris quieto del 0 al 8 y
+la tabla quieta del 65 al 149): cada tramo igual queda en una capa, y quedan 57 JPG, 15,6 MB (llegan
+41). Como en el 3 en línea, los ip traen unos decimales de más: en el frame entero k se ve la imagen
+k − 1. El primero es un gris con una raya diagonal, opaco: el gráfico tapa el video desde el frame 1
+(el 0 queda vacío, como en los demás). El recuadro magenta detrás de los números viene en los JPG,
+en todos los frames desde el 20: si fuera un placeholder, hace falta la secuencia nueva (mismos
+nombres y tamaños).
+
+Salida: el export no trae, y es la entrada al revés entera (Leon, 2026-10-24): los números bajan y
+se apagan, los nombres se borran, las cajas negras se cierran, las barras suben, el fondo vuelve
+hasta el gris y corta al video, como entra (2,5 s). El fondo, con los mismos tramos al revés: no suma
+imágenes.
+
+Key: opaca de punta a punta, nada que arreglar.
+
+Colores en NTSC compuesto (2026-10-24, con setup de 7,5 IRE): las barras de los 8 equipos quedan
+legales (la más alta, Leones, 106; la más baja, Cardenales, −6,6). En el fondo, lo más alto es el
+cian del título y el amarillo del logo de ATRAPA LA EMOCIÓN, los del score (113,5 y 113,7); la
+compresión del JPG lleva 49 px de sus bordes a más de 120 (hasta 128,2), como en el cuadro de PAN de
+los otros juegos. Lo más bajo, el magenta (−18,1 en los bordes del JPG, legal hasta −20). Están en
+los JPG del diseñador: bajarlos es recomprimirlos. En HD (Rec.709), todo legal.
+
+No se probó todavía en CasparCG (2026-10-24): por `file://` en Chromium, con
+`--allow-file-access-from-files`, carga igual que por http.
+
+### Imágenes: `_assets/`
+
+Las imágenes de todos los gráficos van juntas en `_assets/`, una vez cada una, con el sha1 de su
+contenido por nombre (12 caracteres y la extensión), como en cue-zfx-lasuerte-templates (Leon,
+2026-10-24): cada asset de los `data.json` apunta ahí con `u: "../_assets/"`. Las junta
+`herramientas/consolidar.mjs`, después de `prep.js`: lee la imagen de cada asset que todavía no está
+ahí (en `<gráfico>/images/`, las del export copiadas tal cual, o en la carpeta de otro gráfico), la
+copia con su sha1 y reescribe el asset; al final borra las carpetas `images/` y las imágenes de
+`_assets/` que ya no usa ningún gráfico, sólo si todas las referencias resolvieron. Es idempotente:
+una segunda corrida no cambia nada. El lint falla si un asset no está en `_assets/`.
+
+Sin pasar a WebP, a diferencia de lasuerte: la app legacy (LVBP-Stats) sale por un CasparCG 2.3 en el
+que nunca se probó, y ahorraba ~1 MB (Leon). Cada imagen queda en su formato, PNG o JPG.
+
+Lo que ahorra: las copias entre gráficos, los frames repetidos de las secuencias y las imágenes que
+ningún JSON usaba (las de los tramos quietos). En el zip del release, las imágenes de los diez
+gráficos que había pasaron de 10,8 a 8,6 MB; con la tabla de posiciones (14,3 MB), el zip pasa de
+11,5 a 23,6 MB. Comparado al píxel contra lo publicado (28 frames de los diez gráficos, con todos los
+equipos prendidos): idéntico.
+
+Las imágenes que un gráfico toma de otro no se copian: `prep.js` (`imagenDe()`) le pone en su asset la
+de ese gráfico preparado, con la ruta vista desde éste. La defensiva toma la textura de las puertas de
+la ofensiva; la ofensiva, los escudos de las compuertas de la defensiva; el lanzador, la barra de
+Bravos del bateador; el parcial sin publicidad, las barras del parcial. La compuerta de Águilas de la
+defensiva (llegó aparte, como PNG) sale del `defensiva/data.json` preparado.
+
+⚠ Depende de que `data_file` en el `index.html` no lleve barra: Lottie usa `u + p`, relativo a la
+página, sólo sin `assetsPath`. Es la primera vez que un gráfico de este repo carga imágenes fuera de
+su carpeta (los scripts ya salían con `../index.js`): no se probó todavía en CasparCG, ni en el 2.5/2.6
+ni en el 2.3 de la app legacy.
+
 ### Cuando llega un export nuevo del diseñador
 
 El score llega como `SCOREBUG.zip` (carpeta `SCOREBUG/` con `data.json`, `images/` y `FONT/`), la
@@ -569,11 +658,14 @@ defensiva como `DEFENSIVA.rar` y la ofensiva como `OFENSIVA.rar` (carpetas `DEFE
 carpeta `LOWBAR BATEADOR/`, con espacio), el parcial como `FINAL_DE_INNING.zip` (carpeta `FINAL DE
 INNING/`), el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`), el 3 en línea como
 `3_EN_LINEA.zip` (carpeta `3 EN LINEA/`), los otros juegos como `OTROS_JUEGOS.zip` (carpeta `OTROS
-JUEGOS/`) y el prevenido como `PREVENIDO_AL_BATE.zip` (carpeta `PREVENIDO AL BATE/`); el parcial sin
-publicidad no tiene export, sale del parcial. La receta de los diez es `herramientas/prep.js`, que
-prepara los que encuentre, y el parcial sin publicidad siempre (las imágenes del 3 en línea y del
-prevenido, antes, `herramientas/tresenlinea.py` y `herramientas/prevenido.py`):
-buscar las capas por `nm` (los índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`.
+JUEGOS/`), el prevenido como `PREVENIDO_AL_BATE.zip` (carpeta `PREVENIDO AL BATE/`) y la tabla de
+posiciones como `TABLA DE POSICIONES.zip` (carpeta `TABLA DE POSICIONES/`); el parcial sin publicidad
+no tiene export, sale del parcial. La receta de los once es `herramientas/prep.js`, que prepara los
+que encuentre, y el parcial sin publicidad siempre (las imágenes del 3 en línea y del prevenido,
+antes, `herramientas/tresenlinea.py` y `herramientas/prevenido.py`): buscar las capas por `nm` (los
+índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`. Las imágenes del export van
+antes a `<gráfico>/images/`, tal cual, y después de `prep.js`, `node herramientas/consolidar.mjs` las
+pasa a `_assets/` (ver *Imágenes: `_assets/`*).
 
 **Score**
 
@@ -660,8 +752,8 @@ el anterior con los outs en cian; en el render cambian sólo los outs.
   aparecía como una franja azul que tapaba el centro del campo y cortaba el DEFENSIVA. `prep.js` la
   cambia por la complementaria sin invertir: la misma diagonal, cerrada por la derecha.
 - **Compuertas:** el 49 % pasa de la capa al CSS, cada una lleva su `ln` y suma el Fill gris (ver
-  arriba). Sin compuerta de Águilas en el export, `prep.js` la arma desde
-  `images/compuerta_aguilas.png`.
+  arriba). Sin compuerta de Águilas en el export, `prep.js` la arma con la imagen de la del
+  `defensiva/data.json` preparado (`AGUI_PUERTA`).
 - **Fuente:** `fPath` llega como `FONT/LT Energy`: pasa a `font/LTEnergy-Regular.ttf`.
 - **All Caps:** llega apagado en todas las capas de texto: `prep.js` lo prende.
 - **Textos de caja:** los apellidos ya llegan de caja (con `lh` 52, no parten en líneas encimadas),
@@ -676,8 +768,9 @@ el anterior con los outs en cian; en el render cambian sólo los outs.
 - **Puertas de color:** encima de cada puerta, la textura y las 8 pantallas de color de la
   ofensiva (ver arriba). Necesita la ofensiva preparada: si llegan los dos exports juntos, correr
   `prep.js` dos veces.
-- **Imágenes:** las 19 del export van tal cual a `defensiva/images/`, más `compuerta_aguilas.png` y
-  `texturapuertas.png` (copia de `ofensiva/images/img_1.png`).
+- **Imágenes:** las 19 del export van tal cual a `defensiva/images/`. La compuerta de Águilas y la
+  textura de las puertas no se copian: la primera es la del `defensiva/data.json` preparado y la
+  segunda, la de la ofensiva (`imagenDe()`).
 
 Comparado frame a frame contra el export (con sólo la máscara arreglada y el mismo equipo), antes
 del Fill gris: igual salvo 1 o 2 niveles de 255 dentro del escudo de las compuertas, por el 49 % en
@@ -709,8 +802,8 @@ el `<image>`. El Fill sólo cambia el escudo, sin costo de frames medible en la 
   nombre muy largo partía en dos líneas chicas en vez de encoger.
 - **Markers y timeline:** `play` / `salida` en el 90, `stop` en el 0 vacío. La entrada termina en
   el 89 (el mánager): si cambia, mover `ENTRADA_OF`. Las capas que arrancan en el 0 pasan al 1.
-- **Imágenes:** las 14 del export van tal cual a `ofensiva/images/`, más los 7
-  `compuerta_<equipo>.png` (copias de `defensiva/images/img_0–6`).
+- **Imágenes:** las 14 del export van tal cual a `ofensiva/images/`; los otros 7 escudos son los de la
+  defensiva preparada (`imagenDe()`).
 
 Comparado frame a frame contra el export (con las máscaras arregladas, Águilas, sin el Fill y con
 el título del export): igual salvo 1 o 2 niveles de 255 en el escudo.
@@ -790,8 +883,8 @@ barra; antes del arreglo del key. Con la fuente variable del export, los textos 
   arriba, un sólido. Pasa a estar justo encima. Su Hue/Saturation (saturación −100, claridad −23)
   Lottie tampoco lo pinta: la textura es gris, así que es un Tint de negro a gris 77 %, que sí pinta.
 - **Escudos:** el 49 % pasa al CSS, cada uno con su `ln` `escudo<SIGLAS>` (ver arriba).
-- **Barra de Bravos:** no vino. Es la del bateador (`images/barra_bravos.png`, copia de
-  `bateador/images/img_8.png`), con las medidas de las otras, que escalan con el ancho de la imagen:
+- **Barra de Bravos:** no vino. Es la del bateador preparado (`LAN_BARRA_BRAVOS`: su barra de
+  Bravos, la misma imagen, con `imagenDe()`), con las medidas de las otras, que escalan con el ancho de la imagen:
   el ancla y la máscara de la de Águilas (512 px) por 514/512. Si el diseñador la manda, `prep.js`
   falla: sacar `LAN_BARRA_BRAVOS`.
 - **Textos de caja:** ya llegan de caja, pero las del nombre y el apellido cruzaban el número y el
@@ -810,7 +903,7 @@ barra; antes del arreglo del key. Con la fuente variable del export, los textos 
   como en el bateador. La entrada termina en el 109 (el último rótulo): si cambia, mover
   `ENTRADA_LAN`. El frame 0 ya llega vacío.
 - **Textos vacíos:** como en el bateador, `vaciaTextos()` al final.
-- **Imágenes:** las 16 del export van tal cual a `lanzador/images/`, más `barra_bravos.png`.
+- **Imágenes:** las 16 del export van tal cual a `lanzador/images/`.
 
 Comparado frame a frame contra el export del 2026-10-18 con el panel, la textura y el escudo
 arreglados a mano (sólo Águilas, el texto del diseño y la misma fuente): idéntico en la pausa salvo
@@ -860,7 +953,7 @@ Las 16 imágenes llegan con otra paleta de la compresión de Bodymovin (el mismo
   de 0,04 px en el tramo; al entrar y al salir, el salto es el de un frame cualquiera). Si la
   secuencia cambia de tiempos, medir de nuevo; con los PNG de color completo, `null`.
 - **Imágenes:** las 270 del export van tal cual a `parcial/images/` (`img_0`–`261`, la secuencia;
-  `img_262`–`269`, las barras). Con el tramo quieto, `img_39`–`133` quedan en la carpeta sin usar.
+  `img_262`–`269`, las barras). Con el tramo quieto, `img_39`–`133` no se usan: no pasan a `_assets/`.
 
 Comparado frame a frame contra el export del 2026-10-18 (sin data, con su `op` llevado al 300):
 idéntico al píxel del 0 al 221, salvo las columnas de 1 px del arreglo del key (x 714–715, 998–999 y
@@ -872,8 +965,8 @@ idéntico al píxel del 0 al 221, salvo las columnas de 1 px del arreglo del key
   timeline del parcial (`PAR_PAUSA`, `PAR_FIN`) o si el cuadro de Pepsi es parent o matte de otra
   capa.
 - **Fuera:** `PEPSI LOGO` (con el precomp y las imágenes de la secuencia) y `MARCO DE PUBLICIDAD 3` y
-  `4` (`PSP_RAYAS`). Quedan las 8 barras, que se copian de `parcial/images/` con los mismos nombres
-  (`img_262`–`269`), y la fuente, de `parcial/font/`.
+  `4` (`PSP_RAYAS`). Quedan las 8 barras, las mismas del parcial (su asset, con la ruta vista desde
+  éste: `imagenDe()`), y la fuente, copiada de `parcial/font/`.
 - **Key:** `Capa de formas 4` (los bateadores), 1 px más angosta a la derecha: deshace el arreglo del
   parcial, que la hacía crecer por debajo de la raya.
 - **Centrado:** `PSP_CORRE` (196 px) en las capas sin parent (`Nulo 23`, las posiciones y las barras
@@ -946,8 +1039,8 @@ los frames de la secuencia, difieren los bordes tramados.
 - **Fast Box Blur:** el de la sede y los nombres pasa a Gaussian Blur (`OJ_BLUR`). El lint avisa de un
   Fast Box Blur sin convertir.
 - **Cuadro de PAN:** desde el frame `OJ_QUIETO` (78) de la secuencia, un solo JPG: la capa de ese
-  frame dura hasta el final y las de después salen del JSON con sus imágenes (`img_79`–`137` quedan en
-  la carpeta sin usar). Con una secuencia sin compresión, `null`.
+  frame dura hasta el final y las de después salen del JSON con sus imágenes (`img_79`–`137` no se
+  usan: no pasan a `_assets/`). Con una secuencia sin compresión, `null`.
 - **Key:** el fondo negro de las barras de cada juego (`OJ_FONDO`, en px de pantalla, debajo de la
   última barra del juego), la primera banda (`Capa de formas 7`) 1 px más alta y los cuadros negros
   (`CUADRO SCORE`, ` 2`, ` 3`) 1 px más altos (ver *Key* arriba). Si la columna se mueve, medir de
@@ -999,8 +1092,8 @@ nivel), salvo el borde de abajo.
   cercano de su recuadro (`PRE_MARGEN`, medido con `rectangulo()`). El alto, el ascent del cuerpo
   más 2.
 - **Tramo quieto:** desde el frame 112 de la secuencia (`PRE_QUIETO`), un solo PNG: la capa de ese
-  frame dura hasta el 150 y las de en medio salen del JSON con sus imágenes (`img_113`–`150` quedan en
-  la carpeta sin usar).
+  frame dura hasta el 150 y las de en medio salen del JSON con sus imágenes (`img_113`–`150` no se
+  usan: no pasan a `_assets/`).
 - **Key:** la barra (`Capa de formas 1`) y el recuadro (`Capa de formas 2`), 1 px más altos hacia
   arriba (`creceRectanguloY`; ver *Key* arriba).
 - **Markers y timeline:** `START` (0–30) y `STOP` (180–210) del diseñador → `play` 0–170 (pausa en
@@ -1019,6 +1112,47 @@ desde el 24, la fila 755 (la barra 1 px más alta, debajo del renglón al 60 % d
 recuadro en la x 1441, el tramo quieto (114–151, en el panel) y, desde que se va el panel, la fila de
 arriba de la barra. El frame 0, vacío (el export mostraba una esquina del panel). La salida, contra
 la entrada al revés (debajo del panel): idéntica (hasta 1 nivel).
+
+**Posiciones**
+
+- **Imágenes:** las 158 del export van tal cual a `posiciones/images/` (`img_0`–`7`, las barras;
+  `img_8`–`157`, la secuencia); `consolidar.mjs` pasa a `_assets/` las 65 que quedan.
+- **Clases:** `.EQUIPO<n>` → `equipo<n>`; `.JJEQUIPO<n>`, `.JGEQUIPO<n>`, `.JPEQUIPO<n>`,
+  `.AVEQUIPO<n>` (sin la E de AVE) y `.DIFEQUIPO<n>` → `JJequipo<n>`, `JGequipo<n>`, `JPequipo<n>`,
+  `AVEequipo<n>` y `DIFequipo<n>`; las 8 barras `.BARRA<EQUIPO>` → 64 capas `<SIGLAS><n>_opacidad`.
+  Las cajas negras (`BARRA EQUIPO <n>º LUGAR`, con espacios de más), `Nulo 22` y el precomp `BASE
+  TABLA DE POSICIONES` quedan como vienen.
+- **Barras:** cada una llega en una fila (Águilas arriba … Tigres abajo), con su máscara (bajan del 29
+  al 44). En cada fila van las 8, cada una con su x, su ancla y su escala (las imágenes miden de 400 a
+  405 px, y el diseñador las alineó una por una) y la y de la barra del diseño en esa fila, que va
+  arriba de la pila. Las filas, en el orden de capas del diseño.
+- **Fila 8:** `.EQUIPO8` pierde el parent (`Nulo 22`), con su posición y su escala de pantalla al final
+  de la entrada. `prep.js` falla si llega de otra forma.
+- **Números:** cada columna, al x de la mayoría de sus filas; cada fila, al y de la mayoría de sus
+  columnas.
+- **Fuente:** `fPath` llega como `TABLA DE POSICIONES / FONT`: pasa a `font/LTEnergy-Regular.ttf` (el
+  mismo archivo que el del bateador).
+- **All Caps:** llega apagado: `prep.js` lo prende.
+- **Textos de caja:** ya llegan de caja, con `lh` 0.01 (va 1.2 del cuerpo). Medidos con la entrada
+  terminada: los nombres, centrados donde estaban, hasta 8 px (`POS_MARGEN`) antes del borde más
+  cercano de su caja negra (`rectangulo()`; la caja del export la pasaba 11 px de cada lado); los
+  números, centrados en su columna, hasta 8 px antes de la columna vecina (repartidos: 8 px entre dos
+  cajas), de la caja negra (JJ) o del final del recuadro magenta (DIF; x 1425, `POS_FONDO`, medido en
+  la secuencia). El alto, el ascent del cuerpo más 2.
+- **Fondo:** cada JPG que es el mismo archivo que el del frame anterior (comparado en el export) se
+  junta con la capa de ése, y sale del JSON con su imagen: 93 de 150.
+- **Markers y timeline:** `start` (0–76) y `stop` (120–150) del diseñador → `play` 0–76 (pausa en el
+  75: `POS_PAUSA`), `salida` 76–152 y `stop` en el 0. Todo lo que no es el fondo suma su entrada al
+  revés (`alReves`): lo que la entrada muestra en el frame t, la salida lo muestra en el 151 − t
+  (`FIN`), y el 151 es el primer frame vacío. El fondo, sus tramos al revés en el precomp: la imagen k,
+  del 150 − k al 151 − k. Las capas que arrancan en el 0 pasan al 1. La entrada termina en el 75
+  (`POS_ENTRADA`, los números): `prep.js` falla si algo anima después.
+- **Textos vacíos:** al final, todos.
+
+Comparado frame a frame contra el export (con las filas y los textos del diseño, del 1 al 75):
+idéntico del 1 al 40; del 44 al 60, el nombre de la fila 8 (el parent), y desde el 65, los números
+corridos (hasta 3 px, la columna JJ en la fila 4). La salida es el espejo de la entrada: el 100 muestra
+lo del 51 y el 150, el gris del 1; el 151, vacío.
 
 ### QA
 
@@ -1048,6 +1182,13 @@ la entrada al revés (debajo del panel): idéntica (hasta 1 nivel).
   largos y en minúsculas, cambio del título al aire, `stop` en la pausa y a mitad de la entrada, y que
   el layer se suelte; en CasparCG, el key (con el panel y en la pausa) y que la entrada no repita
   frames (como en el 3 en línea, `crop=480:384:1440:544`; la secuencia trae iguales del 1 al 3).
+- Posiciones: los 8 equipos en las 8 filas (8 casos que los rotan), nombres largos y en minúsculas,
+  números de más cifras (`100`, `1.000`, `10.5`), entrada frame a frame contra el export, la salida
+  contra la entrada al revés, data al aire, `stop` en la pausa y a mitad de la entrada, y que el
+  layer se suelte; en CasparCG, que carguen las imágenes de `_assets/` y que la entrada no repita
+  frames (el fondo es una secuencia a pantalla completa).
+- Imágenes (`consolidar.mjs`): cada gráfico, al píxel contra lo publicado, con todos los equipos
+  prendidos y cada frame en su propia carga; y por `file://`.
 - Defensiva, ofensiva, bateador y lanzador: los 8 equipos (barra, color de las puertas, del fondo o
   del panel, y escudo), y sin equipo; entrada frame a frame, cambio de equipo al aire, `stop` en la
   pausa y a mitad de la entrada, y que el layer se suelte. El bateador y el lanzador, además, el key
@@ -1075,6 +1216,7 @@ con Playwright global, `$(npm root -g)/playwright/index.mjs`).
 | `prep.js` | La receta de arriba, ejecutable: prepara el export del diseñador. Instrucciones en su encabezado |
 | `tresenlinea.py` | Las imágenes del 3 en línea: el recorte y los frames de la salida (va antes de `prep.js`) |
 | `prevenido.py` | Las imágenes del prevenido: el recorte (va antes de `prep.js`) |
+| `consolidar.mjs` | Las imágenes de todos los gráficos, a `_assets/` (va después de `prep.js`) |
 | `shot.mjs` | Frames de un gráfico con data: `node herramientas/shot.mjs <url> <salida> '<json>' <frames> [x,y,w,h]`; `JSON=<archivo>` sirve otro data.json para comparar versiones |
 | `matrix.mjs` | Muchas variantes de data en una carga (todos los cruces…), con reporte de textos y consola |
 | `onair.mjs` | Un flujo al aire (update, play, next, stop) con capturas en cada paso |
@@ -1093,6 +1235,7 @@ El root contiene los **archivos compartidos** que todos los gráficos consumen v
 - [webcg-devtools.umd.js](webcg-devtools.umd.js) — devtools para testear localmente con UI gráfica
 - [index.html](index.html) — plantilla de referencia, se copia en cada gráfico
 - [.gitattributes](.gitattributes) — qué NO entra al zip del release. Viaja a cada repo derivado, ver "Deploy"
+- `_assets/` — en este repo, las imágenes de todos los gráficos, una vez cada una (ver *Imágenes: `_assets/`*)
 
 Cada gráfico vive en una **subcarpeta hermana** con su `MiAnim.json` y un `index.html` propio que apunta a `../index.js`, `../lottie.js`, `../webcg-framework.umd.js`. Si un gráfico necesita lógica muy particular, se copia el `index.js` localmente y se edita ahí.
 
@@ -1105,8 +1248,8 @@ editor (audit y guardado, 2026-10-15), pero se reescribió a mano en el mismo fo
 del MCP pone las capas de imagen con clase `_opacidad` también entre las imágenes, con una ruta de
 ejemplo en el payload, y `index.js` no les reemplaza la imagen (ver *claves sólo CSS*). Si el editor
 lo regenera, reponerlo desde git. El del bateador, el del parcial, el del parcial sin publicidad (una
-copia del del parcial) y el del lanzador se escribieron a mano en ese formato, sin pasar por el
-editor.
+copia del del parcial), el del lanzador y el de la tabla de posiciones se escribieron a mano en ese
+formato, sin pasar por el editor.
 
 ## Convenciones del Lottie
 

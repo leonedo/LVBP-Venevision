@@ -12,168 +12,168 @@
       "id": "image_0",
       "w": 486,
       "h": 430,
-      "u": "images/",
-      "p": "img_0.png",
+      "u": "../_assets/",
+      "p": "d0ff1244e5a4.png",
       "e": 0
     },
     {
       "id": "image_1",
       "w": 1924,
       "h": 1085,
-      "u": "images/",
-      "p": "img_1.png",
+      "u": "../_assets/",
+      "p": "6460637b92fb.png",
       "e": 0
     },
     {
       "id": "image_2",
       "w": 400,
       "h": 99,
-      "u": "images/",
-      "p": "img_2.png",
+      "u": "../_assets/",
+      "p": "7eb17f11f470.png",
       "e": 0
     },
     {
       "id": "image_3",
       "w": 403,
       "h": 99,
-      "u": "images/",
-      "p": "img_3.png",
+      "u": "../_assets/",
+      "p": "1ae28af13db4.png",
       "e": 0
     },
     {
       "id": "image_4",
       "w": 401,
       "h": 99,
-      "u": "images/",
-      "p": "img_4.png",
+      "u": "../_assets/",
+      "p": "56bb36fc41e3.png",
       "e": 0
     },
     {
       "id": "image_5",
       "w": 401,
       "h": 99,
-      "u": "images/",
-      "p": "img_5.png",
+      "u": "../_assets/",
+      "p": "6be9a13d32ff.png",
       "e": 0
     },
     {
       "id": "image_6",
       "w": 401,
       "h": 99,
-      "u": "images/",
-      "p": "img_6.png",
+      "u": "../_assets/",
+      "p": "a05198caf4ed.png",
       "e": 0
     },
     {
       "id": "image_7",
       "w": 401,
       "h": 99,
-      "u": "images/",
-      "p": "img_7.png",
+      "u": "../_assets/",
+      "p": "48fd6d9255f4.png",
       "e": 0
     },
     {
       "id": "image_8",
       "w": 405,
       "h": 99,
-      "u": "images/",
-      "p": "img_8.png",
+      "u": "../_assets/",
+      "p": "84e4b91c20e8.png",
       "e": 0
     },
     {
       "id": "image_9",
       "w": 400,
       "h": 99,
-      "u": "images/",
-      "p": "img_9.png",
+      "u": "../_assets/",
+      "p": "56a8e346b9aa.png",
       "e": 0
     },
     {
       "id": "image_10",
       "w": 918,
       "h": 644,
-      "u": "images/",
-      "p": "img_10.png",
+      "u": "../_assets/",
+      "p": "745aafc4968a.png",
       "e": 0
     },
     {
       "id": "image_11",
       "w": 2228,
       "h": 448,
-      "u": "images/",
-      "p": "img_11.png",
+      "u": "../_assets/",
+      "p": "af9698c57ab2.png",
       "e": 0
     },
     {
       "id": "image_12",
       "w": 994,
       "h": 922,
-      "u": "images/",
-      "p": "img_12.png",
+      "u": "../_assets/",
+      "p": "38d76e7eaf1e.png",
       "e": 0
     },
     {
       "id": "image_13",
       "w": 1920,
       "h": 1080,
-      "u": "images/",
-      "p": "img_13.jpg",
+      "u": "../_assets/",
+      "p": "23d45076482e.jpg",
       "e": 0
     },
     {
       "id": "image_compuerta_caribes",
       "w": 501,
       "h": 429,
-      "u": "images/",
-      "p": "compuerta_caribes.png",
+      "u": "../_assets/",
+      "p": "f16997e07dba.png",
       "e": 0
     },
     {
       "id": "image_compuerta_bravos",
       "w": 512,
       "h": 512,
-      "u": "images/",
-      "p": "compuerta_bravos.png",
+      "u": "../_assets/",
+      "p": "0e6bc4d5df65.png",
       "e": 0
     },
     {
       "id": "image_compuerta_cardenales",
       "w": 508,
       "h": 362,
-      "u": "images/",
-      "p": "compuerta_cardenales.png",
+      "u": "../_assets/",
+      "p": "face5b8c523b.png",
       "e": 0
     },
     {
       "id": "image_compuerta_leones",
       "w": 389,
       "h": 509,
-      "u": "images/",
-      "p": "compuerta_leones.png",
+      "u": "../_assets/",
+      "p": "06b0777d3777.png",
       "e": 0
     },
     {
       "id": "image_compuerta_magallanes",
       "w": 502,
       "h": 494,
-      "u": "images/",
-      "p": "compuerta_magallanes.png",
+      "u": "../_assets/",
+      "p": "988b1a97e07b.png",
       "e": 0
     },
     {
       "id": "image_compuerta_tiburones",
       "w": 496,
       "h": 463,
-      "u": "images/",
-      "p": "compuerta_tiburones.png",
+      "u": "../_assets/",
+      "p": "9663423f35e0.png",
       "e": 0
     },
     {
       "id": "image_compuerta_tigres",
       "w": 498,
       "h": 421,
-      "u": "images/",
-      "p": "compuerta_tigres.png",
+      "u": "../_assets/",
+      "p": "ef47ed82ad34.png",
       "e": 0
     }
   ],
