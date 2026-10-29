@@ -6,12 +6,12 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Once gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
+proyecto*). Doce gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
 variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva, el
-bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido y la tabla de posiciones con `font/LTEnergy-Regular.ttf`,
+bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones y el score final con `font/LTEnergy-Regular.ttf`,
 la estática que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable:
 mide igual, y en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y
-los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
+los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, y el del score final, del 2026-10-29, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
 (`font/ChakraPetch-Bold.ttf`, libre, de Google Fonts) en el título y las carreras. Las keys del
 UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una vez cada una (ver
 *Imágenes: `_assets/`*).
@@ -29,6 +29,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `otrosjuegos/` | Cómo van los otros juegos (el export es OTROS JUEGOS; el título, ASÍ VAN), una columna abajo a la derecha: arriba, un cuadro de Harina PAN entra, arma su logo y se va (una secuencia de JPG); debajo, el título y tres juegos, cada uno con la sede, las barras de visita y local (escudo y nombre), las carreras y el inning con sus flechas. El frame 0 está vacío | `play` lo pone al aire vacío (pausa en el 0); el controlador elige con un `goto`: `tresjuegos` (100–266), `dosjuegos` (400–566) o `unjuego` (700–866), el mismo gráfico con 3, 2 o 1 juegos. En cada uno, desde el `goto`, el cuadro entra del 11 al 23, la columna del 27 al 95 (un juego detrás del otro) y el cuadro se va del 157 al 164 | `salida`: la columna, su entrada al revés, sin el cuadro (2,3 s); `salida2` (1,9 s) y `salida1` (1,3 s) |
 | `prevenido/` | El bateador en el círculo (el export es PREVENIDO AL BATE), abajo a la derecha: un panel de LMV entra girando, muestra su logo con un brillo y se va (una secuencia de PNG); debajo, la barra negra con el PREVENIDO AL BATE y el recuadro azul con el nombre. El frame 0 está vacío | stage `play` pause (0–170): la barra entra del 23 al 32, el título del 31 al 39, el recuadro y el nombre del 33 al 48, y el panel se va del 151 al 168 | `salida`: la barra, el título, el recuadro y el nombre, su entrada al revés, sin el panel (0,9 s) |
 | `posiciones/` | La tabla de posiciones (el export es TABLA DE POSICIONES), a pantalla completa y opaca: el fondo, el título POSICIONES, los rótulos de las columnas, el recuadro magenta de los números y el cuadro de GoGo Royal (una secuencia de JPG); encima, 8 filas, cada una con la barra del equipo (con su escudo), el nombre en una caja negra y JJ, JG, JP, AVE y DIF. El frame 0 está vacío; desde el 1, el gris del diseño tapa el video | stage `play` pause (0–76): el gris quieto hasta el 11, el fondo entra del 12 al 64, las barras bajan del 29 al 44, los nombres aparecen del 41 al 66 y los números del 60 al 75 | `salida`: la entrada al revés, que termina en el gris y corta al video (2,5 s) |
+| `scorefinal/` | El score final (el export es SCORE FINAL), el line score, abajo (x 302–1634, y 724–910): las barras de visita y local (escudo y nombre, las mismas imágenes de la tabla de posiciones), las carreras de los 9 innings sobre un recuadro magenta, C H E en negro y la caja del logo de ATRAPA LA EMOCIÓN, con una raya plateada a la derecha. El frame 0 está vacío | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48 y la caja del logo del 40 al 58 | `salida`: la entrada al revés (1,9 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
@@ -49,7 +50,8 @@ casos que ponen cada equipo en las 6 filas, recortado al gráfico) y `otrosjuego
 (pantalla completa con el ejemplo de su `data.md`, en la pausa) y `prevenido_panel.png` (en el 100,
 con el panel), del 2026-10-23; `posiciones.png` (pantalla completa con el ejemplo de su `data.md`, en
 la pausa) y `posiciones_equipos.png` (8 casos que ponen cada equipo en las 8 filas, recortado a la
-tabla), del 2026-10-24. Si un gráfico cambia, hay que
+tabla), del 2026-10-24; `scorefinal.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa)
+y `scorefinal_equipos.png` (los 56 cruces `visita_vs_local`, recortado al gráfico), del 2026-10-29. Si un gráfico cambia, hay que
 regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último frame de la entrada). No
 entran al zip (`.gitattributes`).
 
@@ -638,6 +640,50 @@ no sólo en la primera carga; en Chromium no se repite ninguno, y en el mismo en
 otros juegos y el prevenido no repiten. Pendiente (Leon, 2026-10-24): probarla en su máquina con
 Windows y GPU cuando se haga el lado de las apps; hasta entonces no se toca.
 
+**Score final.** El line score; el export es SCORE FINAL (2026-10-29), y la carpeta, `scorefinal`.
+Gráfico nuevo: hasta ahora VV no tenía uno. Es el equivalente del `final` de LVBP-Meridiano sin la
+barra de ganador, perdedor y MVP ni el título. Abajo (x 302–1634, y 724–910), opaco: a la izquierda
+las barras de visita (arriba) y local, cada una con el nombre en una caja negra; al centro, la banda
+azul con los rótulos de los innings y, debajo, las carreras de cada inning sobre un recuadro magenta
+con una raya cian entre las dos filas; después C H E en negro y la caja del logo de ATRAPA LA
+EMOCIÓN (una imagen nueva, con una sombra), con una raya plateada a la derecha. Claves: las del
+`final` de Meridiano donde dicen lo mismo, para que el controlador les mande a los dos la misma data:
+`<SIGLAS>VISITA_opacidad` / `<SIGLAS>LOCAL_opacidad`, `CARRERASVISITA`, `HITSVISITA`, `ERRORESVISITA`
+(y `LOCAL`), `INNINGVISITA1`…`9` / `INNINGLOCAL1`…`9` y `ultimoinning` (el rótulo de la columna 9:
+`9`, o `10`, `12`… en extra innings; acá arranca en `9`, en Meridiano en `X`). Del parcial de este repo,
+`NOMBREVISITA` / `NOMBRELOCAL` (el nombre escrito sobre la barra) y los rótulos fijos
+`rotulocarreras`, `rotulohits`, `rotuloerrores`; propios, `rotuloinning1`…`8` (fijos). No tiene las
+de la barra de abajo de Meridiano (`lanzadorganador`…, `barra_opacidad`) ni `titulo`. Los textos que
+manda el controlador arrancan vacíos, como en el bateador: el payload del `final` de Meridiano no trae
+los nombres, y el controlador tiene que mandarlos.
+
+Barras de equipo: las mismas 8 imágenes de la tabla de posiciones (los mismos archivos de
+`_assets/`), apiladas, cada una con su máscara, todas visibles al arrancar, como en el parcial: el
+controlador manda `1` a la que va y `0` a las otras siete, en cada fila. Sin data quedan arriba
+Tigres (visita) y Tiburones (local).
+
+Textos: en mayúsculas. Los nombres, desde donde empiezan hasta 8 px antes del final de su caja negra:
+entran `MAGALLANES` y `CARDENALES` al cuerpo del diseño; más largos encogen. Las carreras de cada
+inning y los rótulos, centrados en su columna, en cajas del ancho de la columna más angosta menos 8
+px (la 1 y la 2 están a 57 px; las otras, a 59–62): entran dos cifras (`10`) al tamaño del diseño, y
+`100` encoge un poco. C H E, lo mismo entre sus columnas: entran tres cifras.
+
+Las carreras llegaban corridas a ojo: la de la local del 9, 2 px más abajo que las otras ocho, y las
+de la visita del 1 al 4, 0,6 px; el rótulo del 1, 1 px más arriba. Cada fila va al y de la mayoría.
+
+Salida: el export no trae (su `STOP`, 90–119, no anima nada): es la entrada al revés (1,9 s), como en
+los demás.
+
+Key: los recuadros se tocan borde con borde, y en el key quedaban dos columnas de 1 px, de arriba
+abajo, al 60–92 %: entre las barras (y las cajas de los nombres) y el magenta (x 587), y entre el negro
+de C H E (y la banda azul) y la caja del logo (x 1408). El magenta crece 1 px a la izquierda, y el
+negro y la banda, 1 px a la derecha, por debajo de su vecino. En Chromium, con los 56 cruces, el alfa
+es 255 en todo el gráfico salvo los bordes de afuera.
+
+Colores: el magenta es el de los outs del score de antes (`#EA0059`) y el cian, el de los textos del
+score (`#00D9E2`, 113,5 IRE en NTSC compuesto). Pendiente: medir el logo y las barras en NTSC (las
+barras son las de la tabla de posiciones: legales).
+
 ### Imágenes: `_assets/`
 
 Las imágenes de todos los gráficos van juntas en `_assets/`, una vez cada una, con el sha1 de su
@@ -678,8 +724,9 @@ carpeta `LOWBAR BATEADOR/`, con espacio), el parcial como `FINAL_DE_INNING.zip` 
 INNING/`), el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`), el 3 en línea como
 `3_EN_LINEA.zip` (carpeta `3 EN LINEA/`), los otros juegos como `OTROS_JUEGOS.zip` (carpeta `OTROS
 JUEGOS/`), el prevenido como `PREVENIDO_AL_BATE.zip` (carpeta `PREVENIDO AL BATE/`) y la tabla de
-posiciones como `TABLA DE POSICIONES.zip` (carpeta `TABLA DE POSICIONES/`); el parcial sin publicidad
-no tiene export, sale del parcial. La receta de los once es `herramientas/prep.js`, que prepara los
+posiciones como `TABLA DE POSICIONES.zip` (carpeta `TABLA DE POSICIONES/`) y el score final como
+`SCORE FINAL 1.zip` (carpeta `SCORE FINAL/`); el parcial sin publicidad
+no tiene export, sale del parcial. La receta de los doce es `herramientas/prep.js`, que prepara los
 que encuentre, y el parcial sin publicidad siempre (las imágenes del 3 en línea y del prevenido,
 antes, `herramientas/tresenlinea.py` y `herramientas/prevenido.py`): buscar las capas por `nm` (los
 índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`. Las imágenes del export van
@@ -1176,6 +1223,39 @@ idéntico del 1 al 40; del 44 al 60, el nombre de la fila 8 (el parent), y desde
 corridos (hasta 3 px, la columna JJ en la fila 4). La salida es el espejo de la entrada: el 100 muestra
 lo del 51 y el 150, el gris del 1; el 151, vacío.
 
+**Score final**
+
+- **Imágenes:** las 9 del export van tal cual a `scorefinal/images/` (`img_0`, el logo; `img_1`–`8`,
+  las barras, los mismos archivos que las de la tabla de posiciones); `consolidar.mjs` sólo suma el logo.
+- **Clases:** `,NOMBRE EQUIPO VISITANTE` (con coma: sin clase) y `.NOMBRE EQUIPO LOCAL` (clase
+  `NOMBRE`) → `NOMBREVISITA` / `NOMBRELOCAL`; `.CARRERAS POR INNING ALTA<n>` / `BAJA<n>` (todas con la
+  clase `CARRERAS`) → `INNINGVISITA<n>` / `INNINGLOCAL<n>`; `.CARRERASVISITA`, `.HITSVISITA`,
+  `.ERRORESVISITA` (y `LOCAL`) quedan; `.INNING1`…`8` → `rotuloinning1`…`8` y `.INNING9 ` (con un
+  espacio, y el texto `9 ` también) → `ultimoinning`; `C`, `H`, `E` (sin clase) → `rotulocarreras`,
+  `rotulohits`, `rotuloerrores`; las barras `.BARRA_<EQUIPO>_<LOCAL|VISITA>` →
+  `<SIGLAS><LOCAL|VISITA>_opacidad`. El logo (`LOGO FINAL ATRAPA LA EMOCION.png`, clase `png`) pierde
+  la clase. Las `Capa de formas` y `Nulo 1` quedan como vienen.
+- **Fuente:** `fPath` llega como `SCORE FINAL/ FONT`: pasa a `font/LTEnergy-Regular.ttf` (el mismo
+  archivo que el del bateador).
+- **All Caps:** llega apagado: `prep.js` lo prende.
+- **Posiciones:** las carreras de cada fila y los rótulos, al y de la mayoría (ver arriba).
+- **Textos de caja:** ya llegan de caja, con `lh` 0.01 (va 1.2 del cuerpo). Los anchos, en px de
+  pantalla con `enPantalla()` (todo cuelga de `Nulo 1`, al 90 %): las carreras de los innings y sus
+  rótulos, la menor distancia entre dos columnas menos `SF_MARGEN` (8); C H E, lo mismo; los nombres,
+  desde donde empiezan hasta `SF_MARGEN` antes del final de su caja negra (`Capa de formas 21` y `22`;
+  la del export terminaba a 4 px). El alto, el ascent del cuerpo más 2.
+- **Key:** `Capa de formas 17` (el magenta) crece 1 px a la izquierda, y `18` (el negro de C H E) y `3`
+  (la banda azul, girada 0,098° en el export), 1 px a la derecha (`creceTrazadoX`).
+- **Markers y timeline:** `START` (0–30) y `STOP` (90–119) del diseñador → `play` 0–59 (pausa en el
+  58: `SF_PAUSA`), `salida` 59–118 y `stop` en el 0. Todo suma su entrada al revés (`alReves`): lo que la
+  entrada muestra en el frame t, la salida lo muestra en el 117 − t, el primer frame vacío. Las capas
+  que arrancan en el 0 pasan al 1. La entrada termina en el 58 (`SF_ENTRADA`, la raya plateada).
+- **Textos vacíos:** al final, todos salvo los rótulos y `ultimoinning`.
+
+Comparado frame a frame contra el export (con los textos del diseño, del 1 al 58): idéntico del 1 al
+14; desde el 20, sólo las columnas del arreglo del key y las carreras y el rótulo que se movieron. La
+salida, contra la entrada al revés: idéntica.
+
 ### QA
 
 - Juzgar con el runtime real y la fuente cargada (`<gráfico>/index.html` en el browser o con
@@ -1209,6 +1289,11 @@ lo del 51 y el 150, el gris del 1; el 151, vacío.
   contra la entrada al revés, data al aire, `stop` en la pausa y a mitad de la entrada, y que el
   layer se suelte; en CasparCG, que carguen las imágenes de `_assets/` y que la entrada no repita
   frames (el fondo es una secuencia a pantalla completa).
+- Score final: los 56 cruces visita × local, nombres largos y en minúsculas, números de más cifras
+  (`10` y `100` en los innings, `100` en C H E, `12` en `ultimoinning`), entrada frame a frame contra el
+  export, la salida contra la entrada al revés, data al aire, `stop` en la pausa y a mitad de la
+  entrada, y que el layer se suelte; en CasparCG, el key (sin columnas a menos de 255 entre los
+  recuadros).
 - Imágenes (`consolidar.mjs`): cada gráfico, al píxel contra lo publicado, con todos los equipos
   prendidos y cada frame en su propia carga; y por `file://`.
 - Defensiva, ofensiva, bateador y lanzador: los 8 equipos (barra, color de las puertas, del fondo o

@@ -16,6 +16,7 @@ carpeta con su `index.html`, su `data.json` y su `data.md` (las claves del UPDAT
 | `otrosjuegos/` | Otros juegos (ASÍ VAN), abajo a la derecha: cómo van los otros juegos de la jornada (sede, equipos, carreras e inning), con el cuadro de Harina PAN (una secuencia de JPG); `play` y un `goto('tresjuegos')`, `goto('dosjuegos')` o `goto('unjuego')` según cuántos juegos haya |
 | `prevenido/` | Prevenido al bate, abajo a la derecha: el bateador en el círculo (el nombre bajo PREVENIDO AL BATE), con el panel de LMV (una secuencia de PNG) |
 | `posiciones/` | Tabla de posiciones, a pantalla completa: los 8 equipos, cada uno con su barra, nombre, JJ, JG, JP, AVE y DIF, sobre un fondo con el cuadro de GoGo Royal (una secuencia de JPG) |
+| `scorefinal/` | Score final (line score), abajo: barras de los dos equipos con su nombre, las carreras de los 9 innings, C H E y el logo de ATRAPA LA EMOCIÓN |
 
 Las imágenes de todos los gráficos están juntas en `_assets/`, una vez cada una (el nombre es el sha1
 de su contenido): el `data.json` de cada gráfico las pide con `../_assets/`.

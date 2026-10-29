@@ -3,13 +3,14 @@
 // defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15), del bateador (LOWBAR BATEADOR,
 // 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18), del lanzador (PITCHERS, 2026-10-21), del
 // 3 en línea (3 EN LINEA, 2026-10-22), de los otros juegos (OTROS JUEGOS, 2026-10-22), del prevenido
-// (PREVENIDO AL BATE, 2026-10-23) y de la tabla de posiciones (TABLA DE POSICIONES, 2026-10-22): si
+// (PREVENIDO AL BATE, 2026-10-23), de la tabla de posiciones (TABLA DE POSICIONES, 2026-10-22) y del
+// score final (SCORE FINAL, 2026-10-29): si
 // el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
 //      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/,
-//      PREVENIDO AL BATE/, TABLA DE POSICIONES/. Los que no estén se saltean: alcanza con el zip que
+//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, SCORE FINAL/. Los que no estén se saltean: alcanza con el zip que
 //      llegó. El parcial sin publicidad no tiene export: sale del parcial preparado, y se arma siempre.
 //   2. Las imágenes de cada export que llegó, a <gráfico>/images/ (se copian tal cual; consolidar.mjs
 //      las pasa después a _assets/ y borra la carpeta). Si llegó el 3 EN LINEA: python3
@@ -2026,4 +2027,137 @@ if (hay('TABLA DE POSICIONES')) {
     allCaps(d);
     vaciaTextos(d);
     save(path.join(REPO, 'posiciones/data.json'), d);
+}
+
+// ---------------------------------------------------------------- score final
+// El line score (el export es SCORE FINAL; la carpeta, scorefinal): abajo, de x 302 a 1634, las barras
+// de visita y local con el nombre, las carreras de los 9 innings, C H E y el logo de ATRAPA LA EMOCIÓN.
+// Las claves, las del final de LVBP-Meridiano donde dicen lo mismo (las barras <SIGLAS>VISITA/LOCAL,
+// CARRERAS, HITS y ERRORES, INNINGVISITA1–9 / INNINGLOCAL1–9 y ultimoinning, el rótulo de la columna 9),
+// y las del parcial de este repo para el nombre escrito sobre la barra (NOMBREVISITA / NOMBRELOCAL) y
+// los rótulos fijos (rotulocarreras…), para que el controlador les mande la misma data.
+// Flujo: la entrada termina en el 58 (la raya plateada de la derecha). El export no trae salida (su
+// STOP, 90–119, no anima nada): es la entrada al revés, como en los demás.
+const SF_PAUSA = 59;                   // play 0–59: queda en el 58
+const SF_ENTRADA = 58;                 // la entrada termina en el 58
+const SF_MARGEN = 8;                   // las cajas, 8 px antes de la columna vecina o del borde de su caja negra
+if (hay('SCORE FINAL')) {
+    const d = load(path.join(SRC, 'SCORE FINAL/data.json'));
+    const FIN = SF_PAUSA + SF_ENTRADA;     // lo que la entrada muestra en el frame t, la salida lo muestra en el FIN − t
+    const vacio = FIN;
+    const columnas = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    if (d.layers.some(l => l.td || l.tt || l.ty === 0)) throw new Error('scorefinal: mattes o precomps inesperados');
+    const moda = xs => { const n = new Map(); for (const x of xs) n.set(x, (n.get(x) || 0) + 1); return [...n].sort((a, b) => b[1] - a[1])[0][0]; };
+
+    // ---- las carreras de cada inning: llegan en columnas con el mismo x en las dos filas, pero algunas
+    // corridas en y a ojo (la de la local del 9, 2 px más abajo; las de la visita del 1 al 4, 0,6 px):
+    // cada fila, al y de la mayoría. El rótulo del 1, 1 px más arriba que los otros ocho: lo mismo.
+    for (const fila of ['ALTA', 'BAJA']) {
+        const celdas = columnas.map(n => layer(d, `.CARRERAS POR INNING ${fila}${n}`));
+        if (celdas.some(l => l.ks.p.a)) throw new Error(`carreras ${fila}: posición animada`);
+        const y = moda(celdas.map(l => l.ks.p.k[1]));
+        for (const l of celdas) l.ks.p.k[1] = y;
+    }
+    const rotulos = columnas.map(n => layer(d, `.INNING${n}`));
+    const yFinal = l => { const k = l.ks.p.k; if (!l.ks.p.a || k.length !== 2) throw new Error(`${l.nm}: posición inesperada`); return k[1].s[1]; };
+    const yRotulo = moda(rotulos.map(yFinal));
+    for (const l of rotulos) { const dy = yRotulo - yFinal(l); for (const k of l.ks.p.k) k.s[1] += dy; }
+
+    // ---- textos de caja (textos-de-caja.md), medidos con la entrada terminada. Llegan de caja, centrados
+    // (los nombres, a la izquierda), con lh 0.01: va 1.2 del cuerpo, y el alto, el ascent del cuerpo más
+    // 2, como en los otros gráficos (si no, un texto largo partía en dos líneas encimadas en vez de
+    // encoger). Los anchos: las carreras de los innings y sus rótulos, la menor distancia entre dos
+    // columnas menos SF_MARGEN (todos iguales: entran dos cifras al cuerpo del diseño); C H E, lo mismo
+    // entre sus columnas; los nombres, desde donde empiezan hasta SF_MARGEN antes del final de su caja
+    // negra (la del export terminaba a 4 px).
+    const ascent = d.fonts.list[0].ascent / 100;
+    const centro = nm => { const l = layer(d, nm), s = doc(d, nm); return enPantalla(d, l, s.ps[0] + s.sz[0] / 2); };
+    const anchoMinimo = nms => {
+        const xs = nms.map(centro);
+        return Math.min(...xs.slice(1).map((x, i) => x - xs[i])) - SF_MARGEN;
+    };
+    const wInning = anchoMinimo(columnas.map(n => `.CARRERAS POR INNING ALTA${n}`));
+    for (const fila of ['ALTA', 'BAJA']) for (const n of columnas) {
+        const nm = `.CARRERAS POR INNING ${fila}${n}`;
+        anchoCentrado(doc(d, nm), wInning / escalaX(d, layer(d, nm)));
+    }
+    for (const n of columnas) anchoCentrado(doc(d, `.INNING${n}`), wInning / escalaX(d, rotulos[n - 1]));
+    const che = ['CARRERAS', 'HITS', 'ERRORES'];
+    const wChe = anchoMinimo(che.map(c => `.${c}VISITA`));
+    for (const c of che) for (const lado of ['VISITA', 'LOCAL']) anchoCentrado(doc(d, `.${c}${lado}`), wChe / escalaX(d, layer(d, `.${c}${lado}`)));
+    const cajaNombre = { ',NOMBRE EQUIPO VISITANTE': 'Capa de formas 21', '.NOMBRE EQUIPO LOCAL': 'Capa de formas 22' };
+    for (const [nm, caja] of Object.entries(cajaNombre)) {
+        const l = layer(d, nm), s = doc(d, nm), [x0, x1] = rectangulo(d, layer(d, caja), 0);
+        const desde = enPantalla(d, l, s.ps[0]);
+        if (s.j !== 0 || !(x0 < desde && desde < x1)) throw new Error(`${nm}: fuera de su caja negra`);
+        s.sz[0] = (x1 - SF_MARGEN - desde) / escalaX(d, l);
+    }
+    for (const l of d.layers) if (l.ty === 5) for (const k of l.t.d.k) {
+        k.s.sz[1] = +(ascent * k.s.s + 2).toFixed(2);
+        k.s.lh = 1.2 * k.s.s;
+        k.s.t = k.s.t.trim();          // el 9 llega con un espacio al final, que Lottie no cuenta al centrar
+    }
+
+    // ---- clases
+    rename(d, ',NOMBRE EQUIPO VISITANTE', 'NOMBREVISITA');
+    rename(d, '.NOMBRE EQUIPO LOCAL', 'NOMBRELOCAL');
+    for (const c of che) for (const lado of ['VISITA', 'LOCAL']) rename(d, `.${c}${lado}`, c + lado);
+    for (const n of columnas) {
+        rename(d, `.CARRERAS POR INNING ALTA${n}`, `INNINGVISITA${n}`);
+        rename(d, `.CARRERAS POR INNING BAJA${n}`, `INNINGLOCAL${n}`);
+        rename(d, `.INNING${n}`, n < 9 ? `rotuloinning${n}` : 'ultimoinning');
+    }
+    rename(d, 'C', 'rotulocarreras');
+    rename(d, 'H', 'rotulohits');
+    rename(d, 'E', 'rotuloerrores');
+    const logo = layer(d, 'LOGO FINAL ATRAPA LA EMOCION.png');
+    delete logo.cl;
+    // Las barras: las 8 de cada fila apiladas, todas visibles al arrancar, como en el parcial: el
+    // controlador manda 1 a la que va y 0 a las otras siete.
+    const barras = d.layers.filter(l => /^\.BARRA_[A-Z]+_(LOCAL|VISITA)$/.test(l.nm));
+    if (barras.length !== 16) throw new Error(`barras: ${barras.length}`);
+    for (const b of barras) {
+        const [, equipo, lado] = b.nm.match(/^\.BARRA_([A-Z]+)_(LOCAL|VISITA)$/);
+        if (!SIGLAS[equipo]) throw new Error(`${b.nm}: equipo desconocido`);
+        rename(d, b.nm, `${SIGLAS[equipo]}${lado}_opacidad`);
+    }
+
+    // ---- key: los recuadros se tocan borde con borde, y dos bordes suavizados que caen en el mismo
+    // píxel no suman 100 %: quedaban dos columnas de 1 px al 60–92 %, de arriba abajo (x 587, entre las
+    // barras y el rosado de los innings, y x 1408, entre el negro de C H E y la banda azul de los
+    // rótulos y la caja del logo), una línea finita de video al aire. El rosado crece 1 px a la
+    // izquierda, por debajo de las barras y las cajas de los nombres, y el negro y la banda azul, 1 px a
+    // la derecha, por debajo de la caja del logo.
+    const creceTrazadoX = (l, izq, der) => {
+        const g = l.shapes[0].it, sh = g.find(s => s.ty === 'sh'), tr = g.find(s => s.ty === 'tr');
+        if (l.shapes.length !== 1 || sh.ks.a || tr.s.a || Math.abs(tr.r.k) > 0.5 || l.ks.r.k) throw new Error(`${l.nm}: trazado inesperado`); // la banda azul llega girada 0,098°
+        const v = sh.ks.k.v, xs = v.map(p => p[0]), min = Math.min(...xs), max = Math.max(...xs);
+        const sx = escalaX(d, l) * tr.s.k[0] / 100;   // px de pantalla por unidad del trazado
+        for (const p of v) {
+            if (p[0] < min + 1) p[0] -= izq / sx;
+            if (p[0] > max - 1) p[0] += der / sx;
+        }
+    };
+    creceTrazadoX(layer(d, 'Capa de formas 17'), 1, 0);   // el rosado (fill 0.918 0 0.349)
+    creceTrazadoX(layer(d, 'Capa de formas 18'), 0, 1);   // el negro de C H E
+    creceTrazadoX(layer(d, 'Capa de formas 3'), 0, 1);    // la banda azul de los rótulos
+
+    // ---- la salida: todo, su entrada al revés desde la pausa
+    for (const l of d.layers) {
+        for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, SF_ENTRADA, SF_PAUSA);
+        l.ip = Math.max(l.ip, 1);      // el frame 0 queda vacío, como en los otros gráficos
+        l.op = Math.min(FIN - Math.ceil(l.ip) + 0.001, vacio + 1);
+    }
+    d.op = vacio + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: SF_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: SF_PAUSA, cm: 'salida', dr: vacio + 1 - SF_PAUSA }
+    ];
+    if (d.fonts.list.length !== 1 || d.fonts.list[0].fName !== 'LTEnergy-Regular') throw new Error('scorefinal: fuentes inesperadas');
+    d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
+    allCaps(d);
+    // los textos del UPDATE arrancan vacíos, salvo los rótulos (ultimoinning dice 9)
+    for (const l of d.layers) if (l.ty === 5 && l.cl && !/^(rotulo|ultimoinning)/.test(l.cl)) for (const k of l.t.d.k) k.s.t = '';
+    save(path.join(REPO, 'scorefinal/data.json'), d);
 }
