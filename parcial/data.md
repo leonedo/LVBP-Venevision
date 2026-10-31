@@ -49,7 +49,7 @@ empty string leaves the slot empty.
 **Sponsor:** `publicidad`, the path of an image (relative to the graphic's `index.html`, or
 absolute). The box is 316 × 200 px and the image fits whole, any proportion, centered. By default
 it is the Pepsi insert (`../_assets/9116da765ab4.png`). `""` or a path that doesn't load leaves the
-box empty (the grey side stripes stay), without a broken-image icon.
+box empty (the grey side stripes stay; during the entry, nothing slides in), without a broken-image icon.
 
 ```json
 {
@@ -96,8 +96,8 @@ box empty (the grey side stripes stay), without a broken-image icon.
 |----------|-------|
 | Size | 1920 × 1080 px |
 | Frame rate | 29.9700012207031 fps |
-| Frames | 0 – 338 |
-| Duration | 4.47 s |
+| Frames | 0 – 120 |
+| Duration | 4.0 s |
 
 Bottom of the screen, about centered (x 310–1540, y 677–930; 35 px left of center): it doesn't touch the score.
 Frame 0 is empty: nothing shows before `play`.
@@ -154,14 +154,15 @@ Two digits fit in each number at the design size.
 
 | Name | Start (tm) | Duration (dr) | Payload |
 |------|-----------|--------------|---------|
-| `play` | 0 | 67 | stage `pause`, order 1, `stop: "salida"` |
+| `play` | 0 | 60 | stage `pause`, order 1, `stop: "salida"` |
 | `stop` | 0 | 1 | — (frame 0, empty) |
-| `salida` | 67 | 67 | — (the entry in reverse) |
+| `salida` | 60 | 59 | — (the entry in reverse) |
 
-`play` enters and pauses on frame 66 (2.2 s): the board is in by frame 41 (1.4 s); a grey box
-opens to its right (frames 43–61) and the sponsor image wipes in over it, right to left (62–66). No
+`play` enters and pauses on frame 59 (2 s): the board is in by frame 41 (1.4 s); the sponsor image
+slides in from the left, clipped by its box, while the board is still coming in (34–53), and the
+box's right stripe opens (51–59). No
 update animation: data sent while on air replaces silently, the teams and the sponsor included.
-`stop` plays `salida` (frame 67 → 133, 2.2 s): the entry in reverse, the sponsor first and the board
+`stop` plays `salida` (frame 60 → 119, 2 s): the entry in reverse, the sponsor first and the board
 last, ending on an empty frame; it releases the layer when it ends. The `play` stage is active from
 frame 0, so a `stop` that arrives mid-entry also plays `salida`: it jumps to the full graphic and
 exits from there.
