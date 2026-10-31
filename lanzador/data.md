@@ -138,8 +138,8 @@ Fixed image of the design. It can be swapped by path, but a controller doesn't n
 | `stop` | 0 | 1 | — (frame 0, empty) |
 | `salida` | 110 | -110 | — (the entry played backwards) |
 
-`play` enters and pauses on frame 110 (3.7 s). No update animation: data sent while on air replaces
+`play` enters and pauses on frame 110 (2.2 s; the JSON runs at 49.95 fps, 60 % of the design speed). No update animation: data sent while on air replaces
 silently, the team included. The exit is the entry in reverse: `stop` plays `salida` (frame 110 →
-0, 3.7 s, ending on the empty frame) and releases the layer when it ends. The `play` stage is active
+0, 2.2 s, ending on the empty frame) and releases the layer when it ends. The `play` stage is active
 from frame 0, so a `stop` that arrives mid-entry also plays `salida`: it jumps to the full graphic
 and exits from there.

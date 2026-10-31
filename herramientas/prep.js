@@ -831,6 +831,15 @@ const BAT_LW = { '.000': 125.6719, '00': 72.9531 };
 const BAT_ETIQUETA = 70;
 const BAT_BORDE = 309;
 const ENTRADA_BAT = 87;                // la entrada termina en el 86 (OPS)
+// Más rápidas (Leon, 2026-10-31: duraban 2,9 y 3,7 s): el bateador y el lanzador se reproducen al
+// 1/RAPIDO de la velocidad del diseño, con el fr del JSON. La coreografía y los frames de los markers
+// quedan iguales; la entrada y la salida (su espejo) duran un RAPIDO de lo que duraban. Lottie
+// interpola entre frames (subframe), así que en un canal a 29,97 sale igual de suave.
+const RAPIDO = 0.6;
+function rapido(d) {
+    if (Math.abs(d.fr - 29.97) > 0.01) throw new Error(`fr ${d.fr}: el export ya no viene a 29,97`);
+    d.fr = +(d.fr / RAPIDO).toFixed(4);
+}
 const BAT_COSTURA = 2;                 // px que crece hacia abajo la barra negra del split (ver key)
 // El escudo grande va en overlay sobre el fondo, que a lo sumo duplica el brillo de lo que tiene
 // abajo: sobre el fondo de Tigres, casi negro, apenas se ve. Lleva lo mismo que su escudo en las
@@ -952,6 +961,7 @@ if (hay('LOWBAR BATEADOR')) {
     d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
     allCaps(d);
     vaciaTextos(d);
+    rapido(d);
     save(path.join(REPO, 'bateador/data.json'), d);
 }
 
@@ -1149,6 +1159,7 @@ if (hay('PITCHERS')) {
     d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
     allCaps(d);
     vaciaTextos(d);
+    rapido(d);
     save(path.join(REPO, 'lanzador/data.json'), d);
 }
 
