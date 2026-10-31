@@ -190,6 +190,72 @@ const LOGO = 'LOGO FINAL ATRAPA LA EMOCION_1.png';
 // (x 821). Si el ancla llega en otro lugar, falla: medir de nuevo el centro del 10.
 const INNING_ESCALA = 1.4;
 const INNING_ANCLA = [-17.503, -15.02];
+// Tahoma Bold en la barra negra de abajo (nombres y números), el conteo, OUTS y el inning (Leon,
+// 2026-10-31, con una captura de cómo lo quiere); las siglas y las carreras siguen en LT Energy. Es
+// la del sistema, sin archivo en el repo (sin fPath: Lottie la da por cargada y el navegador la toma
+// instalada, como en todo Windows y macOS). El ascent es la altura de la H (1489 de 2048), la medida
+// que da el de LT Energy (73,7 contra una H de 730 de 1000).
+const TAHOMA = { origin: 0, fPath: '', fClass: '', fFamily: 'Tahoma', fWeight: '', fStyle: 'Bold', fName: 'Tahoma-Bold', ascent: 72.71 };
+// Lo que cada capa centra en vertical: mayúsculas (la H: LT Energy 0–0.73, Tahoma 0–0.727) o
+// números (el 0: 0–0.664 y −0.015–0.742). Al cambiar la fuente o el cuerpo, el centro queda donde
+// estaba (la caja de Lottie pone la línea base en ps[1] + ascent × cuerpo).
+const CENTRO = { mayusculas: [0.365, 0.3635], numeros: [0.332, 0.3635] };
+// [capa, qué centra, cuerpo nuevo (null: el mismo)]. La barra de abajo pasa de 21 a 18 (y de 22 a
+// 18.86: la misma proporción), el tamaño de la captura de Leon: con la Tahoma, más ancha, al 21
+// CHIRINOS no entraba (119 px). El inning, al cuerpo en que sus números miden lo mismo que en LT
+// Energy (los de la Tahoma son un 14 % más altos y tocaban las flechas). El conteo y OUTS, igual.
+const TAH_CAPAS = [
+    ['.bateador', 'mayusculas', 18], ['.lanzador', 'mayusculas', 18], ['.mph', 'mayusculas', 18],
+    ['.lanzamientos', 'numeros', 18], ['.velocidad', 'numeros', 18],
+    ['.average', 'numeros', 18.86], ['.actuacion', 'numeros', 18.86],
+    ['.inning', 'numeros', 8.77], ['.conteobolasystrikes', 'numeros', null], ['.outs', 'mayusculas', null]
+];
+// Las cajas de la barra de abajo, en px de pantalla (la barra negra va de x 219 a 754, con la
+// división entre bateador y lanzador en la 487). Sin cambios: el bateador (250.7–336.5, entra
+// CASTRO, 78) y el average (347.2–408.6). La actuación crece hacia la izquierda hasta que entra
+// 10-4 (44.8). Del lado del lanzador, de derecha a izquierda: MPH (44.4) termina donde terminaba
+// (745.6, 8.4 px antes del final); la velocidad, 5.6 px antes de MPH, con lugar para 100 (36.6); los
+// lanzamientos, 8.4 px antes, para P.100 (55.1), y el lanzador, 8.4 px antes, desde 4 px después de
+// la división: 94 px (CHIRINOS, 101.5, baja a 16: Lottie achica de a 1).
+const TAH_ACTUACION = [431.3, 476.8];
+const TAH_MPH_FIN = 745.6, TAH_MPH = 44.4;
+const TAH_VELOCIDAD = 37.5, TAH_LANZAMIENTOS = 56, TAH_LANZADOR_DESDE = 491;
+const TAH_AIRE = 8.4, TAH_AIRE_MPH = 5.6;
+const TAH_INNING = 56;
+function tahomaEnLaBarra(d) {
+    if (d.fonts.list.length !== 1 || d.fonts.list[0].fName !== 'LTEnergy-Regular') throw new Error('score: fuentes inesperadas');
+    const lt = d.fonts.list[0].ascent / 100, ta = TAHOMA.ascent / 100;
+    d.fonts.list.push({ ...TAHOMA });
+    for (const [nm, que, cuerpo] of TAH_CAPAS) {
+        const s = doc(d, nm), [cl, ct] = CENTRO[que], s2 = cuerpo ?? s.s;
+        if (s.f !== 'LTEnergy-Regular') throw new Error(`${nm}: fuente ${s.f}`);
+        s.ps[1] = +(s.ps[1] + (lt - cl) * s.s - (ta - ct) * s2).toFixed(3);
+        if (s.lh) s.lh = +(s.lh * s2 / s.s).toFixed(3);
+        s.s = s2;
+        s.f = TAHOMA.fName;
+    }
+    // Una caja [x0, x1] en px de pantalla, a unidades de su capa.
+    const caja = (nm, x0, x1) => {
+        const l = layer(d, nm), s = doc(d, nm), o = enPantalla(d, l, 0), u = enPantalla(d, l, 1) - o;
+        s.ps[0] = +((x0 - o) / u).toFixed(3);
+        s.sz[0] = +((x1 - x0) / u).toFixed(3);
+    };
+    caja('.actuacion', ...TAH_ACTUACION);
+    const mph = layer(d, '.mph'), m = doc(d, '.mph');
+    const desdeMph = TAH_MPH_FIN - TAH_MPH;
+    m.ps[0] = +((desdeMph - enPantalla(d, mph, 0)) / (enPantalla(d, mph, 1) - enPantalla(d, mph, 0))).toFixed(3);
+    const finVel = desdeMph - TAH_AIRE_MPH, finLzm = finVel - TAH_VELOCIDAD - TAH_AIRE, finLan = finLzm - TAH_LANZAMIENTOS - TAH_AIRE;
+    caja('.velocidad', finVel - TAH_VELOCIDAD, finVel);
+    caja('.lanzamientos', finLzm - TAH_LANZAMIENTOS, finLzm);
+    caja('.lanzador', TAH_LANZADOR_DESDE, finLan);
+    // FINAL en el inning: con la Tahoma, más ancha, no entraba en la caja (38 px) hasta un cuerpo en
+    // que ya entraban dos líneas, y salía partido (FINA / L). La caja crece a TAH_INNING px, centrada
+    // (del negro que va de x 753 a la tercera base, en la 821), y el interlineado va al triple del
+    // cuerpo: Lottie achica hasta que entra en una línea, nunca parte.
+    const inn = layer(d, '.inning'), si = doc(d, '.inning');
+    anchoCentrado(si, +(TAH_INNING / escalaX(d, inn)).toFixed(3));
+    si.lh = +(3 * si.s).toFixed(3);
+}
 if (hay('SCOREBUG')) {
     const d = load(path.join(SRC, 'SCOREBUG/data.json'));
 
@@ -320,6 +386,7 @@ if (hay('SCOREBUG')) {
     vel.sz[0] = 30;                    // entra 100 (28.25)
     vel.ps[0] = fin - vel.sz[0];
     vel.t = vel.t.trim();              // "90 ": el espacio separaba de MPH a la izquierda
+    tahomaEnLaBarra(d);
 
     // La pausa del marcador va después del último keyframe de la entrada (todo menos la barra de
     // jugadores): desde el export del 2026-10-22 es el brillo del logo, que pasa del 29 al 58, y
