@@ -22,8 +22,8 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `score/` | Pizarra arriba a la izquierda: logo (ATRAPA LA EMOCIÓN), barras de visita y local (escudo y siglas), carreras, inning con sus flechas, bases, conteo y outs; abajo, la barra de bateador (apellido, average, actuación) y lanzador (apellido, lanzamientos, velocidad) | `play` (0–59) → stages `marcador` → `jugadores` (la barra sube, 65–90) → `sinjugadores` (la barra baja, 100–125), los tres `pause` | `salida`: la entrada al revés (2 s); desde `jugadores`, `salida_jugadores` baja antes la barra (3 s) |
 | `defensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el campo con las 9 posiciones (rótulo y apellido); arriba a la izquierda, la barra del equipo y DEFENSIVA. El frame 0 está vacío | stage `play` pause (0–53) | `salida`: la entrada al revés (1,8 s): las compuertas se cierran y termina en el frame vacío |
 | `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA. El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
-| `bateador/` | Barra baja del bateador, abajo a la izquierda: arriba, una barra negra con el split; a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87) | `salida`: la entrada al revés (2,9 s) |
-| `lanzador/` | El lanzador (el export es PITCHERS), en la mitad izquierda: un panel del color del equipo con su escudo grande, de arriba abajo en el borde izquierdo; la barra del equipo con el nombre y el apellido (dos líneas) y el número, y debajo una barra negra con el split; la mano de lanzar y 6 estadísticas (rótulo y valor) sobre una textura gris. El frame 0 está vacío | stage `play` pause (0–110) | `salida`: la entrada al revés (3,7 s) |
+| `bateador/` | Barra baja del bateador, abajo a la izquierda: arriba, una barra negra con el split; a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87), al 60 % de la velocidad del diseño: 1,7 s | `salida`: la entrada al revés (1,7 s) |
+| `lanzador/` | El lanzador (el export es PITCHERS), en la mitad izquierda: un panel del color del equipo con su escudo grande, de arriba abajo en el borde izquierdo; la barra del equipo con el nombre y el apellido (dos líneas) y el número, y debajo una barra negra con el split; la mano de lanzar y 6 estadísticas (rótulo y valor) sobre una textura gris. El frame 0 está vacío | stage `play` pause (0–110), al 60 % de la velocidad del diseño: 2,2 s | `salida`: la entrada al revés (2,2 s) |
 | `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, casi centrado (35 px a la izquierda): barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de la publicidad (`publicidad`, una imagen: Pepsi). El frame 0 está vacío | stage `play` pause (0–67): la pizarra entra hasta el 41, un recuadro gris se abre a su derecha (43–61) y la publicidad entra con una cortina (62–66) | `salida`: la entrada al revés (2,2 s) |
 | `parcialsinpublicidad/` | El parcial sin el cuadro de Pepsi ni sus dos rayas grises, centrado (x 507–1411): la misma pizarra, con las mismas claves (el controlador elige con o sin publicidad por el template). Lo arma `prep.js` desde el parcial preparado. El frame 0 está vacío | stage `play` pause (0–42): la pizarra entra hasta el 41 | `salida`: la entrada al revés (1,4 s) |
 | `tresenlinea/` | Los tres que vienen al bate (el export es 3 EN LINEA), abajo a la derecha: un panel de Empire Keeway entra con sus logos y se va, y queda la caja, la banda naranja con el 3 EN LÍNEA y el recuadro azul con los tres nombres (todo una secuencia de PNG, salvo los nombres). El frame 0 está vacío | stage `play` pause (0–197): la caja crece del 16 al 43, los nombres aparecen del 40 al 60 y el panel se va del 177 al 193 | `salida`: los nombres y la caja, su entrada al revés, sin el panel (1,5 s) |
@@ -926,6 +926,11 @@ el título del export): igual salvo 1 o 2 niveles de 255 en el escudo.
 - **Markers y timeline:** `START` (0–30) y `STOP` (90–120) del diseñador → `play`, `salida` y `stop`
   como en la defensiva. La entrada termina en el 86 (el OPS): si cambia, mover `ENTRADA_BAT`. Las
   capas que arrancan en el 0 pasan al 1: el frame 0 queda vacío.
+- **Más rápido:** `rapido()` sube el `fr` del JSON de 29,97 a 49,95 (`RAPIDO`, 0,6; Leon, 2026-10-31:
+  la entrada duraba 2,9 s y el lanzador, 3,7). La coreografía y los frames de los markers no cambian:
+  la entrada y la salida duran un 60 % (1,7 s y, en el lanzador, 2,2). Lottie interpola entre frames,
+  y en CasparCG 2.5.1 a 1080p29.97 sale tan suave como antes (grabado: los mismos frames quietos del
+  final de las curvas). Falla si el export llega con otro `fr`. Para otra velocidad, cambiar `RAPIDO`.
 - **Textos vacíos:** al final, `vaciaTextos()` deja vacío el texto de todas las capas con clase (las
   cajas ya se midieron con el del diseño).
 - **Imágenes:** las 17 del export van tal cual a `bateador/images/`.
@@ -982,6 +987,7 @@ barra; antes del arreglo del key. Con la fuente variable del export, los textos 
 - **Markers y timeline:** `start` (0–30) y `stop` (120–150) del diseñador → `play`, `salida` y `stop`
   como en el bateador. La entrada termina en el 109 (el último rótulo): si cambia, mover
   `ENTRADA_LAN`. El frame 0 ya llega vacío.
+- **Más rápido:** `rapido()`, como en el bateador.
 - **Textos vacíos:** como en el bateador, `vaciaTextos()` al final.
 - **Imágenes:** las 16 del export van tal cual a `lanzador/images/`.
 
