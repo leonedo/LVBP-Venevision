@@ -13,7 +13,7 @@ la estática que mandó el diseñador con sus primeros exports (los del 2026-10-
 mide igual, y en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y
 los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, y el del score final, del 2026-10-29, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
 (`font/ChakraPetch-Bold.ttf`, libre, de Google Fonts) en el título y las carreras, y el score, Tahoma
-Bold en la barra de jugadores, el conteo, OUTS y el inning (la del sistema, sin archivo: ver *Score*). Las keys del
+Bold en la barra de jugadores, el conteo, OUTS y el inning (`font/Tahoma-Bold.ttf`: ver *Score*). Las keys del
 UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una vez cada una (ver
 *Imágenes: `_assets/`*).
 
@@ -125,10 +125,9 @@ sobre el eje del texto del diseño; la velocidad, alineada a la derecha contra `
 
 Fuente: desde el 2026-10-31 (Leon, con una captura de AE de cómo lo quiere), la barra de jugadores
 (bateador, average, actuación, lanzador, lanzamientos, velocidad y MPH), el conteo, OUTS y el inning
-van en **Tahoma Bold**; las siglas y las carreras siguen en LT Energy. Es la Tahoma **del sistema**
-(viene en todo Windows y macOS): la fuente del JSON no tiene `fPath`, Lottie la da por cargada y el
-navegador la toma instalada. No va el archivo porque es de Microsoft y el repo es público (el lint
-la deja pasar sólo a ella). En un contenedor Linux hay que instalarla para probar (`~/.fonts/`). La
+van en **Tahoma Bold** (`score/font/Tahoma-Bold.ttf`); las siglas y las carreras siguen en LT Energy.
+El archivo va en el repo aunque Windows la trae (Leon, 2026-10-31: mejor estar seguros), sabiendo que
+es de Microsoft, su licencia no permite redistribuirla y el repo es público. La
 Tahoma es más ancha: la barra pasa de cuerpo 21 (22 el average y la actuación) a 18 (18,86), el
 tamaño de la captura, y sus cajas se rehicieron (`tahomaEnLaBarra()` en `prep.js`: MPH termina donde
 terminaba y el lado del lanzador se arma de derecha a izquierda, con lugar para `P.100` y `100`). El

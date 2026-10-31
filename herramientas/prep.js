@@ -191,11 +191,10 @@ const LOGO = 'LOGO FINAL ATRAPA LA EMOCION_1.png';
 const INNING_ESCALA = 1.4;
 const INNING_ANCLA = [-17.503, -15.02];
 // Tahoma Bold en la barra negra de abajo (nombres y números), el conteo, OUTS y el inning (Leon,
-// 2026-10-31, con una captura de cómo lo quiere); las siglas y las carreras siguen en LT Energy. Es
-// la del sistema, sin archivo en el repo (sin fPath: Lottie la da por cargada y el navegador la toma
-// instalada, como en todo Windows y macOS). El ascent es la altura de la H (1489 de 2048), la medida
-// que da el de LT Energy (73,7 contra una H de 730 de 1000).
-const TAHOMA = { origin: 0, fPath: '', fClass: '', fFamily: 'Tahoma', fWeight: '', fStyle: 'Bold', fName: 'Tahoma-Bold', ascent: 72.71 };
+// 2026-10-31, con una captura de cómo lo quiere); las siglas y las carreras siguen en LT Energy. El
+// archivo va en score/font/ (Leon: aunque Windows la trae, mejor estar seguros). El ascent es la
+// altura de la H (1489 de 2048), la medida que da el de LT Energy (73,7 contra una H de 730 de 1000).
+const TAHOMA = { origin: 0, fPath: 'font/Tahoma-Bold.ttf', fClass: '', fFamily: 'Tahoma', fWeight: '', fStyle: 'Bold', fName: 'Tahoma-Bold', ascent: 72.71 };
 // Lo que cada capa centra en vertical: mayúsculas (la H: LT Energy 0–0.73, Tahoma 0–0.727) o
 // números (el 0: 0–0.664 y −0.015–0.742). Al cambiar la fuente o el cuerpo, el centro queda donde
 // estaba (la caja de Lottie pone la línea base en ps[1] + ascent × cuerpo).
