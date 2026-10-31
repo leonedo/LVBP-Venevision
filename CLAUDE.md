@@ -24,7 +24,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA. El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
 | `bateador/` | Barra baja del bateador, abajo a la izquierda: arriba, una barra negra con el split; a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87), al 60 % de la velocidad del diseño: 1,7 s | `salida`: la entrada al revés (1,7 s) |
 | `lanzador/` | El lanzador (el export es PITCHERS), en la mitad izquierda: un panel del color del equipo con su escudo grande, de arriba abajo en el borde izquierdo; la barra del equipo con el nombre y el apellido (dos líneas) y el número, y debajo una barra negra con el split; la mano de lanzar y 6 estadísticas (rótulo y valor) sobre una textura gris. El frame 0 está vacío | stage `play` pause (0–110), al 60 % de la velocidad del diseño: 2,2 s | `salida`: la entrada al revés (2,2 s) |
-| `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, casi centrado (35 px a la izquierda): barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de la publicidad (`publicidad`, una imagen: Pepsi). El frame 0 está vacío | stage `play` pause (0–67): la pizarra entra hasta el 41, un recuadro gris se abre a su derecha (43–61) y la publicidad entra con una cortina (62–66) | `salida`: la entrada al revés (2,2 s) |
+| `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, casi centrado (35 px a la izquierda): barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de la publicidad (`publicidad`, una imagen: Pepsi). El frame 0 está vacío | stage `play` pause (0–60): la pizarra entra hasta el 41, la publicidad entra deslizándose desde la izquierda, recortada por su cuadro (34–53), y la raya derecha del cuadro aparece del 51 al 59 | `salida`: la entrada al revés (2 s) |
 | `parcialsinpublicidad/` | El parcial sin el cuadro de Pepsi ni sus dos rayas grises, centrado (x 507–1411): la misma pizarra, con las mismas claves (el controlador elige con o sin publicidad por el template). Lo arma `prep.js` desde el parcial preparado. El frame 0 está vacío | stage `play` pause (0–42): la pizarra entra hasta el 41 | `salida`: la entrada al revés (1,4 s) |
 | `tresenlinea/` | Los tres que vienen al bate (el export es 3 EN LINEA), abajo a la derecha: un panel de Empire Keeway entra con sus logos y se va, y queda la caja, la banda naranja con el 3 EN LÍNEA y el recuadro azul con los tres nombres (todo una secuencia de PNG, salvo los nombres). El frame 0 está vacío | stage `play` pause (0–197): la caja crece del 16 al 43, los nombres aparecen del 40 al 60 y el panel se va del 177 al 193 | `salida`: los nombres y la caja, su entrada al revés, sin el panel (1,5 s) |
 | `otrosjuegos/` | Cómo van los otros juegos (el export es OTROS JUEGOS; el título, ASÍ VAN), una columna abajo a la derecha: arriba, un cuadro de Harina PAN entra, arma su logo y se va (una secuencia de JPG); debajo, el título y tres juegos, cada uno con la sede, las barras de visita y local (escudo y nombre), las carreras y el inning con sus flechas. El frame 0 está vacío | `play` lo pone al aire vacío (pausa en el 0); el controlador elige con un `goto`: `tresjuegos` (100–266), `dosjuegos` (400–566) o `unjuego` (700–866), el mismo gráfico con 3, 2 o 1 juegos. En cada uno, desde el `goto`, el cuadro entra del 11 al 23, la columna del 27 al 95 (un juego detrás del otro) y el cuadro se va del 157 al 164 | `salida`: la columna, su entrada al revés, sin el cuadro (2,3 s); `salida2` (1,9 s) y `salida1` (1,3 s) |
@@ -40,10 +40,11 @@ ejemplo) y `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), las
 ejemplo) y `bateador_equipos.png` / `lanzador_equipos.png` (los 8 equipos, recortado al gráfico),
 las del bateador del 2026-10-18 y las del lanzador del 2026-10-21; `parcial.png` (pantalla completa
 con el ejemplo de su `data.md`, Magallanes y Cardenales) y `parcial_equipos.png` (los 56 cruces
-`visita_vs_local`, recortado a la pizarra), del 2026-10-18 (`parcial.png`, del 2026-10-31, con la
-publicidad fija); `parcialsinpublicidad.png` (pantalla
+`visita_vs_local`, recortado a la pizarra), del 2026-10-18 (`parcial.png`, del 2026-10-31, con el
+export nuevo y la publicidad fija; las barras del export del 2026-10-31 son las mismas, recomprimidas:
+hasta 3 niveles de media); `parcialsinpublicidad.png` (pantalla
 completa con el mismo ejemplo, en la pausa; los equipos son los de `parcial_equipos.png`), del
-2026-10-23; `tresenlinea.png` (pantalla completa con
+2026-10-31; `tresenlinea.png` (pantalla completa con
 el ejemplo de su `data.md`, en la pausa) y `tresenlinea_panel.png` (en el 120, con el panel), del
 2026-10-22; `otrosjuegos.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa),
 `otrosjuegos_panel.png` (en el 120, con el cuadro de Harina PAN), `otrosjuegos_equipos.png` (8
@@ -349,13 +350,13 @@ cliente cambió la publicidad por `Insert PEPSI.jpg`, de 316 × 200, el tamaño 
 `_assets/` como PNG). Por defecto, esa imagen; otra ruta entra entera, de cualquier proporción
 (`pr` meet), y `""` o una ruta que no carga dejan el cuadro vacío, con las rayas grises. Antes era
 la animación del diseñador (una secuencia de PNG de 262 frames, el export del 2026-10-18: el logo
-entraba, le pasaba un brillo y la pausa llegaba a los 7,4 s). De ella quedan los frames genéricos:
-el recuadro gris que se abre desde una línea (al aire, 43–61) y, donde pasaba a azul con una
-cortina de derecha a izquierda (62–65), entra la imagen con esa misma cortina, en los mismos x. La
-pausa, en el 66 (2,2 s), y la salida, la entrada al revés entera (2,2 s): la imagen se va con la
-cortina, el gris se cierra y sale la pizarra. Elegido con Leon entre eso, la imagen sin la caja gris
-y pedirle al diseñador una secuencia nueva (comparación en los archivos del proyecto,
-`pepsi-parcial-vv/`). El controlador todavía no manda `publicidad`: sale Pepsi.
+entraba, le pasaba un brillo y la pausa llegaba a los 7,4 s). Desde el export del 2026-10-31 la
+entrada es la del diseñador (Leon: se ve mejor): la imagen entra deslizándose desde la izquierda,
+recortada por su cuadro, mientras la pizarra todavía entra (34–53), y la raya derecha del cuadro
+aparece del 51 al 59. La pausa, en el 59 (2 s), y la salida, la entrada al revés entera (2 s). Antes
+de ese export, del mismo día, la imagen entraba sobre el recuadro gris de la secuencia vieja, con su
+cortina (pausa a los 2,2 s; comparación en los archivos del proyecto, `pepsi-parcial-vv/` y
+`parcial-export-nuevo-vv/`). El controlador todavía no manda `publicidad`: sale Pepsi.
 
 Key: los recuadros de la pizarra se tocan borde con borde, y dos bordes suavizados que caen en el
 mismo píxel no suman 100 %: en el key de CasparCG quedaban columnas de 1 px al 86–94 % (entre el
@@ -391,7 +392,7 @@ el borde de afuera). Centrado (Leon, entre ése y el mismo lugar del parcial): t
 derecha y la pizarra pasa de x 311–1215 a 507–1411.
 
 Flujo: la entrada es la de la pizarra del parcial, con la pausa en el 41 (1,4 s), y la salida, la
-misma que en el parcial después del cuadro, la entrada al revés, adelantada del 92 al 42: 1,4 s.
+de la pizarra en el parcial, la entrada al revés, adelantada del 78 al 42: 1,4 s.
 Claves, textos, barras y colores: los del parcial.
 
 Comparado frame a frame contra el parcial (del 0 al 41, fuera del cuadro de Pepsi y corrido 196 px):
@@ -1011,59 +1012,45 @@ Las 16 imágenes llegan con otra paleta de la compresión de Bodymovin (el mismo
   `rotulocarreras`, `rotulohits`, `rotuloerrores`; `.albate` → `titulo_jugadores`;
   `.POSPREVENIDO1`…`3` → `posicion1`…`3` (el texto por defecto pierde el espacio final, que Lottie no
   cuenta al centrar); `.PREVENIDO1`…`3` → `jugador1`…`3`; las barras `.<EQUIPO><LOCAL|VISITA>` (sin
-  `_`, con el nombre del equipo) → `<SIGLAS><LOCAL|VISITA>_opacidad`. Las `mask N` (sus mattes) y
-  el precomp `PEPSI LOGO` quedan como vienen.
+  `_`, con el nombre del equipo) → `<SIGLAS><LOCAL|VISITA>_opacidad`; la imagen `Insert PEPSI.jpg`
+  (clase `jpg`) → `publicidad`. Las `mask N` (sus mattes) y el cuadro que matea la imagen (`Shape
+  Layer 1`) quedan como vienen.
 - **Fuente:** `fPath` llega como la carpeta (`FINAL DE INNING/FONT`): pasa a `font/LTEnergyVFVF.ttf`,
   el mismo archivo que el del score. El `ascent` queda el del export (72.9996).
 - **All Caps:** llega apagado en todas las capas de texto: `prep.js` lo prende.
 - **Textos de caja:** ya llegan de caja, con `lh` 0.01 (va 1.2 del cuerpo) y cajas que cruzaban su
-  lugar. Medidos en el frame 221 con la fuente cargada: `inning` a 38, centrado, 4 px antes de cada
+  lugar. Medidos en la pausa con la fuente cargada: `inning` a 38, centrado, 4 px antes de cada
   flecha; los nombres a 203, centrados, 8 px adentro de la caja negra; `titulo_jugadores` a 274,
   centrado, 8 px adentro de la columna; los apellidos a 129.46 (`PAR_JUGADOR`), desde donde empiezan
   hasta 8 px antes del final de la columna (x 1215: la caja del export entraba 40 px en el cuadro de
   Pepsi). Las posiciones y los números quedan con su caja. El alto de todas, el ascent del cuerpo
   más 2, como en el bateador.
 - **Key:** `Capa de formas 1` (los números) crece 1 px a cada lado y `Capa de formas 4` (los
-  bateadores) 1 px a la derecha (ver *Key* arriba).
-- **Markers y timeline:** el export dice que dura 38 frames (su `op`), sus capas llegan al 297 y sus
-  markers (`START` 0–30, `stop` 270–298) no sirven. `play` 0–222 (pausa en el 221, `PAR_PAUSA`),
-  `salida` 222–338 y `stop` en el 0. La pizarra (todo menos `PEPSI LOGO` y su raya derecha, `MARCO DE
-  PUBLICIDAD 4`, que sale con él) suma su entrada al revés desde el 296 (`alReves`, como la bajada de
-  la barra del score): una capa que entraba en el frame t se va en el 337 − t. El 296
-  (`PAR_FIN_PEPSI`) es el primer frame vacío del final de la secuencia: `prep.js` lo comprueba (los
-  PNG vacíos son el mismo archivo) y falla si cambia. Las capas que arrancan en el 0 pasan al 1: el
-  frame 0 queda vacío.
-- **Tramo quieto:** los frames 38–133 de la secuencia (`PAR_QUIETO`; al aire, del 76 al 171) son el
-  logo quieto, con el tramado distinto en cada uno: queda la capa del 38, que dura todo el tramo, y
-  las otras 95 salen del JSON con sus imágenes (medido: el centro de la luz del logo no se corre más
-  de 0,04 px en el tramo; al entrar y al salir, el salto es el de un frame cualquiera). Si la
-  secuencia cambia de tiempos, medir de nuevo; con los PNG de color completo, `null`.
-- **Imágenes:** las 270 del export van tal cual a `parcial/images/` (`img_0`–`261`, la secuencia;
-  `img_262`–`269`, las barras). Con el tramo quieto, `img_39`–`133` no se usan: no pasan a `_assets/`.
-- **La publicidad fija** (2026-10-31): después de la receta, otro paso de `prep.js` cambia la
-  secuencia por la imagen (`PEP_IMAGEN`, en `_assets/`) y la timeline. Corre siempre sobre
-  `parcial/data.json` (con o sin el export) y no hace nada si ya está la capa `publicidad`. Del
-  precomp quedan los frames grises de la secuencia (`PEP_GRIS`, 5–23) y su espejo para la salida;
-  la imagen es una capa de primer nivel (`index.js` reemplaza imágenes sólo ahí) encima del precomp,
-  en `PEP_ESQUINA`, con una máscara que reproduce la cortina azul de la secuencia frame por frame
-  (`PEP_CORTINA`, los x medidos, en hold). `play` 0–67 (pausa en el 66, `PEP_ENTRADA`), `salida`
-  67–134 y `stop` en el 0: todo es su entrada al revés, lo que la entrada muestra en el frame t, la
-  salida lo muestra en el 133 − t (`PEP_FIN`). La pizarra corre su salida del 337 al 133; la raya
-  derecha (`MARCO DE PUBLICIDAD 4`) cambia la salida del diseñador por su entrada al revés. Las
-  imágenes de la secuencia que no quedan salen de `_assets/` con `consolidar.mjs`.
+  bateadores) 1 px a la derecha (ver *Key* arriba). La raya gris de la izquierda del cuadro (`MARCO
+  DE PUBLICIDAD 3`) crece 1 px a la derecha, por encima de la imagen: la imagen empieza en la x
+  1221,4 y la raya terminaba en la 1220,9, y en el key de CasparCG quedaba la columna 1221 al 65 %.
+- **Publicidad:** la imagen del export es el JPG recomprimido por Bodymovin: el asset pasa al PNG
+  del cliente en `_assets/` (`PEP_IMAGEN`), con `pr` meet. Queda con su matte (`Shape Layer 1`, el
+  cuadro, quieto) y sin parent: `prep.js` falla si llega de otra forma.
+- **Markers y timeline:** `START` (0–30) y `stop` (120–150) del diseñador → `play` 0–60 (pausa en
+  el 59, `PAR_ENTRADA`), `salida` 60–119 y `stop` en el 0. La raya derecha (`MARCO DE PUBLICIDAD 4`)
+  trae además una salida suelta (273–282), que sale. Todo suma su entrada al revés (`alReves`): lo
+  que la entrada muestra en el frame t, la salida lo muestra en el 119 − t (`PAR_FIN`), el primer
+  frame vacío. La entrada termina en el 58,7 (la raya derecha): `prep.js` falla si termina en otro
+  frame. Las capas que arrancan en el 0 pasan al 1: el frame 0 queda vacío.
+- **Imágenes:** las barras (`img_1`–`8`) van tal cual a `parcial/images/`; el JPG (`img_0`), no.
 
-Comparado frame a frame contra el export del 2026-10-18 (sin data, con su `op` llevado al 300):
-idéntico al píxel del 0 al 221, salvo las columnas de 1 px del arreglo del key (x 714–715, 998–999 y
-1215–1216) y el tramo quieto (77–171, en el cuadro de Pepsi). Con la publicidad fija, contra la
-versión con la secuencia: idéntico del 0 al 61; la salida, contra la entrada al revés, idéntica.
+Comparado frame a frame contra el export del 2026-10-31 (sin data): idéntico del 1 al 59 salvo las
+columnas del arreglo del key (x 714 y 1215, y la 1221 en CasparCG) y unos píxeles de la imagen (el JPG
+del export contra el PNG del cliente). La salida, contra la entrada al revés: idéntica.
 
 **Parcial sin publicidad**
 
 - **Sin export:** corre siempre, después del parcial, sobre `parcial/data.json`. Falla si cambió la
-  timeline del parcial (`PEP_ENTRADA`, `PEP_FIN`) o si el cuadro de la publicidad es parent o matte
-  de otra capa.
-- **Fuera:** `PEPSI LOGO` (con el precomp y las imágenes de la secuencia), `.publicidad` y `MARCO DE PUBLICIDAD 3` y
-  `4` (`PSP_RAYAS`). Quedan las 8 barras, las mismas del parcial (su asset, con la ruta vista desde
+  timeline del parcial (`PAR_ENTRADA`, `PAR_FIN`) o si el cuadro de la publicidad es parent de otra
+  capa.
+- **Fuera:** `.publicidad` con su matte (`Shape Layer 1`) y `MARCO DE PUBLICIDAD 3` y `4`
+  (`PSP_RAYAS`). Quedan las 8 barras, las mismas del parcial (su asset, con la ruta vista desde
   éste: `imagenDe()`), y la fuente, copiada de `parcial/font/`.
 - **Key:** `Capa de formas 4` (los bateadores), 1 px más angosta a la derecha: deshace el arreglo del
   parcial, que la hacía crecer por debajo de la raya.
@@ -1071,8 +1058,8 @@ versión con la secuencia: idéntico del 0 al 61; la salida, contra la entrada a
   de la visita). Falla si `Nulo 23` no llega a `PSP_NULO`: medir de nuevo la pizarra (bbox del render
   en el 41) y mover `PSP_CORRE`, en px enteros.
 - **Markers y timeline:** `play` 0–42 (pausa en el 41, `PSP_PAUSA`), `salida` 42–84 y `stop` en el 0.
-  Los keyframes y el `op` de la salida de la pizarra (desde el 92, `PEP_SALE_PIZARRA`) se adelantan
-  `PSP_ADELANTA` (50); falla si hay un keyframe entre el 41 y el 92.
+  Los keyframes y el `op` de la salida de la pizarra (desde el 78, `PSP_SALE`) se adelantan
+  `PSP_ADELANTA` (36); falla si hay un keyframe entre el 41 y el 78.
 - **`index.html` y `data.md`:** copias de los del parcial, a mano: el título; la publicidad, la
   posición y los markers en el `data.md`.
 

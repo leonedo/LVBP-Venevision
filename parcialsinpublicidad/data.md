@@ -154,7 +154,7 @@ Two digits fit in each number at the design size.
 
 `play` enters and pauses on frame 41 (1.4 s), the board complete: the same entry as the `parcial`'s
 board. No update animation: data sent while on air replaces silently, the teams included. `stop`
-plays `salida` (frame 42 → 83, 1.4 s): the board leaves, its entry in reverse (as in the `parcial`
-after the Pepsi box), ending on an empty frame; it releases the layer when it ends. The `play`
+plays `salida` (frame 42 → 83, 1.4 s): the board leaves, its entry in reverse (as the `parcial`'s
+board leaves), ending on an empty frame; it releases the layer when it ends. The `play`
 stage is active from frame 0, so a `stop` that arrives mid-entry also plays `salida`: it jumps to
 the full graphic and exits from there.

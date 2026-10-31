@@ -1166,13 +1166,13 @@ if (hay('PITCHERS')) {
 // ---------------------------------------------------------------- parcial
 // El score de fin de inning (el export es FINAL DE INNING): C H E de los dos equipos con su barra y
 // su nombre, el inning con sus flechas, los tres que vienen al bate (posición y apellido) y el cuadro
-// de Pepsi, que desde el export del 2026-10-18 llega como una secuencia de PNG (262 frames de 334 ×
-// 208, un precomp). Las claves, las del parcial de LVBP-Meridiano, que a su vez son las del score donde
+// de la publicidad, que desde el export del 2026-10-31 es una imagen fija (antes, la animación de Pepsi
+// del diseñador, una secuencia de PNG). Las claves, las del parcial de LVBP-Meridiano, que a su vez son las del score donde
 // dicen lo mismo: los escudos (<SIGLAS>VISITA_opacidad, <SIGLAS>LOCAL_opacidad), inning, las flechas,
 // CARRERAS/HITS/ERRORES VISITA y LOCAL, jugador1–3 y titulo_jugadores. Propias: posicion1–3 (como en la
 // ofensiva), NOMBREVISITA / NOMBRELOCAL (el nombre escrito sobre la barra; en el score, EQUIPOVISITA
 // son las siglas) y los rótulos fijos C, H, E.
-// Cajas medidas en el frame 221 con la fuente cargada (todo cuelga de Nulo 23, al 102 %, salvo las
+// Cajas medidas en la pausa con la fuente cargada (todo cuelga de Nulo 23, al 102 %, salvo las
 // posiciones, sin parent).
 const PAR_INNING = 38;                 // 4 px antes de cada flecha (10 mide 26.7)
 const PAR_NOMBRE = 203;                // 8 px adentro de la caja negra (221 px; AGUILAS mide 120.1)
@@ -1181,21 +1181,18 @@ const PAR_TITULO = 274;                // 8 px adentro de la columna de los bate
 // del final de la columna (x 1215.2): la caja del export llegaba 40 px adentro del cuadro de Pepsi.
 // TOVAR mide 83.5 y CASTILLO 115.9.
 const PAR_JUGADOR = { ps: 32.8073883056641, W: 129.46 };
-// Flujo: la pizarra entra del 0 al 41 y el cuadro de Pepsi del 37 al 73; el logo queda quieto, le pasa
-// un brillo (181–220) y la entrada para en el 221, con el logo limpio (Leon, 2026-10-18). La salida es
-// la del diseñador para el cuadro de Pepsi (222–295: las letras se van, el logo se vuelve un punto y el
-// recuadro se cierra) y después la pizarra, que el export no saca (la corta en el 297): su entrada al
-// revés, del 296 al 337. En total, 3,9 s.
-const PAR_PAUSA = 222;                 // play 0–222: queda en el 221
+// Flujo (el export del 2026-10-31, con la publicidad fija): la pizarra entra del 0 al 41; la imagen de
+// la publicidad entra deslizándose desde la izquierda, recortada por el cuadro (34–53), y la raya
+// derecha del cuadro aparece del 51 al 59. La pausa, en el 59 (2 s), y la salida, la entrada al revés
+// entera, como en los demás: lo que la entrada muestra en el frame t, la salida lo muestra en el
+// PAR_FIN − t (2 s).
 const PAR_PIZARRA = 41;                // la entrada de la pizarra termina en el 41 (el tercer bateador)
-const PAR_FIN_PEPSI = 296;             // la secuencia queda vacía desde el 296 (su frame 259)
-const PAR_FIN = PAR_FIN_PEPSI + PAR_PIZARRA; // 337, vacío
-// Los PNG de la secuencia vienen reducidos a unos 40 colores con tramado, y cada frame se trama
-// distinto: con el logo quieto, sus bordes titilaban. En los frames 38–133 de la secuencia (al aire,
-// del 76 al 171, antes del brillo) el logo no se mueve (medido: el centro de su luz no se corre más de
-// 0,04 px), y se ve un solo PNG, el primero (Leon, 2026-10-18). Cuando lleguen los PNG con color
-// completo, null.
-const PAR_QUIETO = [38, 134];          // frames de la secuencia, del 38 al 133
+const PAR_ENTRADA = 59;                // la raya derecha termina en el 58,7: queda en el 59
+const PAR_FIN = 2 * PAR_ENTRADA + 1;   // 119, vacío: la salida empieza en el 60 mostrando el 59
+// La publicidad es una imagen con la clave `publicidad`, como en Meridiano (Leon, 2026-10-31: el
+// cliente cambió la animación de Pepsi por Insert PEPSI.jpg, de 316 × 200, el tamaño del cuadro). El
+// export trae el JPG recomprimido por Bodymovin: va el del cliente, en PNG, en _assets/.
+const PEP_IMAGEN = { w: 316, h: 200, p: '9116da765ab4.png' };
 if (hay('FINAL DE INNING')) {
     const d = load(path.join(SRC, 'FINAL DE INNING/data.json'));
 
@@ -1271,183 +1268,58 @@ if (hay('FINAL DE INNING')) {
     };
     ensancha('Capa de formas 1', 1, 1);
     ensancha('Capa de formas 4', 0, 1);
+    // La imagen de la publicidad empieza en la x 1221,4 y la raya gris de su izquierda (MARCO DE
+    // PUBLICIDAD 3, encima) termina en la 1220,9: en el key quedaba la columna 1221 al 65 %. La raya
+    // crece 1 px a la derecha, por encima de la imagen.
+    ensancha('MARCO DE PUBLICIDAD 3', 0, 1);
 
-    // ---- timeline. El export dice que dura 38 frames (op) y sus capas llegan hasta el 297; sus
-    // markers (START 0–30, stop 270–298) no sirven: la entrada dura hasta el 221.
-    const pepsi = layer(d, 'PEPSI LOGO');
-    const secuencia = d.assets.find(a => a.id === pepsi.refId);
-    if (!secuencia || secuencia.layers.length !== 262 || pepsi.st !== pepsi.ip) throw new Error('PEPSI LOGO: secuencia inesperada');
-    // Su primer frame vacío del final: los PNG vacíos de la secuencia son el mismo archivo (el del 0).
-    // (el frame k de la secuencia es la capa que se ve en su k: los nm vienen al revés, PEPSI_00296 en el 0)
-    const capa = k => secuencia.layers.find(c => c.ip <= k + 0.5 && k + 0.5 < c.op); // a mitad del frame: los ip traen decimales
-    const png = k => {
-        const a = d.assets.find(x => x.id === capa(k).refId);
-        return fs.readFileSync(path.join(SRC, 'FINAL DE INNING', a.u, a.p));
-    };
-    const kFin = Math.round(PAR_FIN_PEPSI - pepsi.st);
-    if (!png(kFin).equals(png(0)) || png(kFin - 1).equals(png(0))) throw new Error('PEPSI LOGO: medir de nuevo PAR_FIN_PEPSI (su primer frame vacío del final)');
-    if (PAR_QUIETO) {
-        // la capa del primer frame dura hasta el final del tramo; las otras se van, con sus imágenes
-        const [k0, k1] = PAR_QUIETO;
-        const primera = capa(k0), fuera = new Set();
-        for (let k = k0 + 1; k < k1; k++) fuera.add(capa(k));
-        primera.op = capa(k1 - 1).op;
-        secuencia.layers = secuencia.layers.filter(c => !fuera.has(c));
-        const usadas = new Set(secuencia.layers.map(c => c.refId));
-        d.assets = d.assets.filter(a => usadas.has(a.id) || ![...fuera].some(c => c.refId === a.id));
-    }
-    const marcoDer = layer(d, 'MARCO DE PUBLICIDAD 4'); // la raya derecha, que sale con el cuadro (273–282)
-    // La pizarra (todo menos el cuadro de Pepsi y su raya derecha): su entrada al revés desde el 296.
-    // Una capa que entraba en el frame t se va en el PAR_FIN − t.
-    for (const l of d.layers) {
-        if (l === pepsi || l === marcoDer) continue;
-        for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, PAR_PIZARRA, PAR_FIN_PEPSI);
-    }
+    // ---- la publicidad: el JPG del export (Insert PEPSI.jpg, clase jpg), mateado por el cuadro
+    // (Shape Layer 1, quieto), pasa a la clave `publicidad`. Una ruta de otra proporción entra entera
+    // (meet); "" o una ruta que no carga dejan el cuadro vacío.
+    const pub = rename(d, 'Insert PEPSI.jpg', 'publicidad');
+    const mate = d.layers[d.layers.indexOf(pub) - 1];
+    if (!pub.tt || !mate.td || mate.nm !== 'Shape Layer 1' || pub.parent != null) throw new Error('publicidad: matte o parent inesperado');
+    const img = d.assets.find(a => a.id === pub.refId);
+    if (img.w !== PEP_IMAGEN.w || img.h !== PEP_IMAGEN.h) throw new Error(`publicidad: ${img.w} × ${img.h}`);
+    if (!fs.existsSync(path.join(REPO, '_assets', PEP_IMAGEN.p))) throw new Error(`falta _assets/${PEP_IMAGEN.p}`);
+    Object.assign(img, { u: '../_assets/', p: PEP_IMAGEN.p, e: 0, pr: 'xMidYMid meet' });
+
+    // ---- timeline. Los markers del diseñador (START 0–30, stop 120–150) no sirven, y la raya derecha
+    // trae una salida suelta (273–282): sale, y todo suma su entrada al revés.
+    const marcoDer = layer(d, 'MARCO DE PUBLICIDAD 4');
+    for (const p of propiedadesAnimadas([marcoDer.ks, marcoDer.shapes])) p.k = p.k.filter(k => k.t <= PAR_ENTRADA);
+    const ultimo = Math.max(...propiedadesAnimadas(d.layers).flatMap(p => p.k.map(k => k.t)));
+    if (ultimo > PAR_ENTRADA || ultimo < PAR_ENTRADA - 1) throw new Error(`la entrada termina en el ${ultimo}: mover PAR_ENTRADA`);
+    for (const l of d.layers) for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, PAR_ENTRADA, PAR_ENTRADA + 1);
     for (const l of d.layers) {
         // los mattes, con la capa que matean
         const ref = l.td ? d.layers[d.layers.indexOf(l) + 1] : l;
-        if (l.op < PAR_FIN_PEPSI || ref.ip > PAR_PAUSA) throw new Error(`${l.nm}: ip ${l.ip}, op ${l.op}: termina antes de la salida`);
-        l.op = (ref === pepsi || ref === marcoDer) ? PAR_FIN_PEPSI : PAR_FIN - Math.max(ref.ip, 1) + 0.001;
+        if (l.op < PAR_ENTRADA || ref.ip > PAR_ENTRADA) throw new Error(`${l.nm}: ip ${l.ip}, op ${l.op}`);
+        l.op = PAR_FIN - Math.max(ref.ip, 1) + 0.001;
     }
     for (const l of d.layers) l.ip = Math.max(l.ip, 1);
-    if (Math.max(...propiedadesAnimadas(d.layers).flatMap(p => p.k.map(k => k.t))) > PAR_FIN) throw new Error('animación después del final');
     d.op = PAR_FIN + 1;
     d.markers = [
-        { tm: 0, cm: 'play', dr: PAR_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'play', dr: PAR_ENTRADA + 1, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
         { tm: 0, cm: 'stop', dr: 1 },
-        { tm: PAR_PAUSA, cm: 'salida', dr: PAR_FIN + 1 - PAR_PAUSA }
+        { tm: PAR_ENTRADA + 1, cm: 'salida', dr: PAR_FIN - PAR_ENTRADA }
     ];
     d.fonts.list[0].fPath = 'font/LTEnergyVFVF.ttf';
     allCaps(d);
     save(path.join(REPO, 'parcial/data.json'), d);
 }
 
-// ---------------------------------------------------------------- parcial: la publicidad fija
-// El cliente cambió la publicidad (Leon, 2026-10-31): en lugar de la animación de Pepsi del
-// diseñador, una imagen fija (Insert PEPSI.jpg, 316 × 200, el tamaño del cuadro). De la secuencia
-// quedan sus frames genéricos: el recuadro gris que se abre desde una línea (sus frames 5–23). Donde
-// la secuencia pasaba a azul con una cortina de derecha a izquierda (24–27) entra la imagen, con esa
-// misma cortina (una máscara en los mismos x, frame por frame), y no queda nada del logo animado ni
-// del brillo. La imagen es una capa de primer nivel con la clave `publicidad`, como en Meridiano: el
-// próximo cambio de patrocinante es una ruta, sin tocar el gráfico.
-// La salida es la entrada al revés entera (la imagen se va con la cortina, el gris se cierra y después
-// sale la pizarra), como en los demás gráficos: lo que la entrada muestra en el frame t, la salida lo
-// muestra en el PEP_FIN − t. Corre sobre el parcial preparado (también sin exports en SRC): con un
-// FINAL DE INNING nuevo, la receta de arriba arma la secuencia y esto la cambia; si ya está, no hace nada.
-const PEP_IMAGEN = { w: 316, h: 200, p: '9116da765ab4.png' }; // en _assets/: el JPG del cliente, en PNG
-const PEP_ESQUINA = [5, 3];            // dónde empieza lo opaco del cuadro en la secuencia (334 × 208)
-const PEP_GRIS = [5, 23];              // los frames de la secuencia con el recuadro gris abriéndose y entero
-// El borde izquierdo del azul de la cortina, en x de la secuencia, en sus frames 24–27 (en el 28 ya
-// está entero). En el frame entero k de la animación se ve el k − 1 de la secuencia (sus ip traen
-// decimales de más): el 24 se ve en el 62 (la secuencia empieza en el 37).
-const PEP_CORTINA = [270, 199, 125, 54];
-const PEP_ENTRADA = 66;                // la imagen entera: termina la entrada (la pizarra, en el 41)
-const PEP_FIN = 2 * PEP_ENTRADA + 1;   // 133, vacío: la salida empieza en el 67 mostrando el 66
-const PEP_SALE_PIZARRA = PEP_FIN - PAR_PIZARRA; // 92: la pizarra empieza a salir
-if (fs.existsSync(path.join(REPO, 'parcial/data.json'))) {
-    const d = load(path.join(REPO, 'parcial/data.json'));
-    if (d.layers.some(l => l.cl === 'publicidad')) console.log('· parcial: la publicidad ya es la imagen fija');
-    else {
-        const m = Object.fromEntries(d.markers.map(x => [x.cm, x]));
-        if (m.play.dr !== PAR_PAUSA || m.salida.tm !== PAR_PAUSA || d.op !== PAR_FIN + 1) throw new Error('parcial: timeline inesperada');
-        const pepsi = layer(d, 'PEPSI LOGO'), marcoDer = layer(d, 'MARCO DE PUBLICIDAD 4');
-        const secuencia = d.assets.find(a => a.id === pepsi.refId);
-        if (pepsi.ip !== pepsi.st || Math.round(pepsi.st) !== 37 || pepsi.ks.a.k[0] !== 167 || pepsi.ks.a.k[1] !== 104) throw new Error('PEPSI LOGO: transform o tiempo inesperado');
-        const nombre = k => `PEPSI_${String(296 - k).padStart(5, '0')}.png`; // los nm vienen al revés
-        const frame = k => secuencia.layers.find(c => c.nm === nombre(k));
-        if (Math.abs(frame(PEP_GRIS[1]).ip - PEP_GRIS[1]) > 0.01) throw new Error('PEPSI LOGO: la secuencia cambió');
-
-        const st = Math.round(pepsi.st); // 37 (llega con decimales de más)
-        // ---- la secuencia: el gris de la entrada y su espejo en la salida (en tiempo del precomp)
-        const fuera = PEP_ENTRADA - st; // 29: la imagen entera, ya sin el gris debajo
-        const gris = [];
-        for (let k = PEP_GRIS[0]; k <= PEP_GRIS[1]; k++) {
-            const c = frame(k);
-            if (k === PEP_GRIS[1]) c.op = fuera - 0.5; // el último gris queda debajo de la cortina
-            gris.push(c);
-            // en la salida: lo que se veía en el frame entero k + 1 del precomp, en el (PEP_FIN − 2·st) − (k + 1)
-            const espejo = PEP_FIN - 2 * st - (k + 1);
-            const copia = clone(c);
-            copia.ip = k === PEP_GRIS[1] ? (PEP_FIN - 2 * st) - (fuera - 0.5) : espejo - 0.5;
-            copia.op = espejo + 0.5;
-            copia.st = copia.ip;
-            gris.push(copia);
-        }
-        gris.forEach((c, i) => { c.ind = i + 1; });
-        secuencia.layers = gris;
-        pepsi.op = Math.ceil(Math.max(...gris.map(c => c.op)) + st);
-
-        // ---- la imagen, encima del cuadro: una capa de primer nivel (las claves de imagen de index.js
-        // miran sólo las de primer nivel), en el lugar de lo opaco de la secuencia
-        if (!fs.existsSync(path.join(REPO, '_assets', PEP_IMAGEN.p))) throw new Error(`falta _assets/${PEP_IMAGEN.p}`);
-        d.assets.push({ id: 'image_publicidad', w: PEP_IMAGEN.w, h: PEP_IMAGEN.h, u: '../_assets/', p: PEP_IMAGEN.p, e: 0, pr: 'xMidYMid meet' });
-        // La cortina: un rectángulo que deja ver la imagen desde x hasta la derecha, frame por frame (hold),
-        // y lo mismo al revés en la salida. x en coordenadas de la imagen.
-        const rect = x => ({ i: [[0, 0], [0, 0], [0, 0], [0, 0]], o: [[0, 0], [0, 0], [0, 0], [0, 0]], v: [[x, -10], [PEP_IMAGEN.w + 10, -10], [PEP_IMAGEN.w + 10, PEP_IMAGEN.h + 10], [x, PEP_IMAGEN.h + 10]], c: true });
-        const primero = st + PEP_GRIS[1] + 2; // 62: el primer frame de la cortina
-        const xs = [...PEP_CORTINA.map(x => x - PEP_ESQUINA[0]), -10];
-        const keys = [
-            ...xs.map((x, i) => ({ t: primero + i, s: [rect(x)], h: 1 })),
-            ...xs.slice(0, -1).reverse().map((x, i) => ({ t: PEP_FIN - (PEP_ENTRADA - 1) + i, s: [rect(x)], h: 1 }))
-        ];
-        if (primero + xs.length - 1 !== PEP_ENTRADA) throw new Error('PEP_ENTRADA: no termina con la cortina');
-        const imagen = {
-            ddd: 0, ind: freeInd(d, Math.max(...d.layers.map(l => l.ind)) + 1), ty: 2, nm: '.publicidad', cl: 'publicidad',
-            refId: 'image_publicidad', sr: 1,
-            ks: {
-                o: { a: 0, k: 100, ix: 11 }, r: { a: 0, k: 0, ix: 10 },
-                p: { a: 0, k: [pepsi.ks.p.k[0] - 167 + PEP_ESQUINA[0], pepsi.ks.p.k[1] - 104 + PEP_ESQUINA[1], 0], ix: 2, l: 2 },
-                a: { a: 0, k: [0, 0, 0], ix: 1, l: 2 }, s: { a: 0, k: [100, 100, 100], ix: 6, l: 2 }
-            },
-            ao: 0, hasMask: true,
-            masksProperties: [{ inv: false, mode: 'a', pt: { a: 1, k: keys, ix: 1 }, o: { a: 0, k: 100, ix: 3 }, x: { a: 0, k: 0, ix: 4 }, nm: 'cortina' }],
-            ip: primero - 0.5, op: PEP_FIN - primero + 0.5, st: 0, bm: 0
-        };
-        d.layers.splice(d.layers.indexOf(pepsi), 0, imagen);
-
-        // ---- la raya derecha del cuadro: su entrada al revés, en lugar de la salida del diseñador
-        for (const p of propiedadesAnimadas([marcoDer.ks, marcoDer.shapes])) {
-            p.k = p.k.filter(k => k.t <= PEP_ENTRADA);
-            alReves(p, 0, PEP_ENTRADA, PEP_ENTRADA + 1);
-        }
-        marcoDer.op = PEP_FIN - Math.max(marcoDer.ip, 1) + 0.001;
-
-        // ---- la pizarra: su salida (el espejo en el PAR_FIN) pasa al espejo en el PEP_FIN
-        const corre = PAR_FIN - PEP_FIN;
-        for (const l of d.layers) {
-            if (l === pepsi || l === marcoDer || l === imagen) continue;
-            for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) for (const k of p.k) {
-                if (k.t > PAR_PIZARRA + 0.5 && k.t < PAR_FIN_PEPSI - 0.5) throw new Error(`${l.nm}: keyframe en el ${k.t}`);
-                if (k.t >= PAR_FIN_PEPSI - 0.5) k.t -= corre;
-            }
-            l.op -= corre;
-        }
-
-        // ---- las imágenes que ya no usa nadie (la secuencia salvo el gris)
-        const usadas = new Set([...d.layers, ...d.assets.flatMap(a => a.layers || [])].map(l => l.refId).filter(Boolean));
-        d.assets = d.assets.filter(a => a.layers || usadas.has(a.id));
-        if (Math.max(...propiedadesAnimadas(d.layers).flatMap(p => p.k.map(k => k.t))) > PEP_FIN) throw new Error('animación después del final');
-        if (d.layers.some(l => l.op > PEP_FIN + 1)) throw new Error('una capa dura más que la salida');
-        d.op = PEP_FIN + 1;
-        d.markers = [
-            { tm: 0, cm: 'play', dr: PEP_ENTRADA + 1, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
-            { tm: 0, cm: 'stop', dr: 1 },
-            { tm: PEP_ENTRADA + 1, cm: 'salida', dr: PEP_FIN - PEP_ENTRADA }
-        ];
-        save(path.join(REPO, 'parcial/data.json'), d);
-    }
-}
-
 // ---------------------------------------------------------------- parcial sin publicidad
 // El parcial sin el cuadro de Pepsi, como gráfico aparte (Leon, 2026-10-23): el controlador elige el
 // template y le manda la misma data. No tiene export: sale del parcial ya preparado, así que corre
-// siempre (también sin exports en SRC) y los dos no se separan. Sin el cuadro (PEPSI LOGO), sin sus
+// siempre (también sin exports en SRC) y los dos no se separan. Sin el cuadro (la publicidad y su matte), sin sus
 // dos rayas grises (MARCO DE PUBLICIDAD 3, la de la izquierda, que entra con la pizarra, y 4) y
 // centrado en la pantalla. La entrada es la de la pizarra, que termina en el 41, y la salida, la
-// misma que en el parcial después del cuadro: la entrada de la pizarra al revés, que pasa del 92 al
+// misma que en el parcial después del cuadro: la entrada de la pizarra al revés, que pasa del 78 al
 // 42 (1,4 s).
 const PSP_PAUSA = PAR_PIZARRA + 1;     // play 0–42: queda en el 41, con la pizarra completa
-const PSP_ADELANTA = PEP_SALE_PIZARRA - PSP_PAUSA; // la salida de la pizarra, 50 frames antes
+const PSP_SALE = PAR_FIN - PAR_PIZARRA; // 78: en el parcial, la pizarra empieza a salir
+const PSP_ADELANTA = PSP_SALE - PSP_PAUSA; // la salida de la pizarra, 36 frames antes
 // Sin las rayas, la pizarra ocupa x 311–1215 (bbox del render en el 41): corrida 196 px, x 507–1411,
 // queda centrada. Un px entero: el render es el del parcial, corrido.
 const PSP_CORRE = 196;
@@ -1456,12 +1328,14 @@ const PSP_RAYAS = ['MARCO DE PUBLICIDAD 3', 'MARCO DE PUBLICIDAD 4'];
 if (fs.existsSync(path.join(REPO, 'parcial/data.json'))) {
     const d = load(path.join(REPO, 'parcial/data.json'));
     const m = Object.fromEntries(d.markers.map(x => [x.cm, x]));
-    if (m.play.dr !== PEP_ENTRADA + 1 || m.salida.tm !== PEP_ENTRADA + 1 || d.op !== PEP_FIN + 1) throw new Error('parcial: timeline inesperada');
+    if (m.play.dr !== PAR_ENTRADA + 1 || m.salida.tm !== PAR_ENTRADA + 1 || d.op !== PAR_FIN + 1) throw new Error('parcial: timeline inesperada');
     d.nm = 'FINAL DE INNING SIN PUBLICIDAD VV';
 
-    // ---- el cuadro de Pepsi y sus rayas, con la secuencia y sus imágenes
-    const fuera = [layer(d, 'PEPSI LOGO'), layer(d, '.publicidad'), ...PSP_RAYAS.map(nm => layer(d, nm))];
-    if (d.layers.some(l => fuera.some(f => f.ind === l.parent)) || fuera.some(l => l.td || l.tt)) throw new Error('parcial sin publicidad: el cuadro de Pepsi es parent o matte');
+    // ---- el cuadro de la publicidad (la imagen y su matte) y sus rayas
+    const pub = layer(d, '.publicidad'), mate = d.layers[d.layers.indexOf(pub) - 1];
+    if (!mate.td) throw new Error('parcial sin publicidad: la publicidad sin su matte');
+    const fuera = [mate, pub, ...PSP_RAYAS.map(nm => layer(d, nm))];
+    if (d.layers.some(l => fuera.some(f => f.ind === l.parent)) || PSP_RAYAS.some(nm => layer(d, nm).td || layer(d, nm).tt)) throw new Error('parcial sin publicidad: el cuadro de Pepsi es parent o matte');
     d.layers = d.layers.filter(l => !fuera.includes(l));
     const usadas = new Set(d.layers.map(l => l.refId).filter(Boolean));
     d.assets = d.assets.filter(a => usadas.has(a.id));
@@ -1485,13 +1359,13 @@ if (fs.existsSync(path.join(REPO, 'parcial/data.json'))) {
         p.k = [p.k[0] + PSP_CORRE, ...p.k.slice(1)];
     }
 
-    // ---- timeline: la salida de la pizarra (desde el 296) pasa a empezar en la pausa
+    // ---- timeline: la salida de la pizarra (desde el 78) pasa a empezar en la pausa
     for (const p of propiedadesAnimadas(d.layers)) for (const k of p.k) {
-        if (k.t > PAR_PIZARRA + 0.5 && k.t < PEP_SALE_PIZARRA - 0.5) throw new Error(`keyframe en el ${k.t}, entre la entrada y la salida de la pizarra`);
-        if (k.t >= PEP_SALE_PIZARRA - 0.5) k.t -= PSP_ADELANTA;
+        if (k.t > PAR_PIZARRA + 0.5 && k.t < PSP_SALE - 0.5) throw new Error(`keyframe en el ${k.t}, entre la entrada y la salida de la pizarra`);
+        if (k.t >= PSP_SALE - 0.5) k.t -= PSP_ADELANTA;
     }
     for (const l of d.layers) {
-        if (l.op < PEP_SALE_PIZARRA) throw new Error(`${l.nm}: op ${l.op}, termina antes de la salida`);
+        if (l.op < PSP_SALE) throw new Error(`${l.nm}: op ${l.op}, termina antes de la salida`);
         l.op -= PSP_ADELANTA;
     }
     d.op -= PSP_ADELANTA;
