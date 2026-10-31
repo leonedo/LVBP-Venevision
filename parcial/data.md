@@ -14,15 +14,15 @@
 A control client sends a flat JSON object. Any subset of these keys is valid — omit what you don't need to change.
 
 **End-of-inning score:** runs, hits and errors for each team (visitor on top, home below), the
-inning with its arrows, the three batters due up in the next inning and the Pepsi box (fixed: it
-takes no data).
+inning with its arrows, the three batters due up in the next inning and the sponsor box
+(`publicidad`, an image: Pepsi by default).
 
 **Same keys as the LVBP-Meridiano `parcial`**, which in turn are the ones of `score` for what both
 show: the team bars, `inning`, the two arrows and the runs (`CARRERASVISITA`, `CARRERASLOCAL`). A
 client can send the same values to the three, plus the team names and the positions: **always send
 the positions** too (`""` leaves one empty), or the design's `3B` stays in front of every batter. Hits and
 errors follow the style of the runs: `HITSVISITA`, `ERRORESVISITA`, `HITSLOCAL`, `ERRORESLOCAL`.
-Meridiano's `titulo` and `publicidad` don't exist here: they are ignored.
+Meridiano's `titulo` doesn't exist here: it is ignored. `publicidad` does, as in Meridiano.
 
 **Team bars:** as in `score`, all 16 start visible and overlap, 8 per row: send `1` for the two
 that play and `0` for the other fourteen. The visitor's row takes `<TEAM>VISITA_opacidad`, the home
@@ -45,6 +45,11 @@ the surname (`jugador1`–`jugador3`, in white, left-aligned), as in the LVBP-Ve
 (`posicionN`, `jugadorN`). Up to about 8 letters of surname keep the design size (`CASTILLO`);
 longer ones shrink within the column (`RODRÍGUEZ` a little, `MONASTERIOS` about a quarter). An
 empty string leaves the slot empty.
+
+**Sponsor:** `publicidad`, the path of an image (relative to the graphic's `index.html`, or
+absolute). The box is 316 × 200 px and the image fits whole, any proportion, centered. By default
+it is the Pepsi insert (`../_assets/9116da765ab4.png`). `""` or a path that doesn't load leaves the
+box empty (the grey side stripes stay), without a broken-image icon.
 
 ```json
 {
@@ -92,7 +97,7 @@ empty string leaves the slot empty.
 | Size | 1920 × 1080 px |
 | Frame rate | 29.9700012207031 fps |
 | Frames | 0 – 338 |
-| Duration | 11.28 s |
+| Duration | 4.47 s |
 
 Bottom of the screen, about centered (x 310–1540, y 677–930; 35 px left of center): it doesn't touch the score.
 Frame 0 is empty: nothing shows before `play`.
@@ -121,6 +126,12 @@ All are box text: a longer string shrinks to fit instead of overflowing, always 
 
 Two digits fit in each number at the design size.
 
+## Image layers
+
+| Class | What | Default |
+|-------|------|---------|
+| `publicidad` | Sponsor box (316 × 200, fits whole) | `../_assets/9116da765ab4.png` (Pepsi) |
+
 ## Opacity layers
 
 | Class | What | Default opacity |
@@ -143,15 +154,14 @@ Two digits fit in each number at the design size.
 
 | Name | Start (tm) | Duration (dr) | Payload |
 |------|-----------|--------------|---------|
-| `play` | 0 | 222 | stage `pause`, order 1, `stop: "salida"` |
+| `play` | 0 | 67 | stage `pause`, order 1, `stop: "salida"` |
 | `stop` | 0 | 1 | — (frame 0, empty) |
-| `salida` | 222 | 116 | — (the Pepsi box leaves, then the board) |
+| `salida` | 67 | 67 | — (the entry in reverse) |
 
-`play` enters and pauses on frame 221 (7.4 s): the board is in by frame 41 (1.4 s), the Pepsi box
-by frame 73 (2.4 s), and a shine crosses the Pepsi logo before the pause (frames 181–220). The
-graphic can go on air before that: the data is all there from 1.4 s. No update animation: data sent
-while on air replaces silently, the teams included. `stop` plays `salida` (frame 222 → 337, 3.9 s):
-the Pepsi box plays its exit (the letters go, the logo turns into a dot and the box closes) and then
-the board leaves, its entry in reverse, ending on an empty frame; it releases the layer when it
-ends. The `play` stage is active from frame 0, so a `stop` that arrives mid-entry also plays
-`salida`: it jumps to the full graphic and exits from there.
+`play` enters and pauses on frame 66 (2.2 s): the board is in by frame 41 (1.4 s); a grey box
+opens to its right (frames 43–61) and the sponsor image wipes in over it, right to left (62–66). No
+update animation: data sent while on air replaces silently, the teams and the sponsor included.
+`stop` plays `salida` (frame 67 → 133, 2.2 s): the entry in reverse, the sponsor first and the board
+last, ending on an empty frame; it releases the layer when it ends. The `play` stage is active from
+frame 0, so a `stop` that arrives mid-entry also plays `salida`: it jumps to the full graphic and
+exits from there.
