@@ -12,7 +12,8 @@ bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla 
 la estática que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable:
 mide igual, y en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y
 los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, y el del score final, del 2026-10-29, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
-(`font/ChakraPetch-Bold.ttf`, libre, de Google Fonts) en el título y las carreras. Las keys del
+(`font/ChakraPetch-Bold.ttf`, libre, de Google Fonts) en el título y las carreras, y el score, Tahoma
+Bold en la barra de jugadores, el conteo, OUTS y el inning (la del sistema, sin archivo: ver *Score*). Las keys del
 UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una vez cada una (ver
 *Imágenes: `_assets/`*).
 
@@ -119,10 +120,23 @@ de imagen es lo que destapó el arreglo de *claves sólo CSS* de `index.js`: ant
 escribía como ruta y la barra desaparecía.
 
 Textos: salen en mayúsculas aunque lleguen en minúsculas (ver *Mayúsculas* en Convenciones del
-Lottie). `bateador` y `lanzador` son sólo el apellido: al tamaño del diseño entran unas 7 letras en
-el bateador (`CASTILLO` baja de 21 a 20, `RODRÍGUEZ` a 17) y 8 en el lanzador (`RODRÍGUEZ` a 19);
-más largos encogen dentro de su lugar. Siglas, carreras e inning van centrados sobre el eje del
-texto del diseño; la velocidad, alineada a la derecha contra `MPH`.
+Lottie). `bateador` y `lanzador` son sólo el apellido: al tamaño de la barra (18) entran unas 7
+letras en el bateador (`CASTILLO` baja un poco) y 7 en el lanzador (`CHIRINOS` baja de 18 a 16,
+`RODRÍGUEZ` a 14); más largos encogen dentro de su lugar. Siglas, carreras e inning van centrados
+sobre el eje del texto del diseño; la velocidad, alineada a la derecha contra `MPH`.
+
+Fuente: desde el 2026-10-31 (Leon, con una captura de AE de cómo lo quiere), la barra de jugadores
+(bateador, average, actuación, lanzador, lanzamientos, velocidad y MPH), el conteo, OUTS y el inning
+van en **Tahoma Bold**; las siglas y las carreras siguen en LT Energy. Es la Tahoma **del sistema**
+(viene en todo Windows y macOS): la fuente del JSON no tiene `fPath`, Lottie la da por cargada y el
+navegador la toma instalada. No va el archivo porque es de Microsoft y el repo es público (el lint
+la deja pasar sólo a ella). En un contenedor Linux hay que instalarla para probar (`~/.fonts/`). La
+Tahoma es más ancha: la barra pasa de cuerpo 21 (22 el average y la actuación) a 18 (18,86), el
+tamaño de la captura, y sus cajas se rehicieron (`tahomaEnLaBarra()` en `prep.js`: MPH termina donde
+terminaba y el lado del lanzador se arma de derecha a izquierda, con lugar para `P.100` y `100`). El
+inning va a un cuerpo menor (8,77: los números de la Tahoma son un 14 % más altos y tocaban las
+flechas), en una caja de 56 px y con interlineado triple, para que `FINAL` encoja en una línea en
+vez de partir. Cada texto queda con su centro vertical donde estaba.
 
 Inning: más grande que en el diseño (Leon, 2026-10-24, sin que pise nada). La capa va al 140 %
 (Leon, entre 130 y 140) y crece desde su ancla, que el diseño puso en el centro del `10`: queda
@@ -760,6 +774,9 @@ pasa a `_assets/` (ver *Imágenes: `_assets/`*).
 - **Inning:** la capa al 140 % (`INNING_ESCALA`), desde su ancla (`INNING_ANCLA`, el centro del
   `10` del diseño). Falla si el ancla llega en otro lugar o con la escala animada: medir de nuevo el
   centro del `10` y la distancia a las flechas.
+- **Tahoma Bold:** `tahomaEnLaBarra()` (ver *Fuente* arriba): la fuente, los cuerpos, el centro
+  vertical y las cajas de la barra y del inning. Las cajas van en px de pantalla: si la barra se
+  mueve, medir de nuevo (`TAH_*`).
 - **Nulo raíz:** desde el export del 2026-10-17 todo cuelga de `Null 1` (p `[962, 537.2]`, s 134 %):
   `prep.js` lo corre `CORRE` (2, 3 px) hasta la zona segura de títulos. Si llega en otro lugar o a
   otra escala, falla: medir de nuevo la esquina (bbox del render en el frame 90) y mover `CORRE`.

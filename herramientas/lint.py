@@ -81,8 +81,10 @@ for g in GRAFICOS:
     salidas = {'stop'} | {(m.get('payload') or {}).get('stop') for m in d['markers']} - {None}
     for name in salidas:
         if name in ms and abs(ms[name]['dr']) / d['fr'] > 4.5: p(g, f'la salida {name} dura {abs(ms[name]["dr"]) / d["fr"]:.1f} s (más de 4,5)')
-    # cada fuente en un archivo de la carpeta del gráfico (CasparCG la abre con file://)
+    # cada fuente en un archivo de la carpeta del gráfico (CasparCG la abre con file://), salvo las
+    # del sistema que se piden a propósito: la Tahoma Bold del score (no se redistribuye)
     for f in d['fonts']['list']:
+        if (g, f.get('fName'), f.get('fPath')) == ('score', 'Tahoma-Bold', ''): continue
         if not f.get('fPath', '').startswith('font/') or not os.path.isfile(REPO + g + '/' + f['fPath']): p(g, f'fPath {f.get("fPath")!r}')
     for a in d['assets']:
         if 'p' in a:
