@@ -14,8 +14,8 @@
 A control client sends a flat JSON object. Any subset of these keys is valid — omit what you don't need to change.
 
 **Final score (line score):** the runs of each inning for both teams (visitor on top, home below),
-runs, hits and errors, the team bars with their names, and the ATRAPA LA EMOCIÓN logo on the right
-(fixed: it takes no data).
+runs, hits and errors, the team bars with their names, and the box on the right: the ATRAPA LA
+EMOCIÓN logo by default, or a sponsor (`publicidad`).
 
 **Same keys as the LVBP-Meridiano `final`** for what both show: the team bars, the runs, hits and
 errors (`CARRERASVISITA`, `HITSVISITA`, `ERRORESVISITA`, `CARRERASLOCAL`…), the runs of each inning
@@ -41,6 +41,13 @@ size, three shrink a little. Send `X` for a half inning not played (the home tea
 won) and `""` to leave a cell empty. All the numbers start empty.
 
 **Runs, hits and errors:** centered in their columns; three digits fit at the design size.
+
+**Sponsor:** `publicidad`, the path of an image (relative to the graphic's `index.html`, or
+absolute), as in `parcial`. It replaces the logo in the box on the right: about 167 × 155 px on
+screen, the image fits whole, any proportion, centered (a wide one, like the Pepsi insert, shows about
+167 × 106). It enters like the logo (grows from frame 49 to 56) and keeps its drop shadow. By default
+it is the ATRAPA LA EMOCIÓN logo (`../_assets/3e822b60c984.png`). `""` or a path that doesn't load
+leaves the box empty, without a broken-image icon.
 
 **Placement:** bottom of the screen (x 302–1634, y 724–910). It overlaps `parcial` and `otrosjuegos`:
 they don't go on air together.
@@ -77,7 +84,8 @@ they don't go on air together.
   "LEOLOCAL_opacidad": 0,
   "MAGALOCAL_opacidad": 0,
   "TIBUSLOCAL_opacidad": 0,
-  "TIGRESLOCAL_opacidad": 0
+  "TIGRESLOCAL_opacidad": 0,
+  "publicidad": "../_assets/3e822b60c984.png"
 }
 ```
 
@@ -129,6 +137,12 @@ All are box text: a longer string shrinks to fit instead of overflowing, always 
 | 7 | `INNINGVISITA7` | `INNINGLOCAL7` | (empty) |
 | 8 | `INNINGVISITA8` | `INNINGLOCAL8` | (empty) |
 | 9 (`ultimoinning`) | `INNINGVISITA9` | `INNINGLOCAL9` | (empty) |
+
+## Image layers
+
+| Class | What | Default |
+|-------|------|---------|
+| `publicidad` | Box on the right (363 × 337 asset, about 167 × 155 on screen; fits whole) | `../_assets/3e822b60c984.png` (ATRAPA LA EMOCIÓN) |
 
 ## Opacity layers
 
