@@ -2107,9 +2107,45 @@ if (hay('TABLA DE POSICIONES')) {
 // STOP, 90–119, no anima nada): es la entrada al revés, como en los demás.
 const SF_PAUSA = 59;                   // play 0–59: queda en el 58
 const SF_ENTRADA = 58;                 // la entrada termina en el 58
-const SF_MARGEN = 8;
+const SF_MARGEN = 8;                   // las cajas, 8 px antes de la columna vecina o del borde de su caja negra
 const SF_PUB = { x: 1408, y: 770, w: 215.1, h: 140.4 };   // la publicidad, en px de pantalla: la caja a lo ancho, la parte negra de alto
-const SF_LOGO = '488fb05ab214.png';     // el logo de ATRAPA LA EMOCIÓN entero en 430 × 280, la publicidad por defecto                   // las cajas, 8 px antes de la columna vecina o del borde de su caja negra
+const SF_PUB_ENTRA = [39, 58];          // la publicidad entra deslizándose, 19 frames como en el parcial, y siempre adentro de su caja (40–51)
+// La caja de la derecha es la clave `publicidad`, para la imagen de un patrocinador (Leon,
+// 2026-11-05), con la imagen y la entrada del cuadro del parcial: por defecto, el Pepsi del parcial
+// (PEP_IMAGEN), y entra deslizándose desde la izquierda, recortada por su rectángulo, con la curva del
+// parcial y la misma distancia en anchos de imagen (328 px para 316). El rectángulo (SF_PUB) es la
+// caja a lo ancho (x 1408–1623) y la parte negra de C H E de alto (y 770–910): la imagen lo cubre
+// (slice), y una de otra proporción queda recortada; la ideal, 430 × 280 (Pepsi, 316 × 200, pierde
+// 2 px de cada lado). El logo de ATRAPA LA EMOCIÓN del export sale: su capa pasa a ser la de la
+// publicidad, sin parent, sin su sombra blanca y sin su escala. "" o una ruta que no carga, la caja vacía.
+function publicidadEnLaCaja(d) {
+    const pub = rename(d, 'LOGO FINAL ATRAPA LA EMOCION.png', 'publicidad');
+    const img = d.assets.find(a => a.id === pub.refId);
+    if (img.w !== 363 || img.h !== 337 || !pub.ef || pub.ks.p.a) throw new Error('publicidad: el logo llega de otra forma');
+    if (!fs.existsSync(path.join(REPO, '_assets', PEP_IMAGEN.p))) throw new Error(`falta _assets/${PEP_IMAGEN.p}`);
+    Object.assign(img, { w: SF_PUB.w, h: SF_PUB.h, u: '../_assets/', p: PEP_IMAGEN.p, e: 0, pr: 'xMidYMid slice' });
+    const cx = SF_PUB.x + SF_PUB.w / 2, cy = SF_PUB.y + SF_PUB.h / 2, fuera = cx - SF_PUB.w * 328 / 316;
+    delete pub.parent; delete pub.ef;
+    pub.ks = {
+        o: { a: 0, k: 100 }, r: { a: 0, k: 0 }, a: { a: 0, k: [SF_PUB.w / 2, SF_PUB.h / 2, 0] }, s: { a: 0, k: [100, 100, 100] },
+        p: { a: 1, k: [
+            { i: { x: 0, y: 1 }, o: { x: 0.333, y: 0 }, t: SF_PUB_ENTRA[0], s: [fuera, cy, 0], to: [0, 0, 0], ti: [0, 0, 0] },
+            { t: SF_PUB_ENTRA[1], s: [cx, cy, 0] }
+        ] }
+    };
+    pub.tt = 1;
+    const mate = {
+        ddd: 0, ind: Math.max(...d.layers.map(l => l.ind)) + 1, ty: 4, nm: 'mate publicidad', td: 1, sr: 1, ao: 0, bm: 0,
+        ks: { o: { a: 0, k: 100 }, r: { a: 0, k: 0 }, p: { a: 0, k: [cx, cy, 0] }, a: { a: 0, k: [0, 0, 0] }, s: { a: 0, k: [100, 100, 100] } },
+        shapes: [{ ty: 'gr', nm: 'cuadro', it: [
+            { ty: 'rc', d: 1, s: { a: 0, k: [SF_PUB.w, SF_PUB.h] }, p: { a: 0, k: [0, 0] }, r: { a: 0, k: 0 } },
+            { ty: 'fl', c: { a: 0, k: [1, 1, 1, 1] }, o: { a: 0, k: 100 }, r: 1, bm: 0 },
+            { ty: 'tr', p: { a: 0, k: [0, 0] }, a: { a: 0, k: [0, 0] }, s: { a: 0, k: [100, 100] }, r: { a: 0, k: 0 }, o: { a: 0, k: 100 }, sk: { a: 0, k: 0 }, sa: { a: 0, k: 0 } }
+        ] }],
+        ip: pub.ip, op: pub.op, st: 0
+    };
+    d.layers.splice(d.layers.indexOf(pub), 0, mate);
+}
 if (hay('SCORE FINAL')) {
     const d = load(path.join(SRC, 'SCORE FINAL/data.json'));
     const FIN = SF_PAUSA + SF_ENTRADA;     // lo que la entrada muestra en el frame t, la salida lo muestra en el FIN − t
@@ -2179,27 +2215,7 @@ if (hay('SCORE FINAL')) {
     rename(d, 'C', 'rotulocarreras');
     rename(d, 'H', 'rotulohits');
     rename(d, 'E', 'rotuloerrores');
-    // La caja de la derecha es la clave `publicidad`, para la imagen de un patrocinador (Leon,
-    // 2026-11-05): llena el rectángulo de la caja a lo ancho (x 1408–1623) y a la altura de la parte
-    // negra de C H E (y 770–910), 215 × 140 px de pantalla; una imagen de otra proporción lo cubre
-    // igual, recortada (slice). Entra como entraba el logo (crece desde el centro del 49 al 56), sin su
-    // sombra blanca: alrededor de una imagen opaca era un halo sobre el negro y la banda azul. Por
-    // defecto, el logo de ATRAPA LA EMOCIÓN entero en ese rectángulo (SF_LOGO: el PNG del export
-    // llevado a 280 de alto, centrado en 430 × 280, con alfa). "" o una ruta que no carga, la caja vacía.
-    const logo = rename(d, 'LOGO FINAL ATRAPA LA EMOCION.png', 'publicidad');
-    const imgLogo = d.assets.find(a => a.id === logo.refId);
-    const raiz = layer(d, 'Nulo 1');
-    if (imgLogo.w !== 363 || imgLogo.h !== 337 || logo.parent !== raiz.ind || raiz.ks.p.a || raiz.ks.s.k[0] !== 90
-        || String(raiz.ks.p.k.slice(0, 2)) !== '972,662' || String(raiz.ks.a.k.slice(0, 2)) !== '51,48' || logo.ks.p.a || logo.ks.a.a)
-        throw new Error('publicidad: el logo o el Nulo 1 llegan de otra forma: medir de nuevo SF_PUB');
-    if (!fs.existsSync(path.join(REPO, '_assets', SF_LOGO))) throw new Error(`falta _assets/${SF_LOGO}`);
-    const u = SF_PUB.w / 0.9, v = SF_PUB.h / 0.9;            // px de pantalla a unidades de la capa (Nulo 1 al 90 %)
-    Object.assign(imgLogo, { w: Math.round(u), h: Math.round(v), u: '../_assets/', p: SF_LOGO, e: 0, pr: 'xMidYMid slice' });
-    logo.ks.a.k = [imgLogo.w / 2, imgLogo.h / 2, 0];
-    logo.ks.p.k = [51 + (SF_PUB.x + SF_PUB.w / 2 - 972) / 0.9, 48 + (SF_PUB.y + SF_PUB.h / 2 - 662) / 0.9, 0];
-    if (!logo.ks.s.a || logo.ks.s.k.filter(k => k.s[0] === 51).length !== 2) throw new Error('publicidad: escala inesperada');
-    for (const k of logo.ks.s.k) if (k.s[0] === 51) k.s = [100, 100, 100];
-    delete logo.ef;
+    publicidadEnLaCaja(d);
     // Las barras: las 8 de cada fila apiladas, todas visibles al arrancar, como en el parcial: el
     // controlador manda 1 a la que va y 0 a las otras siete.
     const barras = d.layers.filter(l => /^\.BARRA_[A-Z]+_(LOCAL|VISITA)$/.test(l.nm));
