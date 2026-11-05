@@ -14,8 +14,8 @@
 A control client sends a flat JSON object. Any subset of these keys is valid — omit what you don't need to change.
 
 **Final score (line score):** the runs of each inning for both teams (visitor on top, home below),
-runs, hits and errors, the team bars with their names, and the box on the right: the ATRAPA LA
-EMOCIÓN logo by default, or a sponsor (`publicidad`).
+runs, hits and errors, the team bars with their names, and the sponsor box on the right (`publicidad`:
+Pepsi by default).
 
 **Same keys as the LVBP-Meridiano `final`** for what both show: the team bars, the runs, hits and
 errors (`CARRERASVISITA`, `HITSVISITA`, `ERRORESVISITA`, `CARRERASLOCAL`…), the runs of each inning
@@ -43,12 +43,13 @@ won) and `""` to leave a cell empty. All the numbers start empty.
 **Runs, hits and errors:** centered in their columns; three digits fit at the design size.
 
 **Sponsor:** `publicidad`, the path of an image (relative to the graphic's `index.html`, or
-absolute), as in `parcial`. It fills the box on the right: its full width and the height of the
-black part of C H E (x 1408–1623, y 770–910, 215 × 140 px on screen). **Best size: 430 × 280 px**
-(or any image with that 43:28 proportion); one of another proportion still covers the whole box,
-cropped at the sides or top and bottom, centered. It grows in from its center (frames 49 to 56), as
-the logo did. By default it is the ATRAPA LA EMOCIÓN logo, whole in that box
-(`../_assets/488fb05ab214.png`). `""` or a path that doesn't load leaves the box empty, without a
+absolute), as in `parcial`, with the same default image and a similar entry. It fills the box on the
+right: its full width and the height of the black part of C H E (x 1408–1623, y 770–910, 215 × 140
+px on screen). **Best size: 430 × 280 px** (or any image with that 43:28 proportion); one of another
+proportion still covers the whole box, cropped at the sides or top and bottom, centered (the Pepsi
+insert, 316 × 200, loses 2 px on each side). It slides in from the left, clipped by the box (frames
+39 to 58), as in `parcial`. By default it is the Pepsi insert of `parcial`
+(`../_assets/9116da765ab4.png`). `""` or a path that doesn't load leaves the box empty, without a
 broken-image icon.
 
 **Placement:** bottom of the screen (x 302–1634, y 724–910). It overlaps `parcial` and `otrosjuegos`:
@@ -87,7 +88,7 @@ they don't go on air together.
   "MAGALOCAL_opacidad": 0,
   "TIBUSLOCAL_opacidad": 0,
   "TIGRESLOCAL_opacidad": 0,
-  "publicidad": "../_assets/488fb05ab214.png"
+  "publicidad": "../_assets/9116da765ab4.png"
 }
 ```
 
@@ -144,7 +145,7 @@ All are box text: a longer string shrinks to fit instead of overflowing, always 
 
 | Class | What | Default |
 |-------|------|---------|
-| `publicidad` | Box on the right, 215 × 140 px on screen (covers it: best 430 × 280) | `../_assets/488fb05ab214.png` (ATRAPA LA EMOCIÓN) |
+| `publicidad` | Sponsor box on the right, 215 × 140 px on screen (covers it: best 430 × 280) | `../_assets/9116da765ab4.png` (Pepsi) |
 
 ## Opacity layers
 
