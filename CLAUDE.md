@@ -30,7 +30,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `otrosjuegos/` | Cómo van los otros juegos (el export es OTROS JUEGOS; el título, ASÍ VAN), una columna abajo a la derecha: arriba, un cuadro de Harina PAN entra, arma su logo y se va (una secuencia de JPG); debajo, el título y tres juegos, cada uno con la sede, las barras de visita y local (escudo y nombre), las carreras y el inning con sus flechas. El frame 0 está vacío | `play` lo pone al aire vacío (pausa en el 0); el controlador elige con un `goto`: `tresjuegos` (100–266), `dosjuegos` (400–566) o `unjuego` (700–866), el mismo gráfico con 3, 2 o 1 juegos. En cada uno, desde el `goto`, el cuadro entra del 11 al 23, la columna del 27 al 95 (un juego detrás del otro) y el cuadro se va del 157 al 164 | `salida`: la columna, su entrada al revés, sin el cuadro (2,3 s); `salida2` (1,9 s) y `salida1` (1,3 s) |
 | `prevenido/` | El bateador en el círculo (el export es PREVENIDO AL BATE), abajo a la derecha: un panel de LMV entra girando, muestra su logo con un brillo y se va (una secuencia de PNG); debajo, la barra negra con el PREVENIDO AL BATE y el recuadro azul con el nombre. El frame 0 está vacío | stage `play` pause (0–170): la barra entra del 23 al 32, el título del 31 al 39, el recuadro y el nombre del 33 al 48, y el panel se va del 151 al 168 | `salida`: la barra, el título, el recuadro y el nombre, su entrada al revés, sin el panel (0,9 s) |
 | `posiciones/` | La tabla de posiciones (el export es TABLA DE POSICIONES), a pantalla completa y opaca: el fondo, el título POSICIONES, los rótulos de las columnas, el recuadro magenta de los números y el cuadro de GoGo Royal (una secuencia de JPG); encima, 8 filas, cada una con la barra del equipo (con su escudo), el nombre en una caja negra y JJ, JG, JP, AVE y DIF. El frame 0 está vacío; desde el 1, el gris del diseño tapa el video | stage `play` pause (0–76): el gris quieto hasta el 11, el fondo entra del 12 al 64, las barras bajan del 29 al 44, los nombres aparecen del 41 al 66 y los números del 60 al 75 | `salida`: la entrada al revés, que termina en el gris y corta al video (2,5 s) |
-| `scorefinal/` | El score final (el export es SCORE FINAL), el line score, abajo (x 302–1634, y 724–910): las barras de visita y local (escudo y nombre, las mismas imágenes de la tabla de posiciones), las carreras de los 9 innings sobre un recuadro magenta, C H E en negro y la caja del logo de ATRAPA LA EMOCIÓN (`publicidad`, una imagen: el logo por defecto), con una raya plateada a la derecha. El frame 0 está vacío | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48 y la caja del logo del 40 al 58 | `salida`: la entrada al revés (1,9 s) |
+| `scorefinal/` | El score final (el export es SCORE FINAL), el line score, abajo (x 302–1634, y 724–910): las barras de visita y local (escudo y nombre, las mismas imágenes de la tabla de posiciones), las carreras de los 9 innings sobre un recuadro magenta, C H E en negro y la caja del logo de ATRAPA LA EMOCIÓN (`publicidad`, una imagen que llena la caja: el logo por defecto), con una raya plateada a la derecha. El frame 0 está vacío | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48 y la caja del logo del 40 al 58 | `salida`: la entrada al revés (1,9 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
@@ -689,12 +689,15 @@ de C H E (y la banda azul) y la caja del logo (x 1408). El magenta crece 1 px a 
 negro y la banda, 1 px a la derecha, por debajo de su vecino. En Chromium, con los 56 cruces, el alfa
 es 255 en todo el gráfico salvo los bordes de afuera.
 
-Publicidad (Leon, 2026-11-05): el logo de la caja de la derecha es la clave `publicidad`, como el
-cuadro del parcial, para cambiarlo por el de un patrocinador. Por defecto, el mismo logo de ATRAPA LA
-EMOCIÓN; otra ruta entra entera, de cualquier proporción (`pr` meet), en la caja del asset (363 × 337,
-al 51 % y al 90 % del `Nulo 1`: unos 167 × 155 px de pantalla; el de Pepsi del parcial queda en 167 ×
-106), con la misma entrada (crece del 49 al 56) y la misma sombra. `""` o una ruta que no carga dejan
-la caja vacía. El controlador todavía no la manda: sale el logo.
+Publicidad (Leon, 2026-11-05): la caja de la derecha es la clave `publicidad`, para la imagen de un
+patrocinador. La imagen llena la caja a lo ancho y a la altura de la parte negra de C H E (x
+1408–1623, y 770–910: 215 × 140 px; Leon, con una captura marcada); el tamaño ideal es 430 × 280, y
+una de otra proporción la cubre igual, recortada (`pr` slice). Entra como el logo del diseño, que
+crecía desde su centro del 49 al 56, pero sin su sombra blanca (alrededor de una imagen opaca era un
+halo sobre el negro y la banda azul). Por defecto, el logo de ATRAPA LA EMOCIÓN entero en ese
+rectángulo (`_assets/488fb05ab214.png`: el PNG del export a 280 de alto, centrado en 430 × 280):
+sale un poco más chico y más abajo que en el diseño, y sin la sombra. `""` o una ruta que no carga
+dejan la caja vacía. El controlador todavía no la manda: sale el logo.
 
 Colores: el magenta es el de los outs del score de antes (`#EA0059`) y el cian, el de los textos del
 score (`#00D9E2`, 113,5 IRE en NTSC compuesto). Pendiente: medir el logo y las barras en NTSC (las
@@ -1249,7 +1252,7 @@ lo del 51 y el 150, el gris del 1; el 151, vacío.
 **Score final**
 
 - **Imágenes:** las 9 del export van tal cual a `scorefinal/images/` (`img_0`, el logo; `img_1`–`8`,
-  las barras, los mismos archivos que las de la tabla de posiciones); `consolidar.mjs` sólo suma el logo.
+  las barras, los mismos archivos que las de la tabla de posiciones); `consolidar.mjs` no suma nada: el logo (`img_0`) no se usa, la publicidad por defecto es `SF_LOGO`.
 - **Clases:** `,NOMBRE EQUIPO VISITANTE` (con coma: sin clase) y `.NOMBRE EQUIPO LOCAL` (clase
   `NOMBRE`) → `NOMBREVISITA` / `NOMBRELOCAL`; `.CARRERAS POR INNING ALTA<n>` / `BAJA<n>` (todas con la
   clase `CARRERAS`) → `INNINGVISITA<n>` / `INNINGLOCAL<n>`; `.CARRERASVISITA`, `.HITSVISITA`,
@@ -1257,7 +1260,7 @@ lo del 51 y el 150, el gris del 1; el 151, vacío.
   espacio, y el texto `9 ` también) → `ultimoinning`; `C`, `H`, `E` (sin clase) → `rotulocarreras`,
   `rotulohits`, `rotuloerrores`; las barras `.BARRA_<EQUIPO>_<LOCAL|VISITA>` →
   `<SIGLAS><LOCAL|VISITA>_opacidad`. El logo (`LOGO FINAL ATRAPA LA EMOCION.png`, clase `png`) →
-  `publicidad`, con `pr` meet en su asset. Las `Capa de formas` y `Nulo 1` quedan como vienen.
+  `publicidad`: el rectángulo `SF_PUB`, la imagen `SF_LOGO` y sin el Drop Shadow (ver arriba). Las `Capa de formas` y `Nulo 1` quedan como vienen.
 - **Fuente:** `fPath` llega como `SCORE FINAL/ FONT`: pasa a `font/LTEnergy-Regular.ttf` (el mismo
   archivo que el del bateador).
 - **All Caps:** llega apagado: `prep.js` lo prende.
