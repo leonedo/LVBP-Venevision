@@ -2107,7 +2107,9 @@ if (hay('TABLA DE POSICIONES')) {
 // STOP, 90–119, no anima nada): es la entrada al revés, como en los demás.
 const SF_PAUSA = 59;                   // play 0–59: queda en el 58
 const SF_ENTRADA = 58;                 // la entrada termina en el 58
-const SF_MARGEN = 8;                   // las cajas, 8 px antes de la columna vecina o del borde de su caja negra
+const SF_MARGEN = 8;
+const SF_PUB = { x: 1408, y: 770, w: 215.1, h: 140.4 };   // la publicidad, en px de pantalla: la caja a lo ancho, la parte negra de alto
+const SF_LOGO = '488fb05ab214.png';     // el logo de ATRAPA LA EMOCIÓN entero en 430 × 280, la publicidad por defecto                   // las cajas, 8 px antes de la columna vecina o del borde de su caja negra
 if (hay('SCORE FINAL')) {
     const d = load(path.join(SRC, 'SCORE FINAL/data.json'));
     const FIN = SF_PAUSA + SF_ENTRADA;     // lo que la entrada muestra en el frame t, la salida lo muestra en el FIN − t
@@ -2177,14 +2179,27 @@ if (hay('SCORE FINAL')) {
     rename(d, 'C', 'rotulocarreras');
     rename(d, 'H', 'rotulohits');
     rename(d, 'E', 'rotuloerrores');
-    // El logo de ATRAPA LA EMOCIÓN pasa a la clave `publicidad`, como el cuadro del parcial (Leon,
-    // 2026-11-05): por defecto, el mismo logo; otra ruta entra entera, de cualquier proporción (pr meet),
-    // en la caja del asset (363 × 337, al 51 % y al 90 % del Nulo 1: unos 167 × 155 px de pantalla), con
-    // la misma entrada (crece del 49 al 56) y la misma sombra. "" o una ruta que no carga, el cuadro vacío.
+    // La caja de la derecha es la clave `publicidad`, para la imagen de un patrocinador (Leon,
+    // 2026-11-05): llena el rectángulo de la caja a lo ancho (x 1408–1623) y a la altura de la parte
+    // negra de C H E (y 770–910), 215 × 140 px de pantalla; una imagen de otra proporción lo cubre
+    // igual, recortada (slice). Entra como entraba el logo (crece desde el centro del 49 al 56), sin su
+    // sombra blanca: alrededor de una imagen opaca era un halo sobre el negro y la banda azul. Por
+    // defecto, el logo de ATRAPA LA EMOCIÓN entero en ese rectángulo (SF_LOGO: el PNG del export
+    // llevado a 280 de alto, centrado en 430 × 280, con alfa). "" o una ruta que no carga, la caja vacía.
     const logo = rename(d, 'LOGO FINAL ATRAPA LA EMOCION.png', 'publicidad');
     const imgLogo = d.assets.find(a => a.id === logo.refId);
-    if (imgLogo.w !== 363 || imgLogo.h !== 337) throw new Error(`publicidad: ${imgLogo.w} × ${imgLogo.h}`);
-    imgLogo.pr = 'xMidYMid meet';
+    const raiz = layer(d, 'Nulo 1');
+    if (imgLogo.w !== 363 || imgLogo.h !== 337 || logo.parent !== raiz.ind || raiz.ks.p.a || raiz.ks.s.k[0] !== 90
+        || String(raiz.ks.p.k.slice(0, 2)) !== '972,662' || String(raiz.ks.a.k.slice(0, 2)) !== '51,48' || logo.ks.p.a || logo.ks.a.a)
+        throw new Error('publicidad: el logo o el Nulo 1 llegan de otra forma: medir de nuevo SF_PUB');
+    if (!fs.existsSync(path.join(REPO, '_assets', SF_LOGO))) throw new Error(`falta _assets/${SF_LOGO}`);
+    const u = SF_PUB.w / 0.9, v = SF_PUB.h / 0.9;            // px de pantalla a unidades de la capa (Nulo 1 al 90 %)
+    Object.assign(imgLogo, { w: Math.round(u), h: Math.round(v), u: '../_assets/', p: SF_LOGO, e: 0, pr: 'xMidYMid slice' });
+    logo.ks.a.k = [imgLogo.w / 2, imgLogo.h / 2, 0];
+    logo.ks.p.k = [51 + (SF_PUB.x + SF_PUB.w / 2 - 972) / 0.9, 48 + (SF_PUB.y + SF_PUB.h / 2 - 662) / 0.9, 0];
+    if (!logo.ks.s.a || logo.ks.s.k.filter(k => k.s[0] === 51).length !== 2) throw new Error('publicidad: escala inesperada');
+    for (const k of logo.ks.s.k) if (k.s[0] === 51) k.s = [100, 100, 100];
+    delete logo.ef;
     // Las barras: las 8 de cada fila apiladas, todas visibles al arrancar, como en el parcial: el
     // controlador manda 1 a la que va y 0 a las otras siete.
     const barras = d.layers.filter(l => /^\.BARRA_[A-Z]+_(LOCAL|VISITA)$/.test(l.nm));

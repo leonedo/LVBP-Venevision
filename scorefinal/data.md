@@ -43,11 +43,13 @@ won) and `""` to leave a cell empty. All the numbers start empty.
 **Runs, hits and errors:** centered in their columns; three digits fit at the design size.
 
 **Sponsor:** `publicidad`, the path of an image (relative to the graphic's `index.html`, or
-absolute), as in `parcial`. It replaces the logo in the box on the right: about 167 × 155 px on
-screen, the image fits whole, any proportion, centered (a wide one, like the Pepsi insert, shows about
-167 × 106). It enters like the logo (grows from frame 49 to 56) and keeps its drop shadow. By default
-it is the ATRAPA LA EMOCIÓN logo (`../_assets/3e822b60c984.png`). `""` or a path that doesn't load
-leaves the box empty, without a broken-image icon.
+absolute), as in `parcial`. It fills the box on the right: its full width and the height of the
+black part of C H E (x 1408–1623, y 770–910, 215 × 140 px on screen). **Best size: 430 × 280 px**
+(or any image with that 43:28 proportion); one of another proportion still covers the whole box,
+cropped at the sides or top and bottom, centered. It grows in from its center (frames 49 to 56), as
+the logo did. By default it is the ATRAPA LA EMOCIÓN logo, whole in that box
+(`../_assets/488fb05ab214.png`). `""` or a path that doesn't load leaves the box empty, without a
+broken-image icon.
 
 **Placement:** bottom of the screen (x 302–1634, y 724–910). It overlaps `parcial` and `otrosjuegos`:
 they don't go on air together.
@@ -85,7 +87,7 @@ they don't go on air together.
   "MAGALOCAL_opacidad": 0,
   "TIBUSLOCAL_opacidad": 0,
   "TIGRESLOCAL_opacidad": 0,
-  "publicidad": "../_assets/3e822b60c984.png"
+  "publicidad": "../_assets/488fb05ab214.png"
 }
 ```
 
@@ -142,7 +144,7 @@ All are box text: a longer string shrinks to fit instead of overflowing, always 
 
 | Class | What | Default |
 |-------|------|---------|
-| `publicidad` | Box on the right (363 × 337 asset, about 167 × 155 on screen; fits whole) | `../_assets/3e822b60c984.png` (ATRAPA LA EMOCIÓN) |
+| `publicidad` | Box on the right, 215 × 140 px on screen (covers it: best 430 × 280) | `../_assets/488fb05ab214.png` (ATRAPA LA EMOCIÓN) |
 
 ## Opacity layers
 
