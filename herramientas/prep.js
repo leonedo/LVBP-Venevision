@@ -2146,7 +2146,10 @@ function publicidadEnLaCaja(d) {
     };
     d.layers.splice(d.layers.indexOf(pub), 0, mate);
 }
-if (hay('SCORE FINAL')) {
+// Dos gráficos del mismo export (Leon, 2026-11-05), como el parcial: scorefinal, con la publicidad en la
+// caja de la derecha (publicidadEnLaCaja), y scorefinalsinpublicidad, el de antes, con el logo de ATRAPA LA
+// EMOCIÓN fijo (su sombra y su entrada del diseño). Lo demás, idéntico.
+if (hay('SCORE FINAL')) for (const conPublicidad of [true, false]) {
     const d = load(path.join(SRC, 'SCORE FINAL/data.json'));
     const FIN = SF_PAUSA + SF_ENTRADA;     // lo que la entrada muestra en el frame t, la salida lo muestra en el FIN − t
     const vacio = FIN;
@@ -2215,7 +2218,8 @@ if (hay('SCORE FINAL')) {
     rename(d, 'C', 'rotulocarreras');
     rename(d, 'H', 'rotulohits');
     rename(d, 'E', 'rotuloerrores');
-    publicidadEnLaCaja(d);
+    if (conPublicidad) publicidadEnLaCaja(d);
+    else delete layer(d, 'LOGO FINAL ATRAPA LA EMOCION.png').cl;
     // Las barras: las 8 de cada fila apiladas, todas visibles al arrancar, como en el parcial: el
     // controlador manda 1 a la que va y 0 a las otras siete.
     const barras = d.layers.filter(l => /^\.BARRA_[A-Z]+_(LOCAL|VISITA)$/.test(l.nm));
@@ -2263,5 +2267,5 @@ if (hay('SCORE FINAL')) {
     allCaps(d);
     // los textos del UPDATE arrancan vacíos, salvo los rótulos (ultimoinning dice 9)
     for (const l of d.layers) if (l.ty === 5 && l.cl && !/^(rotulo|ultimoinning)/.test(l.cl)) for (const k of l.t.d.k) k.s.t = '';
-    save(path.join(REPO, 'scorefinal/data.json'), d);
+    save(path.join(REPO, conPublicidad ? 'scorefinal' : 'scorefinalsinpublicidad', 'data.json'), d);
 }
