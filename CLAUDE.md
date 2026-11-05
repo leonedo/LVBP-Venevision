@@ -6,9 +6,9 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Doce gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
+proyecto*). Trece gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
 variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva, el
-bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones y el score final con `font/LTEnergy-Regular.ttf`,
+bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones y el score final (con y sin publicidad) con `font/LTEnergy-Regular.ttf`,
 la estática que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable:
 mide igual, y en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y
 los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, y el del score final, del 2026-10-29, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
@@ -31,6 +31,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `prevenido/` | El bateador en el círculo (el export es PREVENIDO AL BATE), abajo a la derecha: un panel de LMV entra girando, muestra su logo con un brillo y se va (una secuencia de PNG); debajo, la barra negra con el PREVENIDO AL BATE y el recuadro azul con el nombre. El frame 0 está vacío | stage `play` pause (0–170): la barra entra del 23 al 32, el título del 31 al 39, el recuadro y el nombre del 33 al 48, y el panel se va del 151 al 168 | `salida`: la barra, el título, el recuadro y el nombre, su entrada al revés, sin el panel (0,9 s) |
 | `posiciones/` | La tabla de posiciones (el export es TABLA DE POSICIONES), a pantalla completa y opaca: el fondo, el título POSICIONES, los rótulos de las columnas, el recuadro magenta de los números y el cuadro de GoGo Royal (una secuencia de JPG); encima, 8 filas, cada una con la barra del equipo (con su escudo), el nombre en una caja negra y JJ, JG, JP, AVE y DIF. El frame 0 está vacío; desde el 1, el gris del diseño tapa el video | stage `play` pause (0–76): el gris quieto hasta el 11, el fondo entra del 12 al 64, las barras bajan del 29 al 44, los nombres aparecen del 41 al 66 y los números del 60 al 75 | `salida`: la entrada al revés, que termina en el gris y corta al video (2,5 s) |
 | `scorefinal/` | El score final (el export es SCORE FINAL), el line score, abajo (x 302–1634, y 724–910): las barras de visita y local (escudo y nombre, las mismas imágenes de la tabla de posiciones), las carreras de los 9 innings sobre un recuadro magenta, C H E en negro y la caja del logo de ATRAPA LA EMOCIÓN (`publicidad`, una imagen que llena la caja: Pepsi por defecto), con una raya plateada a la derecha. El frame 0 está vacío | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48, la caja del logo del 40 al 58 y la publicidad entra deslizándose del 39 al 58 | `salida`: la entrada al revés (1,9 s) |
+| `scorefinalsinpublicidad/` | El score final sin publicidad: el de antes del 2026-11-05, con el logo de ATRAPA LA EMOCIÓN fijo en la caja de la derecha (con su sombra blanca). Mismo export, mismas claves y misma data que `scorefinal` (el controlador elige con o sin publicidad por el template) | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48, la caja del logo del 40 al 58 y el logo crece del 49 al 56 | `salida`: la entrada al revés (1,9 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
@@ -699,6 +700,13 @@ export sale. La imagen llena la caja a lo ancho y a la altura de la parte negra 
 una de otra proporción la cubre igual, recortada (`pr` slice: Pepsi pierde 2 px de cada lado). `""` o
 una ruta que no carga dejan la caja vacía. El controlador todavía no la manda: sale Pepsi.
 
+Sin publicidad (Leon, 2026-11-05): `scorefinalsinpublicidad/`, el score final tal como era antes de
+la publicidad (v0.7.0), con el logo de ATRAPA LA EMOCIÓN fijo, su sombra y su entrada. Un gráfico
+aparte, como el parcial sin publicidad, para que el controlador elija con o sin publicidad por el
+template y les mande la misma data. Sale del mismo export (`prep.js` arma los dos); el `index.html`,
+el `data.md` y la fuente, copias de los del score final a mano. `capturas/scorefinalsinpublicidad.png`
+es la `scorefinal.png` de antes; los equipos son los de `scorefinal_equipos.png`.
+
 Colores: el magenta es el de los outs del score de antes (`#EA0059`) y el cian, el de los textos del
 score (`#00D9E2`, 113,5 IRE en NTSC compuesto). Pendiente: medir el logo y las barras en NTSC (las
 barras son las de la tabla de posiciones: legales).
@@ -744,8 +752,8 @@ INNING/`), el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`), el 3 en línea
 `3_EN_LINEA.zip` (carpeta `3 EN LINEA/`), los otros juegos como `OTROS_JUEGOS.zip` (carpeta `OTROS
 JUEGOS/`), el prevenido como `PREVENIDO_AL_BATE.zip` (carpeta `PREVENIDO AL BATE/`) y la tabla de
 posiciones como `TABLA DE POSICIONES.zip` (carpeta `TABLA DE POSICIONES/`) y el score final como
-`SCORE FINAL 1.zip` (carpeta `SCORE FINAL/`); el parcial sin publicidad
-no tiene export, sale del parcial. La receta de los doce es `herramientas/prep.js`, que prepara los
+`SCORE FINAL 1.zip` (carpeta `SCORE FINAL/`), que da los dos score final; el parcial sin publicidad
+no tiene export, sale del parcial. La receta de los trece es `herramientas/prep.js`, que prepara los
 que encuentre, y el parcial sin publicidad siempre (las imágenes del 3 en línea y del prevenido,
 antes, `herramientas/tresenlinea.py` y `herramientas/prevenido.py`): buscar las capas por `nm` (los
 índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`. Las imágenes del export van
