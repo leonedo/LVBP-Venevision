@@ -2177,8 +2177,14 @@ if (hay('SCORE FINAL')) {
     rename(d, 'C', 'rotulocarreras');
     rename(d, 'H', 'rotulohits');
     rename(d, 'E', 'rotuloerrores');
-    const logo = layer(d, 'LOGO FINAL ATRAPA LA EMOCION.png');
-    delete logo.cl;
+    // El logo de ATRAPA LA EMOCIÓN pasa a la clave `publicidad`, como el cuadro del parcial (Leon,
+    // 2026-11-05): por defecto, el mismo logo; otra ruta entra entera, de cualquier proporción (pr meet),
+    // en la caja del asset (363 × 337, al 51 % y al 90 % del Nulo 1: unos 167 × 155 px de pantalla), con
+    // la misma entrada (crece del 49 al 56) y la misma sombra. "" o una ruta que no carga, el cuadro vacío.
+    const logo = rename(d, 'LOGO FINAL ATRAPA LA EMOCION.png', 'publicidad');
+    const imgLogo = d.assets.find(a => a.id === logo.refId);
+    if (imgLogo.w !== 363 || imgLogo.h !== 337) throw new Error(`publicidad: ${imgLogo.w} × ${imgLogo.h}`);
+    imgLogo.pr = 'xMidYMid meet';
     // Las barras: las 8 de cada fila apiladas, todas visibles al arrancar, como en el parcial: el
     // controlador manda 1 a la que va y 0 a las otras siete.
     const barras = d.layers.filter(l => /^\.BARRA_[A-Z]+_(LOCAL|VISITA)$/.test(l.nm));

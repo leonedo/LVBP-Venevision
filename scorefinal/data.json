@@ -14,7 +14,8 @@
       "h": 337,
       "u": "../_assets/",
       "p": "3e822b60c984.png",
-      "e": 0
+      "e": 0,
+      "pr": "xMidYMid meet"
     },
     {
       "id": "image_1",
@@ -467,7 +468,7 @@
       "ddd": 0,
       "ind": 3,
       "ty": 2,
-      "nm": "LOGO FINAL ATRAPA LA EMOCION.png",
+      "nm": ".publicidad",
       "parent": 1,
       "refId": "image_0",
       "sr": 1,
@@ -678,7 +679,8 @@
       "ip": 1,
       "op": 116.001,
       "st": 5.00000020365417,
-      "bm": 0
+      "bm": 0,
+      "cl": "publicidad"
     },
     {
       "ddd": 0,
