@@ -17,6 +17,23 @@
             margin: 0;
 
         }
+        /* El zoom lento del fondo (el de AE: del 189,37 % en el frame 0 al 101 % en el 600, lineal) va por
+           CSS y no en el Lottie, para que siga en la pausa y en la salida, como en AE: la timeline se
+           detiene en la pausa. Arranca con el play (abajo). Los números los controla prep.js (DL_ZOOM). */
+        #fondo image {
+            transform-box: fill-box;
+            transform-origin: 50% 50%;
+            transform: scale(1.893721);
+        }
+
+        body.zoom #fondo image {
+            animation: zoomfondo 20.02s linear forwards;
+        }
+
+        @keyframes zoomfondo {
+            from { transform: scale(1.893721); }
+            to { transform: scale(1.01); }
+        }
     </style>
 </head>
 
@@ -41,6 +58,18 @@
     <script src="../webcg-framework.umd.js"></script>
     <script src="../lottie.js"></script>
     <script src="../index.js"></script>
+    <script>
+        // El zoom del fondo (ver el CSS de arriba) arranca con la entrada: con el play, cuando el
+        // gráfico terminó de cargar, en el mismo momento en que index.js arranca la timeline. Otro play
+        // lo vuelve a empezar.
+        webcg.on('play', function () {
+            alCargar('zoomfondo', function () {
+                document.body.classList.remove('zoom');
+                void document.body.offsetWidth;
+                document.body.classList.add('zoom');
+            });
+        });
+    </script>
     <script>
         // Panel de devtools: con Live Server (puerto 5500) o con ?debug=true en cualquier puerto
         if (location.port === "5500" || /[?&]debug=true\b/.test(location.search)) {

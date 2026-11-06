@@ -32,7 +32,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `posiciones/` | La tabla de posiciones (el export es TABLA DE POSICIONES), a pantalla completa y opaca: el fondo, el título POSICIONES, los rótulos de las columnas, el recuadro magenta de los números y el cuadro de GoGo Royal (una secuencia de JPG); encima, 8 filas, cada una con la barra del equipo (con su escudo), el nombre en una caja negra y JJ, JG, JP, AVE y DIF. El frame 0 está vacío; desde el 1, el gris del diseño tapa el video | stage `play` pause (0–76): el gris quieto hasta el 11, el fondo entra del 12 al 64, las barras bajan del 29 al 44, los nombres aparecen del 41 al 66 y los números del 60 al 75 | `salida`: la entrada al revés, que termina en el gris y corta al video (2,5 s) |
 | `scorefinal/` | El score final (el export es SCORE FINAL), el line score, abajo (x 302–1634, y 724–910): las barras de visita y local (escudo y nombre, las mismas imágenes de la tabla de posiciones), las carreras de los 9 innings sobre un recuadro magenta, C H E en negro y la caja del logo de ATRAPA LA EMOCIÓN (`publicidad`, una imagen que llena la caja: Pepsi por defecto), con una raya plateada a la derecha. El frame 0 está vacío | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48, la caja del logo del 40 al 58 y la publicidad entra deslizándose del 39 al 58 | `salida`: la entrada al revés (1,9 s) |
 | `scorefinalsinpublicidad/` | El score final sin publicidad: el de antes del 2026-11-05, con el logo de ATRAPA LA EMOCIÓN fijo en la caja de la derecha (con su sombra blanca). Mismo export, mismas claves y misma data que `scorefinal` (el controlador elige con o sin publicidad por el template) | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48, la caja del logo del 40 al 58 y el logo crece del 49 al 56 | `salida`: la entrada al revés (1,9 s) |
-| `duelo_lanzadores/` | El duelo de lanzadores (el export es DUELO DE PICHEO; el título, DUELO DE HOY), a pantalla completa y opaco: el fondo azul de ATRAPA LA EMOCIÓN; a cada lado, el panel del equipo con la foto del lanzador delante (`fotolanzadorvisita` / `fotolanzadorlocal`, imágenes) y abajo la barra con el nombre y el número; al centro, el logo, el título y 7 estadísticas (la visita a la izquierda, los rótulos al medio, la local a la derecha). El frame 0 está vacío | stage `play` pause (0–53): las fotos entran de los lados del 0 al 15, el logo crece del 8 al 18, el título aparece letra por letra del 10 al 30, las barras entran del 17 al 37, las estadísticas bajan fila por fila del 22 al 52 y los nombres del 43 al 49 | `salida`: la entrada al revés (1,8 s) |
+| `duelo_lanzadores/` | El duelo de lanzadores (el export es DUELO DE PICHEO; el título, DUELO DE HOY), a pantalla completa y opaco: el fondo azul de ATRAPA LA EMOCIÓN; a cada lado, el panel del equipo con la foto del lanzador delante (`fotolanzadorvisita` / `fotolanzadorlocal`, imágenes) y abajo la barra con el nombre y el número; al centro, el logo, el título y 7 estadísticas (la visita a la izquierda, los rótulos al medio, la local a la derecha). El frame 0 está vacío | stage `play` pause (0–53): las fotos entran de los lados del 0 al 15, el logo crece del 8 al 18, el título aparece letra por letra del 10 al 30, las barras entran del 17 al 37, las estadísticas bajan fila por fila del 22 al 52 y los nombres del 43 al 49; el zoom del fondo (CSS) sigue en la pausa | `salida`: la entrada al revés (1,8 s), con el fondo alejándose |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
@@ -740,7 +740,13 @@ carga.
 Fondo: llegaba al 69 % sobre nada, así que al aire se vería el video a través. Va opaco, con un negro
 debajo (`DL_OPACO` en `prep.js`): igual que en AE sobre el negro de la composición, y tapa el video
 desde el frame 1, como la tabla de posiciones. El fondo tiene además un zoom lento en el export, de
-punta a punta (del 196 % al 101 % en 21 s): queda el tramo de la entrada, y en la pausa está quieto.
+punta a punta (del 196 % al 101 % en 21 s), que en AE sigue durante la pausa (el video de referencia
+que mandó Leon, 2026-11-06: se aleja todo el tiempo). En Lottie la pausa detiene la timeline, así que
+el zoom va por **CSS** en el `index.html` (`#fondo image`, una animación de 20 s que arranca con el
+`play`, cuando el gráfico cargó, a la vez que la entrada): sigue en la pausa y en la salida, y a los
+20 s queda quieto en el 101 %, como al final del export. La capa del fondo queda al 100 %, con `ln`
+fondo. En las capturas cuadro por cuadro (`shot.mjs`) el zoom no sigue al frame sino al reloj. En
+CasparCG 2.5.1 sin GPU, la pausa usa 1,4 núcleos (antes, quieta, casi nada) y no repite frames.
 
 Textos: en mayúsculas. Los nombres, nombre y apellido como en Meridiano (`JHOULYS CHACÍN`): entran
 unos 17 caracteres a la izquierda y 16 a la derecha al cuerpo del diseño (`ALEXANDER MONASTERIOS`
@@ -1378,8 +1384,9 @@ salida, contra la entrada al revés: idéntica.
 - **Textos de caja:** el alto, el ascent del cuerpo más 2, y `lh` 1.2 del cuerpo, como en los otros.
 - **CC Light Sweep:** sale de `Capa de formas 2` y `4` (las barras grises). `prep.js` falla si llega
   animado.
-- **Fondo:** el zoom (del −45 al 600, lineal) queda del 0 al `DL_ENTRADA` con los mismos valores; y un
-  rectángulo negro debajo (`DL_OPACO`).
+- **Fondo:** el zoom (del −45 al 600, lineal) sale del Lottie (la capa al 100 %, `ln` fondo) y lo hace
+  el CSS del `index.html` desde el frame 0 (189,37 % → 101 % en 20,02 s). `prep.js` falla si el zoom del
+  export no es el de `DL_ZOOM`: cambiar las dos cosas. Y un rectángulo negro debajo (`DL_OPACO`).
 - **Markers y timeline:** `START` (0–30) y `STOP` (60–90) del diseñador → `play` 0–53 (pausa en el 52:
   `DL_PAUSA`), `salida` 53–106 y `stop` en el 0. Todo suma su entrada al revés (`alReves`): lo que la
   entrada muestra en el frame t, la salida lo muestra en el 105 − t, el primer frame vacío. Las capas

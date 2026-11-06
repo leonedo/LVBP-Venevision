@@ -158,3 +158,7 @@ silently, the teams and the photos included. `stop` plays `salida` (frame 53 →
 entry in reverse, ending on an empty frame; it releases the layer when it ends. The `play` stage is
 active from frame 0, so a `stop` that arrives mid-entry also plays `salida`: it jumps to the full
 graphic and exits from there.
+
+The background keeps a slow zoom-out while the graphic is on air (in the pause and the exit too), as in
+After Effects: it is a CSS animation in `index.html` that starts with `play` (20 s, then it stays at
+the end). It needs no data.

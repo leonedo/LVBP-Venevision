@@ -2305,6 +2305,8 @@ const PNG_TRANSPARENTE = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQV
 // El fondo llega al 69 % sobre nada: al aire se vería el video a través. Va opaco, como se ve en AE
 // sobre el negro de la composición: un rectángulo negro debajo (DL_OPACO = false lo deja como llega).
 const DL_OPACO = true;
+// El zoom del fondo, como lo tiene el CSS del index.html: del frame 0 al final del export (en %, y s).
+const DL_ZOOM = { desde: 189.3721, hasta: 101, segundos: 20.02 };
 if (hay('DUELO DE PICHEO')) {
     const d = load(path.join(SRC, 'DUELO DE PICHEO/data.json'));
     const FIN = DL_PAUSA + DL_ENTRADA;     // lo que la entrada muestra en el frame t, la salida lo muestra en el FIN − t
@@ -2404,12 +2406,17 @@ if (hay('DUELO DE PICHEO')) {
     }
 
     // ---- el fondo: un zoom lento de punta a punta del export (del 196 % en el −45 al 101 % en el 600,
-    // lineal). Queda el tramo de la entrada, del 0 al DL_ENTRADA, con los mismos valores: en la pausa
-    // está quieto. Y opaco (DL_OPACO).
+    // lineal). En AE sigue en la pausa, y la timeline de Lottie ahí está detenida: el zoom va por CSS en
+    // el index.html (`#fondo image`, desde el play), y la capa queda al 100 %, con `ln` fondo. Falla si
+    // el zoom del export no es el que tiene el CSS (DL_ZOOM): cambiar los dos. Y opaco (DL_OPACO).
     const zoom = fondo.ks.s;
     if (!zoom.a || zoom.k.length !== 2 || zoom.k[0].o.x[0] !== 0.167 || zoom.k[0].i.x[0] !== 0.833) throw new Error('fondo: zoom inesperado');
-    const [k0, k1] = zoom.k, en = t => k0.s.map((v, i) => +(v + (k1.s[i] - v) * (t - k0.t) / (k1.t - k0.t)).toFixed(4));
-    zoom.k = [{ i: k0.i, o: k0.o, t: 0, s: en(0) }, { t: DL_ENTRADA, s: en(DL_ENTRADA) }];
+    const [k0, k1] = zoom.k, en = t => +(k0.s[0] + (k1.s[0] - k0.s[0]) * (t - k0.t) / (k1.t - k0.t)).toFixed(4);
+    const css = { desde: en(0), hasta: k1.s[0], segundos: +(k1.t / d.fr).toFixed(2) };
+    if (k0.s[0] !== k0.s[1] || k1.s[0] !== k1.s[1] || JSON.stringify(css) !== JSON.stringify(DL_ZOOM)) throw new Error(`fondo: el zoom del export (${JSON.stringify(css)}) no es el del CSS (DL_ZOOM)`);
+    if (JSON.stringify(fondo.ks.a.k.slice(0, 2)) !== '[960,540]' || JSON.stringify(fondo.ks.p.k.slice(0, 2)) !== '[960,540]') throw new Error('fondo: el CSS escala desde el centro de la imagen');
+    fondo.ks.s = { a: 0, k: [100, 100, 100], ix: 6, l: 2 };
+    fondo.ln = 'fondo';
     if (DL_OPACO) {
         const negro = {
             ddd: 0, ind: freeInd(d, Math.max(...d.layers.map(l => l.ind)) + 1), ty: 4, nm: 'negro debajo del fondo', sr: 1,
