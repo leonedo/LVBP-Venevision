@@ -4,13 +4,13 @@
 // 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18), del lanzador (PITCHERS, 2026-10-21), del
 // 3 en línea (3 EN LINEA, 2026-10-22), de los otros juegos (OTROS JUEGOS, 2026-10-22), del prevenido
 // (PREVENIDO AL BATE, 2026-10-23), de la tabla de posiciones (TABLA DE POSICIONES, 2026-10-22) y del
-// score final (SCORE FINAL, 2026-10-29): si
+// score final (SCORE FINAL, 2026-10-29) y del duelo de lanzadores (DUELO DE PICHEO, 2026-11-06): si
 // el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
 //      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/,
-//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, SCORE FINAL/. Los que no estén se saltean: alcanza con el zip que
+//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, SCORE FINAL/, DUELO DE PICHEO/. Los que no estén se saltean: alcanza con el zip que
 //      llegó. El parcial sin publicidad no tiene export: sale del parcial preparado, y se arma siempre.
 //   2. Las imágenes de cada export que llegó, a <gráfico>/images/ (se copian tal cual; consolidar.mjs
 //      las pasa después a _assets/ y borra la carpeta). Si llegó el 3 EN LINEA: python3
@@ -2268,4 +2268,177 @@ if (hay('SCORE FINAL')) for (const conPublicidad of [true, false]) {
     // los textos del UPDATE arrancan vacíos, salvo los rótulos (ultimoinning dice 9)
     for (const l of d.layers) if (l.ty === 5 && l.cl && !/^(rotulo|ultimoinning)/.test(l.cl)) for (const k of l.t.d.k) k.s.t = '';
     save(path.join(REPO, conPublicidad ? 'scorefinal' : 'scorefinalsinpublicidad', 'data.json'), d);
+}
+
+// ---------------------------------------------------------------- duelo de lanzadores
+// El duelo (el export es DUELO DE PICHEO; la carpeta, duelo_lanzadores, como su equivalente de
+// LVBP-Meridiano), a pantalla completa: el fondo azul de ATRAPA LA EMOCIÓN, a cada lado el panel del
+// equipo con la foto del lanzador delante y abajo la barra con su nombre y su número; al centro, el
+// logo, DUELO DE HOY y la tabla de 7 estadísticas (la visita a la izquierda, la local a la derecha y
+// los rótulos al medio). Las claves, las del duelo de Meridiano donde dicen lo mismo (titulo,
+// lanzadorvisita / lanzadorlocal, fotolanzadorvisita / fotolanzadorlocal, etiquetaN, valorvisitaN y
+// valorlocalN), y los paneles como los escudos del score de este repo (<SIGLAS>VISITA_opacidad /
+// <SIGLAS>LOCAL_opacidad); propias, numerovisita / numerolocal.
+// Flujo: la entrada termina en el 52 (el SO de las dos columnas). El export no trae salida (su STOP,
+// 60–90, no anima nada): es la entrada al revés, como en los demás.
+const DL_PAUSA = 53;                   // play 0–53: queda en el 52
+const DL_ENTRADA = 52;                 // la entrada termina en el 52
+const DL_MARGEN = 8;                   // las cajas, 8 px antes de la columna vecina o del borde de su barra
+// La tabla: el centro de las columnas de valores, la mediana de lo que se ve en el export (cada texto
+// llegaba centrado a ojo con su ancla, hasta 8 px corrido: el 1 de los perdidos); los rótulos, al medio
+// de las dos (llegaban entre 966 y 980, 13 px más cerca de la local que de la visita).
+const DL_X = { visita: 819.5, local: 1113.5 };
+const DL_FILAS = [['GANADOS', 'GANADOSVISITA', 'GANADOSLOCAL'], ['.PERDIDOS', '.PERDIDOSVISITA', '.PERDIDOSLOCAL'],
+    ['.EFECTIVIDAD', '.EFECTIVIDADVISITA', '.EFECTIVIDADLOCAL'], ['.INNINGLANZADO', '.INNINGLANZADOVISITA', '.INNINGLANZADOLOCAL'],
+    ['.CARRERASLIMPIAS', '.CARRERASLIMPIASVISITA', '.CARRERASLIMPIASLOCAL'], ['.BASESXBOLAS', '.BASESXBOLASVISITA', '.BASESXBOLASLOCAL'],
+    ['.PONCHES', '.PONCHESVISITA', '.PONCHESLOCAL']];
+// La barra de los nombres: el gris termina (visita) y empieza (local) en la x 568 y la 1351 a la altura
+// del medio de las letras (y 889; la barra va en diagonal, 11°), y el negro del número va de ahí a la
+// 718 y la 1202: 150 px.
+const DL_GRIS = { visita: 568, local: 1351 };
+const DL_NUMERO = 150 - 2 * DL_MARGEN;
+// La foto de cada lanzador: el asset de la del diseño (720 × 1080) y transparente por defecto. Las dos
+// capas lo comparten, con pr meet arriba: una foto de cualquier proporción entra entera, centrada en
+// su lado y desde el borde de arriba de la del diseño (una cuadrada queda encima de la barra).
+const DL_FOTO = { id: 'image_foto', w: 720, h: 1080, u: 'images/', p: 'foto.png', e: 0, pr: 'xMidYMin meet' };
+const PNG_TRANSPARENTE = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNgYGBgAAAABQABeqhXUAAAAABJRU5ErkJggg==';
+// El fondo llega al 69 % sobre nada: al aire se vería el video a través. Va opaco, como se ve en AE
+// sobre el negro de la composición: un rectángulo negro debajo (DL_OPACO = false lo deja como llega).
+const DL_OPACO = true;
+if (hay('DUELO DE PICHEO')) {
+    const d = load(path.join(SRC, 'DUELO DE PICHEO/data.json'));
+    const FIN = DL_PAUSA + DL_ENTRADA;     // lo que la entrada muestra en el frame t, la salida lo muestra en el FIN − t
+    const vacio = FIN;
+    if (d.layers.some(l => l.ty === 0) || d.assets.some(a => a.layers)) throw new Error('duelo: precomps inesperados');
+
+    // ---- la tabla. Cada texto, centrado en su columna (j 2) en una caja del ancho entre dos columnas
+    // menos DL_MARGEN. Los renglones llegaban cada 93, 91, 82, 95, 87 y 87 px: van parejos entre el
+    // primero y el último (cada 89,2), cada texto con su matte (el rectángulo por el que entra).
+    const xRotulos = (DL_X.visita + DL_X.local) / 2;
+    const W = (DL_X.local - DL_X.visita) / 2 - DL_MARGEN;
+    const yDe = l => enPantallaY(d, l, 0);
+    const y0 = yDe(layer(d, DL_FILAS[0][0])), y1 = yDe(layer(d, DL_FILAS[DL_FILAS.length - 1][0]));
+    DL_FILAS.forEach((nms, i) => {
+        const capas = nms.map(nm => layer(d, nm));
+        if (capas.some(l => Math.abs(yDe(l) - yDe(capas[0])) > 0.01)) throw new Error(`${nms[0]}: la fila no está a una altura`);
+        const dy = y0 + (y1 - y0) * i / (DL_FILAS.length - 1) - yDe(capas[0]);
+        capas.forEach((l, j) => {
+            const s = doc(d, l.nm), x = [xRotulos, DL_X.visita, DL_X.local][j], sc = escalaX(d, l);
+            s.ps[0] = (x - enPantalla(d, l, 0)) / sc - W / sc / 2;
+            s.sz[0] = W / sc;
+            s.j = 2;
+            const mate = d.layers.find(o => o.ind === l.tp);
+            if (!mate || !mate.td || mate.ks.p.a || !l.ks.p.a) throw new Error(`${l.nm}: matte o posición inesperados`);
+            const padre = d.layers.find(o => o.ind === l.parent), sp = padre ? escalaY(d, padre) : 1;
+            if (mate.parent !== l.parent) throw new Error(`${l.nm}: el matte cuelga de otro nulo`);
+            for (const k of l.ks.p.k) k.s[1] += dy / sp;
+            mate.ks.p.k[1] += dy / sp;
+            // el matte llega del ancho del texto del diseño (100 unidades; 128 % en la EFE): uno más largo
+            // salía cortado a los lados. Pasa al ancho entre dos columnas, centrado en la suya.
+            const g = mate.shapes[0].it, rc = g.find(o => o.ty === 'rc'), tr = g.find(o => o.ty === 'tr');
+            if (mate.shapes.length !== 1 || !rc || rc.s.a || tr.p.a || tr.s.a || tr.r.k || tr.a.k[0]) throw new Error(`${mate.nm}: matte inesperado`);
+            mate.ks.s.k[0] = 100;
+            rc.s.k[0] = (W + DL_MARGEN) / (escalaX(d, mate) * tr.s.k[0] / 100);
+            mate.ks.p.k[0] += (x - enPantalla(d, mate, tr.p.k[0] + rc.p.k[0] * tr.s.k[0] / 100)) / sp;
+        });
+    });
+    const clases = ['etiqueta', 'valorvisita', 'valorlocal'];
+    DL_FILAS.forEach((nms, i) => nms.forEach((nm, j) => rename(d, nm, clases[j] + (i + 1))));
+
+    // ---- la barra: el número, centrado en su negro, DL_MARGEN adentro; el nombre de la visita, desde
+    // donde empieza (x 81) hasta DL_MARGEN antes del negro; el de la local, desde donde empieza (x 1393,
+    // 42 px después del gris) hasta el espejo del comienzo de la visita (x 1839).
+    for (const lado of ['VISITA', 'LOCAL']) {
+        const l = layer(d, `.NUMERO${lado}`);
+        anchoCentrado(doc(d, l.nm), DL_NUMERO / escalaX(d, l));
+    }
+    const nv = layer(d, '.NOMBRE APELLIDO VISITA'), nl = layer(d, '.NOMBRE APELLIDO LOCAL');
+    const sv = doc(d, nv.nm), sl = doc(d, nl.nm);
+    if (sv.j !== 0 || sl.j !== 0) throw new Error('duelo: los nombres no llegan alineados a la izquierda');
+    const desdeV = enPantalla(d, nv, sv.ps[0]), desdeL = enPantalla(d, nl, sl.ps[0]);
+    if (!(desdeV < DL_GRIS.visita && desdeL > DL_GRIS.local)) throw new Error('duelo: los nombres se movieron, medir de nuevo DL_GRIS');
+    sv.sz[0] = (DL_GRIS.visita - DL_MARGEN - desdeV) / escalaX(d, nv);
+    sl.sz[0] = (1920 - desdeV - desdeL) / escalaX(d, nl);
+    rename(d, '.NOMBRE APELLIDO VISITA', 'lanzadorvisita');
+    rename(d, '.NOMBRE APELLIDO LOCAL', 'lanzadorlocal');
+    rename(d, '.NUMEROVISITA', 'numerovisita');
+    rename(d, '.NUMEROLOCAL', 'numerolocal');
+    rename(d, 'DUELO DE HOY', 'titulo');
+    const ascent = d.fonts.list[0].ascent / 100;
+    for (const l of d.layers) if (l.ty === 5) for (const k of l.t.d.k) {
+        k.s.sz[1] = +(ascent * k.s.s + 2).toFixed(2);
+        k.s.lh = 1.2 * k.s.s;
+    }
+
+    // ---- las fotos: el asset compartido, transparente por defecto (DL_FOTO)
+    const fotos = { '.lanzadorizq': 'fotolanzadorvisita', '.lanzadorder': 'fotolanzadorlocal' };
+    const fuera = new Set();
+    for (const [nm, clave] of Object.entries(fotos)) {
+        const l = rename(d, nm, clave), a = d.assets.find(x => x.id === l.refId);
+        if (!a || a.w !== DL_FOTO.w || a.h !== DL_FOTO.h) throw new Error(`${nm}: foto de otro tamaño`);
+        fuera.add(a.id);
+        l.refId = DL_FOTO.id;
+    }
+    d.assets = d.assets.filter(a => !fuera.has(a.id)).concat([clone(DL_FOTO)]);
+    fs.mkdirSync(path.join(REPO, 'duelo_lanzadores/images'), { recursive: true });
+    fs.writeFileSync(path.join(REPO, 'duelo_lanzadores/images', DL_FOTO.p), Buffer.from(PNG_TRANSPARENTE, 'base64'));
+
+    // ---- los paneles: los 8 de cada lado apilados, todos visibles al arrancar, como las barras del
+    // score: el controlador manda 1 al que va y 0 a los otros siete. Arriba quedan Tigres (visita) y
+    // Tiburones (local), los del diseño.
+    const paneles = d.layers.filter(l => /^\.[A-Z]+ (IZQ|DER)$/.test(l.nm));
+    if (paneles.length !== 16) throw new Error(`paneles: ${paneles.length}`);
+    for (const l of paneles) {
+        const [, equipo, lado] = l.nm.match(/^\.([A-Z]+) (IZQ|DER)$/);
+        if (!SIGLAS[equipo] || l.cl !== equipo) throw new Error(`${l.nm}: equipo desconocido`);
+        rename(d, l.nm, `${SIGLAS[equipo]}${lado === 'IZQ' ? 'VISITA' : 'LOCAL'}_opacidad`);
+    }
+    const logo = layer(d, 'LOGO FINAL ATRAPA LA EMOCION.png'), fondo = layer(d, 'FONDO ATRAPA LA EMOCION FINAL_00039.png');
+    delete logo.cl;
+    delete fondo.cl;
+    // El CC Light Sweep de las barras grises: quieto (sin keyframes), Lottie no lo pinta. Sale.
+    for (const nm of ['Capa de formas 2', 'Capa de formas 4']) {
+        const l = layer(d, nm);
+        if (!l.ef || l.ef.length !== 1 || l.ef[0].mn !== 'CC Light Sweep' || propiedadesAnimadas(l.ef).length) throw new Error(`${nm}: efecto inesperado`);
+        delete l.ef;
+    }
+
+    // ---- el fondo: un zoom lento de punta a punta del export (del 196 % en el −45 al 101 % en el 600,
+    // lineal). Queda el tramo de la entrada, del 0 al DL_ENTRADA, con los mismos valores: en la pausa
+    // está quieto. Y opaco (DL_OPACO).
+    const zoom = fondo.ks.s;
+    if (!zoom.a || zoom.k.length !== 2 || zoom.k[0].o.x[0] !== 0.167 || zoom.k[0].i.x[0] !== 0.833) throw new Error('fondo: zoom inesperado');
+    const [k0, k1] = zoom.k, en = t => k0.s.map((v, i) => +(v + (k1.s[i] - v) * (t - k0.t) / (k1.t - k0.t)).toFixed(4));
+    zoom.k = [{ i: k0.i, o: k0.o, t: 0, s: en(0) }, { t: DL_ENTRADA, s: en(DL_ENTRADA) }];
+    if (DL_OPACO) {
+        const negro = {
+            ddd: 0, ind: freeInd(d, Math.max(...d.layers.map(l => l.ind)) + 1), ty: 4, nm: 'negro debajo del fondo', sr: 1,
+            ks: { o: { a: 0, k: 100 }, r: { a: 0, k: 0 }, p: { a: 0, k: [960, 540, 0] }, a: { a: 0, k: [0, 0, 0] }, s: { a: 0, k: [100, 100, 100] } },
+            ao: 0, shapes: [{ ty: 'gr', nm: 'negro', it: [
+                { ty: 'rc', d: 1, s: { a: 0, k: [1920, 1080] }, p: { a: 0, k: [0, 0] }, r: { a: 0, k: 0 } },
+                { ty: 'fl', c: { a: 0, k: [0, 0, 0, 1] }, o: { a: 0, k: 100 }, r: 1 },
+                { ty: 'tr', p: { a: 0, k: [0, 0] }, a: { a: 0, k: [0, 0] }, s: { a: 0, k: [100, 100] }, r: { a: 0, k: 0 }, o: { a: 0, k: 100 }, sk: { a: 0, k: 0 }, sa: { a: 0, k: 0 } }] }],
+            ip: fondo.ip, op: fondo.op, st: 0, bm: 0
+        };
+        d.layers.push(negro);
+    }
+
+    // ---- la salida: todo, su entrada al revés desde la pausa
+    for (const l of d.layers) {
+        for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, DL_ENTRADA, DL_PAUSA);
+        l.ip = Math.max(l.ip, 1);      // el frame 0 queda vacío, como en los otros gráficos
+        l.op = Math.min(FIN - Math.ceil(l.ip) + 0.001, vacio + 1);
+    }
+    d.op = vacio + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: DL_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: DL_PAUSA, cm: 'salida', dr: vacio + 1 - DL_PAUSA }
+    ];
+    if (d.fonts.list.length !== 1 || d.fonts.list[0].fName !== 'LTEnergy-Regular') throw new Error('duelo: fuentes inesperadas');
+    d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
+    allCaps(d);
+    // los textos del UPDATE arrancan vacíos, salvo el título (DUELO DE HOY)
+    for (const l of d.layers) if (l.ty === 5 && l.cl && l.cl !== 'titulo') for (const k of l.t.d.k) k.s.t = '';
+    save(path.join(REPO, 'duelo_lanzadores/data.json'), d);
 }

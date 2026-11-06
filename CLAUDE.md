@@ -6,12 +6,12 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Trece gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
+proyecto*). Catorce gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
 variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva, el
-bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones y el score final (con y sin publicidad) con `font/LTEnergy-Regular.ttf`,
+bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones, el score final (con y sin publicidad) y el duelo de lanzadores con `font/LTEnergy-Regular.ttf`,
 la estática que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable:
 mide igual, y en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y
-los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, y el del score final, del 2026-10-29, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
+los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, el del score final, del 2026-10-29, y el del duelo de lanzadores, del 2026-11-06, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
 (`font/ChakraPetch-Bold.ttf`, libre, de Google Fonts) en el título y las carreras, y el score, Tahoma
 Bold en la barra de jugadores, el conteo, OUTS y el inning (`font/Tahoma-Bold.ttf`: ver *Score*). Las keys del
 UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una vez cada una (ver
@@ -32,6 +32,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `posiciones/` | La tabla de posiciones (el export es TABLA DE POSICIONES), a pantalla completa y opaca: el fondo, el título POSICIONES, los rótulos de las columnas, el recuadro magenta de los números y el cuadro de GoGo Royal (una secuencia de JPG); encima, 8 filas, cada una con la barra del equipo (con su escudo), el nombre en una caja negra y JJ, JG, JP, AVE y DIF. El frame 0 está vacío; desde el 1, el gris del diseño tapa el video | stage `play` pause (0–76): el gris quieto hasta el 11, el fondo entra del 12 al 64, las barras bajan del 29 al 44, los nombres aparecen del 41 al 66 y los números del 60 al 75 | `salida`: la entrada al revés, que termina en el gris y corta al video (2,5 s) |
 | `scorefinal/` | El score final (el export es SCORE FINAL), el line score, abajo (x 302–1634, y 724–910): las barras de visita y local (escudo y nombre, las mismas imágenes de la tabla de posiciones), las carreras de los 9 innings sobre un recuadro magenta, C H E en negro y la caja del logo de ATRAPA LA EMOCIÓN (`publicidad`, una imagen que llena la caja: Pepsi por defecto), con una raya plateada a la derecha. El frame 0 está vacío | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48, la caja del logo del 40 al 58 y la publicidad entra deslizándose del 39 al 58 | `salida`: la entrada al revés (1,9 s) |
 | `scorefinalsinpublicidad/` | El score final sin publicidad: el de antes del 2026-11-05, con el logo de ATRAPA LA EMOCIÓN fijo en la caja de la derecha (con su sombra blanca). Mismo export, mismas claves y misma data que `scorefinal` (el controlador elige con o sin publicidad por el template) | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48, la caja del logo del 40 al 58 y el logo crece del 49 al 56 | `salida`: la entrada al revés (1,9 s) |
+| `duelo_lanzadores/` | El duelo de lanzadores (el export es DUELO DE PICHEO; el título, DUELO DE HOY), a pantalla completa y opaco: el fondo azul de ATRAPA LA EMOCIÓN; a cada lado, el panel del equipo con la foto del lanzador delante (`fotolanzadorvisita` / `fotolanzadorlocal`, imágenes) y abajo la barra con el nombre y el número; al centro, el logo, el título y 7 estadísticas (la visita a la izquierda, los rótulos al medio, la local a la derecha). El frame 0 está vacío | stage `play` pause (0–53): las fotos entran de los lados del 0 al 15, el logo crece del 8 al 18, el título aparece letra por letra del 10 al 30, las barras entran del 17 al 37, las estadísticas bajan fila por fila del 22 al 52 y los nombres del 43 al 49 | `salida`: la entrada al revés (1,8 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
@@ -56,7 +57,10 @@ con el panel), del 2026-10-23; `posiciones.png` (pantalla completa con el ejempl
 la pausa) y `posiciones_equipos.png` (8 casos que ponen cada equipo en las 8 filas, recortado a la
 tabla), del 2026-10-24; `scorefinal.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa)
 y `scorefinal_equipos.png` (los 56 cruces `visita_vs_local`, recortado al gráfico), del 2026-11-05, con
-Pepsi en la caja de la derecha. Si un gráfico cambia, hay que
+Pepsi en la caja de la derecha; `duelo_lanzadores.png` (pantalla completa con el ejemplo de su `data.md`
+y las fotos del diseño, en la pausa), `duelo_lanzadores_equipos.png` (8 casos que ponen cada equipo de
+cada lado, sin fotos) y `duelo_lanzadores_variantes.png` (nombres y valores largos y en minúsculas, sin
+foto y con una ruta que no carga, fotos de otra proporción y sin data), del 2026-11-06. Si un gráfico cambia, hay que
 regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último frame de la entrada). No
 entran al zip (`.gitattributes`).
 
@@ -711,6 +715,56 @@ Colores: el magenta es el de los outs del score de antes (`#EA0059`) y el cian, 
 score (`#00D9E2`, 113,5 IRE en NTSC compuesto). Pendiente: medir el logo y las barras en NTSC (las
 barras son las de la tabla de posiciones: legales).
 
+**Duelo de lanzadores.** El export es DUELO DE PICHEO (2026-11-06); la carpeta, `duelo_lanzadores`,
+como su equivalente de LVBP-Meridiano. Gráfico nuevo: hasta ahora VV no tenía uno (en LVBP-Stats era
+`NoDisponible`). A pantalla completa: el fondo azul de ATRAPA LA EMOCIÓN (un JPG); a cada lado, el
+panel del equipo (una imagen por equipo, con el escudo de marca de agua y una raya plateada en
+diagonal) con la foto del lanzador delante, y abajo una barra gris con el nombre y una negra con el
+número; al centro, el logo de ATRAPA LA EMOCIÓN, DUELO DE HOY y una tabla de 7 filas (los valores de
+la visita a la izquierda, los rótulos en cian al medio, los de la local a la derecha). Claves: las del
+duelo de Meridiano donde dicen lo mismo, para que el controlador arme los dos igual: `titulo`,
+`lanzadorvisita` / `lanzadorlocal`, `fotolanzadorvisita` / `fotolanzadorlocal` y `etiquetaN`,
+`valorvisitaN`, `valorlocalN` (allá 5 filas, acá 7: si llegan 5, la 6 y la 7 quedan vacías). Los
+equipos, como las barras del score: `<SIGLAS>VISITA_opacidad` (el panel de la izquierda) y
+`<SIGLAS>LOCAL_opacidad`, los 8 de cada lado apilados y visibles al arrancar; sin data, Tigres y
+Tiburones, los del diseño. Las `escudovisita` / `escudolocal` de Meridiano no existen acá. Propias:
+`numerovisita` / `numerolocal` (el número de uniforme). Los textos arrancan vacíos, salvo el título.
+
+Fotos: las del diseño son dos recortes sin fondo de 720 × 1080 (dos lanzadores de Leones), que no
+quedan: el asset de las dos capas es un PNG transparente con ese tamaño, `pr` `xMidYMin meet`. Una
+foto de cualquier proporción entra entera, centrada en su lado y desde el borde de arriba de la del
+diseño (una cuadrada queda encima de la barra; una 2:3, como en el diseño). Sin foto, se ve el panel
+solo. LVBP-Stats manda las fotos como `file:///` (`RutaFoto` del duelo de Meridiano), que CasparCG
+carga.
+
+Fondo: llegaba al 69 % sobre nada, así que al aire se vería el video a través. Va opaco, con un negro
+debajo (`DL_OPACO` en `prep.js`): igual que en AE sobre el negro de la composición, y tapa el video
+desde el frame 1, como la tabla de posiciones. El fondo tiene además un zoom lento en el export, de
+punta a punta (del 196 % al 101 % en 21 s): queda el tramo de la entrada, y en la pausa está quieto.
+
+Textos: en mayúsculas. Los nombres, nombre y apellido como en Meridiano (`JHOULYS CHACÍN`): entran
+unos 17 caracteres a la izquierda y 16 a la derecha al cuerpo del diseño (`ALEXANDER MONASTERIOS`
+encoge un poco). El número entra con 3 cifras. En la tabla, cada texto centrado en su columna: entran
+`10.125`, `100.2`, `12-10` y `WHIP`.
+
+Tabla: cada texto llegaba centrado a ojo con su ancla, hasta 8 px corrido, y los rótulos 13 px más
+cerca de la local que de la visita; los renglones, cada 93, 91, 82, 95, 87 y 87 px. Van centrados en
+su columna (las de los valores, en la mediana de lo que se veía; la de los rótulos, al medio de las
+dos) y los renglones parejos entre el primero y el último (cada 89,2). Cada texto entra bajando por un
+rectángulo (su matte), que llegaba del ancho del texto del diseño: uno más largo salía cortado a los
+lados. Pasa al ancho entre dos columnas.
+
+No se pinta el CC Light Sweep de las dos barras grises: está quieto (sin keyframes), con poca
+intensidad, y Lottie no lo pinta. Sale del JSON.
+
+Salida: el export no trae (su `STOP`, 60–90, no anima nada): es la entrada al revés (1,8 s), como en
+los demás.
+
+En CasparCG 2.5.1 (2026-11-06, 1080p29.97, render por CPU): la pausa sale como en Chromium (hasta 15
+niveles, 0 píxeles a más de 40), el key es 255 en toda la pantalla, el UPDATE al aire cambia el equipo
+y el nombre, el `CG STOP` suelta el layer a los 1,9 s (en la pausa y a mitad de la entrada) y la
+entrada y la salida no repiten frames (grabado con `crop=480:270:720:0`).
+
 ### Imágenes: `_assets/`
 
 Las imágenes de todos los gráficos van juntas en `_assets/`, una vez cada una, con el sha1 de su
@@ -752,8 +806,9 @@ INNING/`), el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`), el 3 en línea
 `3_EN_LINEA.zip` (carpeta `3 EN LINEA/`), los otros juegos como `OTROS_JUEGOS.zip` (carpeta `OTROS
 JUEGOS/`), el prevenido como `PREVENIDO_AL_BATE.zip` (carpeta `PREVENIDO AL BATE/`) y la tabla de
 posiciones como `TABLA DE POSICIONES.zip` (carpeta `TABLA DE POSICIONES/`) y el score final como
-`SCORE FINAL 1.zip` (carpeta `SCORE FINAL/`), que da los dos score final; el parcial sin publicidad
-no tiene export, sale del parcial. La receta de los trece es `herramientas/prep.js`, que prepara los
+`SCORE FINAL 1.zip` (carpeta `SCORE FINAL/`), que da los dos score final, y el duelo de lanzadores como
+`DUELO DE PICHEO.zip` (carpeta `DUELO DE PICHEO/`); el parcial sin publicidad
+no tiene export, sale del parcial. La receta de los catorce es `herramientas/prep.js`, que prepara los
 que encuentre, y el parcial sin publicidad siempre (las imágenes del 3 en línea y del prevenido,
 antes, `herramientas/tresenlinea.py` y `herramientas/prevenido.py`): buscar las capas por `nm` (los
 índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`. Las imágenes del export van
@@ -1291,6 +1346,49 @@ Comparado frame a frame contra el export (con los textos del diseño, del 1 al 5
 14; desde el 20, sólo las columnas del arreglo del key y las carreras y el rótulo que se movieron. La
 salida, contra la entrada al revés: idéntica.
 
+**Duelo de lanzadores**
+
+- **Imágenes:** las 20 del export van tal cual a `duelo_lanzadores/images/`; `consolidar.mjs` pasa a
+  `_assets/` las que se usan: el logo, el fondo, los 16 paneles y la foto transparente (`foto.png`, la
+  escribe `prep.js`). Las dos fotos del diseño (`img_1`, `img_10`) no se usan.
+- **Clases:** `.NOMBRE APELLIDO VISITA` / `LOCAL` (los dos con la clase `NOMBRE`) → `lanzadorvisita` /
+  `lanzadorlocal`; `.NUMEROVISITA` / `.NUMEROLOCAL` → `numerovisita` / `numerolocal`; `DUELO DE HOY`
+  (sin clase) → `titulo`; la tabla, por fila de arriba abajo (`GANADOS`, `.PERDIDOS`, `.EFECTIVIDAD`,
+  `.INNINGLANZADO`, `.CARRERASLIMPIAS`, `.BASESXBOLAS`, `.PONCHES`; `GANADOS`, `GANADOSVISITA` y
+  `GANADOSLOCAL` sin el punto) → `etiqueta1`…`7`, y con `VISITA` / `LOCAL` → `valorvisita1`…`7` /
+  `valorlocal1`…`7`; `.lanzadorizq` / `.lanzadorder` → `fotolanzadorvisita` / `fotolanzadorlocal`; los
+  paneles `.<EQUIPO> IZQ` / `DER` (clase el equipo, la misma en los dos lados) →
+  `<SIGLAS>VISITA_opacidad` / `<SIGLAS>LOCAL_opacidad`. El logo y el fondo (clase `png`) pierden la
+  clase. Las `Shape Layer N` (los mattes de la tabla), las `Capa de formas` (las barras) y los nulos
+  quedan como vienen.
+- **Fotos:** las dos capas pasan a un asset transparente de 720 × 1080 (`DL_FOTO`, `pr` `xMidYMin
+  meet`). `prep.js` falla si la foto del diseño llega de otro tamaño.
+- **Fuente:** `fPath` llega como `DUELO DE PICHEO/ FONT`: pasa a `font/LTEnergy-Regular.ttf` (el mismo
+  archivo que el del bateador).
+- **All Caps:** llega apagado: `prep.js` lo prende.
+- **Tabla:** cada texto centrado (j 2) en su columna, en una caja del ancho entre dos columnas menos
+  `DL_MARGEN` (8): los valores en `DL_X` (819,5 y 1113,5, medidos), los rótulos al medio. Los renglones,
+  parejos entre el primero y el último, con su matte; el matte, del ancho entre dos columnas, centrado
+  en la suya. Falla si una fila no está a una altura o si un matte llega con otra forma.
+- **Barra:** el número, centrado en su negro (150 px a la altura del medio de las letras) con
+  `DL_MARGEN` a cada lado; el nombre de la visita, desde donde empieza (x 81) hasta `DL_MARGEN` antes
+  del negro (el gris termina en la x 568, `DL_GRIS`); el de la local, desde donde empieza (x 1393)
+  hasta el espejo del comienzo de la visita (x 1839). Si la barra se mueve, `prep.js` falla: medir de
+  nuevo `DL_GRIS` en el render.
+- **Textos de caja:** el alto, el ascent del cuerpo más 2, y `lh` 1.2 del cuerpo, como en los otros.
+- **CC Light Sweep:** sale de `Capa de formas 2` y `4` (las barras grises). `prep.js` falla si llega
+  animado.
+- **Fondo:** el zoom (del −45 al 600, lineal) queda del 0 al `DL_ENTRADA` con los mismos valores; y un
+  rectángulo negro debajo (`DL_OPACO`).
+- **Markers y timeline:** `START` (0–30) y `STOP` (60–90) del diseñador → `play` 0–53 (pausa en el 52:
+  `DL_PAUSA`), `salida` 53–106 y `stop` en el 0. Todo suma su entrada al revés (`alReves`): lo que la
+  entrada muestra en el frame t, la salida lo muestra en el 105 − t, el primer frame vacío. Las capas
+  que arrancan en el 0 pasan al 1. La entrada termina en el 52 (`DL_ENTRADA`, el SO de las dos
+  columnas).
+- **Textos vacíos:** al final, todos salvo `titulo`.
+
+Comparado frame a frame: la salida, contra la entrada al revés, idéntica (0 niveles en 7 pares).
+
 ### QA
 
 - Juzgar con el runtime real y la fuente cargada (`<gráfico>/index.html` en el browser o con
@@ -1329,6 +1427,11 @@ salida, contra la entrada al revés: idéntica.
   export, la salida contra la entrada al revés, data al aire, `stop` en la pausa y a mitad de la
   entrada, y que el layer se suelte; en CasparCG, el key (sin columnas a menos de 255 entre los
   recuadros).
+- Duelo de lanzadores: los 8 equipos de cada lado (8 casos que los rotan), nombres largos y en
+  minúsculas, valores largos (`10.125`, `100.2`, `12-10`, `WHIP`), número de 3 cifras, fotos de otra
+  proporción, `""` y una ruta que no carga, la salida contra la entrada al revés, data al aire, `stop`
+  en la pausa y a mitad de la entrada, y que el layer se suelte; en CasparCG, el key y que la entrada
+  no repita frames.
 - Imágenes (`consolidar.mjs`): cada gráfico, al píxel contra lo publicado, con todos los equipos
   prendidos y cada frame en su propia carga; y por `file://`.
 - Defensiva, ofensiva, bateador y lanzador: los 8 equipos (barra, color de las puertas, del fondo o

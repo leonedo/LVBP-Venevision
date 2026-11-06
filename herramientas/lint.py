@@ -91,10 +91,10 @@ for g in GRAFICOS:
             if a['u'] != '../_assets/': p(g, f'asset {a["u"]}{a["p"]} fuera de _assets/: correr herramientas/consolidar.mjs')
             # un JPG no tiene alfa: en un gráfico que va sobre el video, lo tapa (el fondo de
             # referencia del diseñador en el score, prep.js). La defensiva, la ofensiva y la tabla de
-            # posiciones son de pantalla completa (la tabla, opaca desde su primer frame): ahí sí hay
+            # posiciones y el duelo son de pantalla completa (la tabla y el duelo, opacos desde su primer frame): ahí sí hay
             # JPG. En los otros juegos, el cuadro de Harina PAN (su precomp) es un rectángulo opaco en
             # todos sus frames: ahí también.
-            jpg_ok = g in ('defensiva', 'ofensiva', 'posiciones') or (g in JPG_PRECOMP and all(
+            jpg_ok = g in ('defensiva', 'ofensiva', 'posiciones', 'duelo_lanzadores') or (g in JPG_PRECOMP and all(
                 l.get('refId') != a['id'] for l in d['layers'] + [l for c in comps.values() if c.get('nm') != JPG_PRECOMP[g] for l in c['layers']]))
             if not jpg_ok and re.search(r'\.jpe?g$', a['p'], re.I): p(g, f'asset {a["p"]}: JPG sin alfa, tapa el video')
     # data.md: cada clave del JSON documentada y cada clave documentada existe
