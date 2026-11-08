@@ -35,8 +35,8 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `duelo_lanzadores/` | El duelo de lanzadores (el export es DUELO DE PICHEO; el título, DUELO DE HOY), a pantalla completa y opaco: el fondo azul de ATRAPA LA EMOCIÓN; a cada lado, el panel del equipo con la foto del lanzador delante (`fotolanzadorvisita` / `fotolanzadorlocal`, imágenes) y abajo la barra con el nombre y el número; al centro, el logo, el título y 7 estadísticas (la visita a la izquierda, los rótulos al medio, la local a la derecha). El frame 0 está vacío | stage `play` pause (0–53): las fotos entran de los lados del 0 al 15, el logo crece del 8 al 18, el título aparece letra por letra del 10 al 30, las barras entran del 17 al 37, las estadísticas bajan fila por fila del 22 al 52 y los nombres del 43 al 49; el zoom del fondo (CSS) sigue en la pausa | `salida`: la entrada al revés (1,8 s), con el fondo alejándose |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
-arriba), `score_marcador.png` (sin la barra) y `score_equipos.png` (los 56 cruces
-`visita_vs_local`), del 2026-10-24; `defensiva.png` / `ofensiva.png` (Leones, con nombres de
+arriba), `score_marcador.png` (sin la barra), del 2026-10-24, y `score_equipos.png` (los 56 cruces
+`visita_vs_local`), del 2026-11-08, con Tigres en rojo; `defensiva.png` / `ofensiva.png` (Leones, con nombres de
 ejemplo) y `defensiva_equipos.png` / `ofensiva_equipos.png` (los 8 equipos), las de la defensiva del
 2026-10-21 y las de la ofensiva del 2026-10-17; `bateador.png` / `lanzador.png` (Leones, con data de
 ejemplo) y `bateador_equipos.png` / `lanzador_equipos.png` (los 8 equipos, recortado al gráfico),
@@ -125,6 +125,15 @@ marca de agua), una encima de otra en cada lado y todas visibles al arrancar: el
 `1` a la que va y `0` a las otras siete, como en Meridiano. Que la clave sea `_opacidad` en una capa
 de imagen es lo que destapó el arreglo de *claves sólo CSS* de `index.js`: antes el número se
 escribía como ruta y la barra desaparecía.
+
+Tigres, en rojo (Leon, 2026-11-08, por ahora sólo en el score): el diseñador mandó las dos barras
+sueltas, `BARRA_TIGRES_LOCAL.png` y `BARRA_TIGRES_VISITANTE.png` (el mismo escudo, sobre un
+degradado de negro a rojo en vez de a azul), que reemplazan a las del export (`TIGRES_NUEVO` en
+`prep.js`). Van con el ancla de la de Águilas de su fila, del mismo ancho: las del export traían un
+borde transparente de 9 y 4 px y quedaban corridas. Los demás gráficos (parcial, otros juegos,
+posiciones, score final) siguen con Tigres en azul. El rojo queda cerca del de Cardenales: en
+`CARD_vs_TIGRES` las dos barras son rojas y se distinguen por el escudo. En NTSC compuesto, legal
+(lo más bajo, −1,5 IRE).
 
 Textos: salen en mayúsculas aunque lleguen en minúsculas (ver *Mayúsculas* en Convenciones del
 Lottie). `bateador` y `lanzador` son sólo el apellido: al tamaño de la barra (18) entran unas 7
@@ -880,6 +889,9 @@ pasa a `_assets/` (ver *Imágenes: `_assets/`*).
   `prep.js` con los keyframes de la subida al revés (curvas invertidas); comprobado frame a frame
   contra la subida. El `stop` global está en el frame 0, que está vacío: un `stop` durante la
   entrada corta.
+- **Tigres:** las dos barras del export (azules, 410 × 99 y 405 × 99) pasan a las rojas que ya
+  están en `_assets/` (`TIGRES_NUEVO`), con el ancla de la de Águilas de su fila. Falla si llegan de
+  otro tamaño: si el export ya trae las rojas, sacar `TIGRES_NUEVO`.
 - **Imágenes:** las 17 PNG del export (`img_0` el logo, `img_1–16` las barras) van tal cual a
   `score/images/`; el JPG del fondo de referencia, no.
 
