@@ -6,9 +6,9 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Catorce gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
+proyecto*). Quince gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
 variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva, el
-bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones, el score final (con y sin publicidad) y el duelo de lanzadores con `font/LTEnergy-Regular.ttf`,
+bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones (con y sin cliente), el score final (con y sin publicidad) y el duelo de lanzadores con `font/LTEnergy-Regular.ttf`,
 la estática que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable:
 mide igual, y en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y
 los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, el del score final, del 2026-10-29, y el del duelo de lanzadores, del 2026-11-06, otra vez la estática). Los otros juegos llevan además Chakra Petch Bold
@@ -30,6 +30,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `otrosjuegos/` | Cómo van los otros juegos (el export es OTROS JUEGOS; el título, ASÍ VAN), una columna abajo a la derecha: arriba, un cuadro de Harina PAN entra, arma su logo y se va (una secuencia de JPG); debajo, el título y tres juegos, cada uno con la sede, las barras de visita y local (escudo y nombre), las carreras y el inning con sus flechas. El frame 0 está vacío | `play` lo pone al aire vacío (pausa en el 0); el controlador elige con un `goto`: `tresjuegos` (100–266), `dosjuegos` (400–566) o `unjuego` (700–866), el mismo gráfico con 3, 2 o 1 juegos. En cada uno, desde el `goto`, el cuadro entra del 11 al 23, la columna del 27 al 95 (un juego detrás del otro) y el cuadro se va del 157 al 164 | `salida`: la columna, su entrada al revés, sin el cuadro (2,3 s); `salida2` (1,9 s) y `salida1` (1,3 s) |
 | `prevenido/` | El bateador en el círculo (el export es PREVENIDO AL BATE), abajo a la derecha: un panel de LMV entra girando, muestra su logo con un brillo y se va (una secuencia de PNG); debajo, la barra negra con el PREVENIDO AL BATE y el recuadro azul con el nombre. El frame 0 está vacío | stage `play` pause (0–170): la barra entra del 23 al 32, el título del 31 al 39, el recuadro y el nombre del 33 al 48, y el panel se va del 151 al 168 | `salida`: la barra, el título, el recuadro y el nombre, su entrada al revés, sin el panel (0,9 s) |
 | `posiciones/` | La tabla de posiciones (el export es TABLA DE POSICIONES), a pantalla completa y opaca: el fondo, el título POSICIONES, los rótulos de las columnas, el recuadro magenta de los números y el cuadro de GoGo Royal (una secuencia de JPG); encima, 8 filas, cada una con la barra del equipo (con su escudo), el nombre en una caja negra y JJ, JG, JP, AVE y DIF. El frame 0 está vacío; desde el 1, el gris del diseño tapa el video | stage `play` pause (0–76): el gris quieto hasta el 11, el fondo entra del 12 al 64, las barras bajan del 29 al 44, los nombres aparecen del 41 al 66 y los números del 60 al 75 | `salida`: la entrada al revés, que termina en el gris y corta al video (2,5 s) |
+| `posicionessincliente/` | La tabla de posiciones sin el cliente (el export es TABLA DE POSICIONES SIN CLIENTE): la misma tabla, con el cuadro de GoGo Royal vacío (queda su caja azul). Mismas claves, misma data y mismos tiempos que `posiciones` (el controlador elige con o sin cliente por el template) | stage `play` pause (0–76), como `posiciones` | `salida`: la entrada al revés (2,5 s) |
 | `scorefinal/` | El score final (el export es SCORE FINAL), el line score, abajo (x 302–1634, y 724–910): las barras de visita y local (escudo y nombre, las mismas imágenes de la tabla de posiciones), las carreras de los 9 innings sobre un recuadro magenta, C H E en negro y la caja del logo de ATRAPA LA EMOCIÓN (`publicidad`, una imagen que llena la caja: Pepsi por defecto), con una raya plateada a la derecha. El frame 0 está vacío | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48, la caja del logo del 40 al 58 y la publicidad entra deslizándose del 39 al 58 | `salida`: la entrada al revés (1,9 s) |
 | `scorefinalsinpublicidad/` | El score final sin publicidad: el de antes del 2026-11-05, con el logo de ATRAPA LA EMOCIÓN fijo en la caja de la derecha (con su sombra blanca). Mismo export, mismas claves y misma data que `scorefinal` (el controlador elige con o sin publicidad por el template) | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48, la caja del logo del 40 al 58 y el logo crece del 49 al 56 | `salida`: la entrada al revés (1,9 s) |
 | `duelo_lanzadores/` | El duelo de lanzadores (el export es DUELO DE PICHEO; el título, DUELO DE HOY), a pantalla completa y opaco: el fondo azul de ATRAPA LA EMOCIÓN; a cada lado, el panel del equipo con la foto del lanzador delante (`fotolanzadorvisita` / `fotolanzadorlocal`, imágenes) y abajo la barra con el nombre y el número; al centro, el logo, el título y 7 estadísticas (la visita a la izquierda, los rótulos al medio, la local a la derecha). El frame 0 está vacío | stage `play` pause (0–53): las fotos entran de los lados del 0 al 15, el logo crece del 8 al 18, el título aparece letra por letra del 10 al 30, las barras entran del 17 al 37, las estadísticas bajan fila por fila del 22 al 52 y los nombres del 43 al 49; el zoom del fondo (CSS) sigue en la pausa | `salida`: la entrada al revés (1,8 s), con el fondo alejándose |
@@ -55,7 +56,8 @@ casos que ponen cada equipo en las 6 filas, recortado al gráfico) y `otrosjuego
 (pantalla completa con el ejemplo de su `data.md`, en la pausa) y `prevenido_panel.png` (en el 100,
 con el panel), del 2026-10-23; `posiciones.png` (pantalla completa con el ejemplo de su `data.md`, en
 la pausa) y `posiciones_equipos.png` (8 casos que ponen cada equipo en las 8 filas, recortado a la
-tabla), del 2026-10-24; `scorefinal.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa)
+tabla), del 2026-10-24; `posicionessincliente.png` (lo mismo, sin el cliente; los equipos son los de
+`posiciones_equipos.png`), del 2026-11-08; `scorefinal.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa)
 y `scorefinal_equipos.png` (los 56 cruces `visita_vs_local`, recortado al gráfico), del 2026-11-05, con
 Pepsi en la caja de la derecha; `duelo_lanzadores.png` (pantalla completa con el ejemplo de su `data.md`
 y las fotos del diseño, en la pausa), `duelo_lanzadores_equipos.png` (8 casos que ponen cada equipo de
@@ -664,6 +666,18 @@ no sólo en la primera carga; en Chromium no se repite ninguno, y en el mismo en
 otros juegos y el prevenido no repiten. Pendiente (Leon, 2026-10-24): probarla en su máquina con
 Windows y GPU cuando se haga el lado de las apps; hasta entonces no se toca.
 
+**Posiciones sin cliente.** La tabla de posiciones sin el cuadro de GoGo Royal (Leon, 2026-11-08: en
+la de antes el cliente viene quemado en la secuencia). El diseñador mandó el export entero de nuevo,
+TABLA DE POSICIONES SIN CLIENTE: las mismas capas, las mismas 8 barras (los mismos archivos) y los
+mismos tiempos; cambia la secuencia del fondo, donde el cuadro del cliente queda vacío, con su caja
+azul y el relieve de la derecha. La textura gris detrás de la tabla es otro render (otro dibujo de
+rayas, el mismo tono). `prep.js` lo arma con la receta de la tabla (`posiciones()`), así que las
+claves, los textos de caja, la salida y el `data.md` son los de `posiciones`: el controlador elige con o
+sin cliente por el template y les manda la misma data. Preparado, el JSON es el de `posiciones` salvo
+el fondo (las capas, iguales hasta en los decimales). En CasparCG 2.5.1 (2026-11-08, 1080p29.97, por
+CPU): la pausa sale como en Chromium y el `CG STOP` suelta el layer a los 2,7 s, en la pausa y a mitad
+de la entrada.
+
 **Score final.** El line score; el export es SCORE FINAL (2026-10-29), y la carpeta, `scorefinal`.
 Gráfico nuevo: hasta ahora VV no tenía uno. Es el equivalente del `final` de LVBP-Meridiano sin la
 barra de ganador, perdedor y MVP ni el título. Abajo (x 302–1634, y 724–910), opaco: a la izquierda
@@ -820,7 +834,8 @@ carpeta `LOWBAR BATEADOR/`, con espacio), el parcial como `FINAL_DE_INNING.zip` 
 INNING/`), el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`), el 3 en línea como
 `3_EN_LINEA.zip` (carpeta `3 EN LINEA/`), los otros juegos como `OTROS_JUEGOS.zip` (carpeta `OTROS
 JUEGOS/`), el prevenido como `PREVENIDO_AL_BATE.zip` (carpeta `PREVENIDO AL BATE/`) y la tabla de
-posiciones como `TABLA DE POSICIONES.zip` (carpeta `TABLA DE POSICIONES/`) y el score final como
+posiciones como `TABLA DE POSICIONES.zip` (carpeta `TABLA DE POSICIONES/`; la sin cliente,
+`TABLA DE POSICIONES SIN CLIENTE.zip`) y el score final como
 `SCORE FINAL 1.zip` (carpeta `SCORE FINAL/`), que da los dos score final, y el duelo de lanzadores como
 `DUELO DE PICHEO.zip` (carpeta `DUELO DE PICHEO/`); el parcial sin publicidad
 no tiene export, sale del parcial. La receta de los catorce es `herramientas/prep.js`, que prepara los
@@ -1329,6 +1344,13 @@ Comparado frame a frame contra el export (con las filas y los textos del diseño
 idéntico del 1 al 40; del 44 al 60, el nombre de la fila 8 (el parent), y desde el 65, los números
 corridos (hasta 3 px, la columna JJ en la fila 4). La salida es el espejo de la entrada: el 100 muestra
 lo del 51 y el 150, el gris del 1; el 151, vacío.
+
+**Posiciones sin cliente**
+
+- La receta de **Posiciones**, la misma función (`posiciones(zip, fondo, carpeta)`): el precomp del
+  fondo llega como `NUEVA TABLA DE POSICIONES 2` (en la de antes, `BASE TABLA DE POSICIONES`).
+- El zip trae `data.json` e `images/` adentro de `FONT/`, con la fuente: van a `TABLA DE POSICIONES SIN
+  CLIENTE/` antes de correr `prep.js`. Las 158 imágenes, tal cual a `posicionessincliente/images/`.
 
 **Score final**
 

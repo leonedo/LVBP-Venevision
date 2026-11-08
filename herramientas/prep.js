@@ -10,7 +10,7 @@
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
 //      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/,
-//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, SCORE FINAL/, DUELO DE PICHEO/. Los que no estén se saltean: alcanza con el zip que
+//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, TABLA DE POSICIONES SIN CLIENTE/, SCORE FINAL/, DUELO DE PICHEO/. Los que no estén se saltean: alcanza con el zip que
 //      llegó. El parcial sin publicidad no tiene export: sale del parcial preparado, y se arma siempre.
 //   2. Las imágenes de cada export que llegó, a <gráfico>/images/ (se copian tal cual; consolidar.mjs
 //      las pasa después a _assets/ y borra la carpeta). Si llegó el 3 EN LINEA: python3
@@ -1982,8 +1982,8 @@ const POS_MARGEN = 8;                  // las cajas de los textos, 8 px antes de
 const POS_FONDO = 1425;                // el borde derecho del recuadro magenta (de la secuencia): el tope de DIF
 // Las columnas, de izquierda a derecha: el nm de sus capas (.<columna>EQUIPO<n>) y su clave.
 const POS_COLUMNAS = [['JJ', 'JJequipo'], ['JG', 'JGequipo'], ['JP', 'JPequipo'], ['AV', 'AVEequipo'], ['DIF', 'DIFequipo']];
-if (hay('TABLA DE POSICIONES')) {
-    const d = load(path.join(SRC, 'TABLA DE POSICIONES/data.json'));
+function posiciones(zip, fondo, carpeta) {
+    const d = load(path.join(SRC, zip, 'data.json'));
     const FIN = POS_PAUSA + POS_ENTRADA;   // lo que la entrada muestra en el frame t, la salida lo muestra en el FIN − t
     const vacio = FIN;                     // el espejo del frame 0, vacío
     const filas = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -2070,7 +2070,7 @@ if (hay('TABLA DE POSICIONES')) {
 
     // ---- la salida: todo menos el fondo, su entrada al revés desde la pausa (una capa que entraba en el
     // frame t se va en el FIN − t)
-    const base = layer(d, 'BASE TABLA DE POSICIONES');
+    const base = layer(d, fondo);
     for (const l of d.layers) {
         if (l === base) continue;
         for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, POS_ENTRADA, POS_PAUSA);
@@ -2082,8 +2082,8 @@ if (hay('TABLA DE POSICIONES')) {
     // revés: en el frame entero k se ve la imagen k − 1 (los ip traen unos decimales de más, como en el 3
     // en línea), así que la imagen k va en la salida de FIN − k − 1 a FIN − k.
     const secuencia = d.assets.find(a => a.id === base.refId);
-    if (!secuencia || secuencia.layers.length !== 150 || base.ip !== 0 || base.st !== 0) throw new Error('BASE TABLA DE POSICIONES: secuencia inesperada');
-    const jpg = c => { const a = capaImagen(d, c); return fs.readFileSync(path.join(SRC, 'TABLA DE POSICIONES', a.u, a.p)); };
+    if (!secuencia || secuencia.layers.length !== 150 || base.ip !== 0 || base.st !== 0) throw new Error(`${fondo}: secuencia inesperada`);
+    const jpg = c => { const a = capaImagen(d, c); return fs.readFileSync(path.join(SRC, zip, a.u, a.p)); };
     const tramos = [];
     for (const c of [...secuencia.layers].sort((a, b) => a.ip - b.ip)) {
         const t = tramos[tramos.length - 1], buf = jpg(c);
@@ -2116,8 +2116,13 @@ if (hay('TABLA DE POSICIONES')) {
     d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
     allCaps(d);
     vaciaTextos(d);
-    save(path.join(REPO, 'posiciones/data.json'), d);
+    save(path.join(REPO, carpeta, 'data.json'), d);
 }
+// La tabla sin cliente (TABLA DE POSICIONES SIN CLIENTE, 2026-11-08; Leon): el mismo export con la
+// secuencia del fondo sin el cuadro de GoGo Royal. Las mismas capas, imágenes de barras y tiempos; el
+// precomp del fondo se llama NUEVA TABLA DE POSICIONES 2. Misma receta, mismas claves.
+if (hay('TABLA DE POSICIONES')) posiciones('TABLA DE POSICIONES', 'BASE TABLA DE POSICIONES', 'posiciones');
+if (hay('TABLA DE POSICIONES SIN CLIENTE')) posiciones('TABLA DE POSICIONES SIN CLIENTE', 'NUEVA TABLA DE POSICIONES 2', 'posicionessincliente');
 
 // ---------------------------------------------------------------- score final
 // El line score (el export es SCORE FINAL; la carpeta, scorefinal): abajo, de x 302 a 1634, las barras
