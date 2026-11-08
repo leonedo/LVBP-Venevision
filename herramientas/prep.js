@@ -183,6 +183,28 @@ const BARRA = ['BARRA PITCHER', 'BARRA BATEADOR', '.lanzador', '.lanzamientos', 
 const RAIZ = { nm: 'Null 1', p: [962, 537.2], s: 134 };
 const CORRE = [2, 3];
 const LOGO = 'LOGO FINAL ATRAPA LA EMOCION_1.png';
+// Tigres cambió de color (Leon, 2026-11-08, por ahora sólo en el score): de azul a rojo. El diseñador
+// mandó las dos barras sueltas (BARRA_TIGRES_LOCAL.png, 401 × 100, y BARRA_TIGRES_VISITANTE.png,
+// 400 × 100, con la última fila transparente), ya en _assets/ con su sha1. Reemplazan a las del
+// export (410 × 99 y 405 × 99, más anchas por un borde transparente) y van con el ancla de la de
+// Águilas de su fila, que tiene el mismo ancho: el escudo y los bordes quedan donde los de los otros
+// equipos. Si un export nuevo trae las barras rojas, prep.js falla: sacar TIGRES_NUEVO.
+const TIGRES_NUEVO = {
+    LOCAL: { p: '271949103480.png', w: 401, h: 100, export: [410, 99] },
+    VISITA: { p: '23aa578dfadd.png', w: 400, h: 100, export: [405, 99] }
+};
+function tigresNuevo(d) {
+    for (const [lado, n] of Object.entries(TIGRES_NUEVO)) {
+        const l = layer(d, `.TIGRES${lado}_opacidad`), agui = layer(d, `.AGUI${lado}_opacidad`);
+        const img = d.assets.find(a => a.id === l.refId), ref = d.assets.find(a => a.id === agui.refId);
+        if (img.w !== n.export[0] || img.h !== n.export[1]) throw new Error(`Tigres ${lado}: llega de ${img.w} × ${img.h}`);
+        if (ref.w !== n.w) throw new Error(`Águilas ${lado}: ${ref.w} de ancho, no ${n.w}`);
+        if (l.ks.a.a || agui.ks.a.a) throw new Error(`Tigres ${lado}: ancla animada`);
+        if (!fs.existsSync(path.join(REPO, '_assets', n.p))) throw new Error(`falta _assets/${n.p}`);
+        Object.assign(img, { w: n.w, h: n.h, u: '../_assets/', p: n.p, e: 0 });
+        l.ks.a.k = clone(agui.ks.a.k);
+    }
+}
 // El inning, más grande (Leon, 2026-10-24, sin que pise nada): la capa va al 140 % y crece desde
 // su ancla, que el diseño puso en el centro del 10, así que queda centrado entre las flechas. El 10
 // pasa de 13 a 19 px de alto y queda a 2 px de cada flecha (entre las dos hay 23; al 150 %, a 1 px
@@ -301,6 +323,7 @@ if (hay('SCOREBUG')) {
         rename(d, l.nm, SIGLAS[m[1]] + m[2] + '_opacidad');
     }
     for (const s of Object.values(SIGLAS)) for (const lado of ['LOCAL', 'VISITA']) layer(d, `.${s}${lado}_opacidad`);
+    tigresNuevo(d);
 
     // La barra de Águilas local llega sin máscara: su tt la mateaba con el texto EQUIPOLOCAL de
     // arriba y la barra sólo se veía por adentro de las letras. Lleva la de las otras siete.
