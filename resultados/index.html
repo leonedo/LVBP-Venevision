@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+
+    <title>Resultados LVBP Venevisión</title>
+
+    <style>
+
+        #bm {
+            position: fixed;
+        }
+
+        body {
+            overflow: hidden;
+            margin: 0;
+
+        }
+        /* El brillo del logo va en Add en AE. Lottie no lo pinta: en el JSON va en Screen, y acá
+           en plus-lighter, que es el Add, en el grupo del matte, que es el que se funde
+           (herramientas/prep.js) */
+        g[mask]:has(> #brillo) {
+            mix-blend-mode: plus-lighter !important;
+        }
+        /* El zoom lento del fondo (el de AE: del 144 % en el frame 0 al 109 % en el 507, lineal) va por
+           CSS y no en el Lottie, para que siga en la pausa y en la salida, como en AE: la timeline se
+           detiene en la pausa. Arranca con el goto que elige el tramo (abajo). Los números los controla
+           prep.js (RES_ZOOM). */
+        #fondo image {
+            transform-box: fill-box;
+            transform-origin: 50% 50%;
+            transform: scale(1.44);
+        }
+        body.zoom #fondo image {
+            animation: zoomfondo 16.92s linear forwards;
+        }
+        @keyframes zoomfondo {
+            from { transform: scale(1.44); }
+            to { transform: scale(1.09); }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="bm"></div>
+
+
+
+
+    <!-- Scripts -->
+    <script>
+        let data_file = "data.json";  // nombre del archivo Lottie
+
+        // --- AUDIO ---
+        // let audio_clips = [{ src: '../audio/aud_0.mp3', inframe: 5 }];
+
+        // --- RELOJ / FECHA ---
+        // Requiere capas de texto en el Lottie con clase "time" y/o "date"
+        // window.ENABLE_CLOCK = true;       // activa el reloj automatico al cargar
+        // window.CLOCK_SECONDS = true;      // muestra segundos (intervalo baja a 1s)
+    </script>
+    <script src="../webcg-framework.umd.js"></script>
+    <script src="../lottie.js"></script>
+    <script src="../index.js"></script>
+    <script>
+        // El zoom del fondo (ver el CSS de arriba) arranca con la entrada: con el goto que elige el tramo
+        // (tresjuegos, dosjuegos o unjuego), cuando el gráfico terminó de cargar, en el mismo momento en
+        // que index.js arranca el tramo. El play (que lo deja vacío, esperando el goto) lo apaga.
+        function zoomFondo(prender) {
+            document.body.classList.remove('zoom');
+            void document.body.offsetWidth;
+            if (prender) document.body.classList.add('zoom');
+        }
+        webcg.on('play', function () { zoomFondo(false); });
+        webcg.on('goto', function (tramo) {
+            if (['tresjuegos', 'dosjuegos', 'unjuego'].indexOf(tramo) < 0) return;
+            alCargar('zoomfondo', function () {
+                if (!exiting) zoomFondo(true);
+            });
+        });
+    </script>
+    <script>
+        // Panel de devtools: con Live Server (puerto 5500) o con ?debug=true en cualquier puerto
+        if (location.port === "5500" || /[?&]debug=true\b/.test(location.search)) {
+            document.write('<script src="../webcg-devtools.umd.js"><' + '/script>');
+        }
+    </script>
+
+</body>
+
+</html>
