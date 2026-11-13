@@ -431,10 +431,13 @@ webcg.on('data', function (data) {
                         // del handler de `data` ni lo veía).
                         try {
                             newPath = data[cl] ? data[cl].text || data[cl] : '';
-                            const group = document.querySelector(classSelector(cl, 'g'));
-                            const image = group ? group.querySelector('image') : null;
+                            // Todas las capas con esa clase, no sólo la primera: un gráfico con
+                            // tramos (resultados) repite la capa una vez por tramo, y antes sólo
+                            // cambiaba la del primero.
+                            const images = [...document.querySelectorAll(classSelector(cl, 'g'))]
+                                .map(group => group.querySelector('image')).filter(Boolean);
 
-                            if (image) {
+                            for (const image of images) {
                                 // Una ruta que no carga (mal escrita, o el archivo no está)
                                 // muestra al aire el ícono de imagen rota del navegador: si
                                 // falla, la imagen queda vacía. El href vacío también tira

@@ -7,7 +7,7 @@ ims = [Image.open(f).convert('RGB') for f in files]
 w, h = int(ims[0].width * scale), int(ims[0].height * scale)
 LBL = 22
 try:
-    font = ImageFont.truetype('/System/Library/Fonts/Supplemental/Arial.ttf', 15)
+    font = ImageFont.truetype('/System/Library/Fonts/Supplemental/Arial.ttf' if os.path.exists('/System/Library/Fonts/Supplemental/Arial.ttf') else '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 15)
 except OSError:
     font = ImageFont.load_default()
 rows = (len(ims) + cols - 1) // cols

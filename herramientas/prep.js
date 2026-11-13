@@ -4,13 +4,14 @@
 // 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18), del lanzador (PITCHERS, 2026-10-21), del
 // 3 en línea (3 EN LINEA, 2026-10-22), de los otros juegos (OTROS JUEGOS, 2026-10-22), del prevenido
 // (PREVENIDO AL BATE, 2026-10-23), de la tabla de posiciones (TABLA DE POSICIONES, 2026-10-22) y del
-// score final (SCORE FINAL, 2026-10-29) y del duelo de lanzadores (DUELO DE PICHEO, 2026-11-06): si
+// score final (SCORE FINAL, 2026-10-29), del duelo de lanzadores (DUELO DE PICHEO, 2026-11-06) y de los
+// resultados (RESULTADOS, con BARRAS PNG RESULTADOS, 2026-11-13): si
 // el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
 //      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/,
-//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, TABLA DE POSICIONES SIN CLIENTE/, SCORE FINAL/, DUELO DE PICHEO/. Los que no estén se saltean: alcanza con el zip que
+//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, TABLA DE POSICIONES SIN CLIENTE/, SCORE FINAL/, DUELO DE PICHEO/, RESULTADOS/ (con BARRAS PNG RESULTADOS/). Los que no estén se saltean: alcanza con el zip que
 //      llegó. El parcial sin publicidad no tiene export: sale del parcial preparado, y se arma siempre.
 //   2. Las imágenes de cada export que llegó, a <gráfico>/images/ (se copian tal cual; consolidar.mjs
 //      las pasa después a _assets/ y borra la carpeta). Si llegó el 3 EN LINEA: python3
@@ -2476,4 +2477,229 @@ if (hay('DUELO DE PICHEO')) {
     // los textos del UPDATE arrancan vacíos, salvo el título (DUELO DE HOY)
     for (const l of d.layers) if (l.ty === 5 && l.cl && l.cl !== 'titulo') for (const k of l.t.d.k) k.s.t = '';
     save(path.join(REPO, 'duelo_lanzadores/data.json'), d);
+}
+
+// ---------------------------------------------------------------- resultados
+// Los resultados de los otros juegos (el export es RESULTADOS, 2026-11-13), a pantalla completa: el
+// fondo de la LVBP con su zoom lento, el panel azul y, encima, RESULTADOS y tres juegos, cada uno con
+// la barra de la visita (escudo y nombre), las carreras de los dos en dos cuadros negros y la barra de
+// la local. Arriba, el cuadro del patrocinante (Tu Azar.com) entra, queda unos 8 s y se cierra, y en
+// su lugar aparece el logo de ATRAPA LA EMOCIÓN, girando, con un brillo. Las claves, las de los otros
+// juegos donde dicen lo mismo (<SIGLAS>VISITA<n>_opacidad, NOMBREVISITA<n>, CARRERASVISITA<n>… y
+// titulo), y la publicidad, la del parcial (publicidad, una imagen). Las barras de equipo no vienen en
+// el export (sólo las de Magallanes): llegan aparte, en BARRAS PNG RESULTADOS/ (BARRA_<EQUIPO>_<LADO>
+// .png, Tigres en rojo), que va junto a RESULTADOS/ en EXPORTS; prep.js las copia a resultados/images/.
+// Como los otros juegos, tres tramos (3, 2 y 1 juegos) que el controlador elige con un goto.
+const RES_FILAS = 77;                  // la entrada de los juegos termina en el 77 (el nombre de la visita del 3)
+const RES_LOGO = [273, 293];           // el logo de ATRAPA entra (aparece del 273 al 280 y gira hasta el 293)
+const RES_BRILLO = [307, 345];         // y le pasa el brillo
+const RES_PAUSA = RES_BRILLO[1] + 1;   // el stage de cada tramo, 0–346: queda en el 345
+const RES_SALE = RES_PAUSA + RES_LOGO[1] - RES_LOGO[0];   // el logo se va primero (346–366) y después el resto
+const RES_FIN = RES_SALE + RES_FILAS;  // lo que la entrada muestra en el frame t (t ≤ 77), la salida lo muestra en el RES_FIN − t
+const RES_PATROCINIO = 270;            // el cuadro del patrocinante termina de cerrarse en el 267 (su matte, a ancho 0) y su marco en el 269
+const RES_MARGEN = 8;                  // las cajas, 8 px antes del cuadro negro de las carreras o del borde del suyo
+const RES_TRAMO = { 3: 100, 2: 600, 1: 1100 };
+const RES_ZOOM = { desde: 144, hasta: 109, segundos: 16.92 };   // el del fondo, como lo tiene el CSS del index.html
+const RES_BARRAS = 'BARRAS PNG RESULTADOS';
+const tamanoPng = f => { const b = fs.readFileSync(f); if (b.toString('ascii', 12, 16) !== 'IHDR') throw new Error(`${f}: no es PNG`); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
+function resultados(juegos) {
+    const d = load(path.join(SRC, 'RESULTADOS/data.json'));
+    if (d.layers.some(l => l.ty === 0) || d.assets.some(a => a.layers)) throw new Error('resultados: precomps inesperados');
+    const porInd = i => d.layers.find(l => l.ind === i);
+
+    // ---- de qué juego es cada capa: el 1 sin parent, el 2 y el 3 colgados de dos nulos (Null 1)
+    const nulos = { 2: porInd(layer(d, '.VISITA2').parent), 3: porInd(layer(d, '.VISITA3').parent) };
+    for (const n of [2, 3]) if (!nulos[n] || nulos[n].nm !== 'Null 1' || layer(d, '.LOCAL' + n).parent !== nulos[n].ind) throw new Error(`juego ${n}: ¿su nulo?`);
+    const cajas = d.layers.filter(l => /^Capa de formas 2[1-6]$/.test(l.nm));   // los cuadros negros de las carreras
+    const barras = d.layers.filter(l => /^BARRA_MAGALLANES_(VISITA|LOCAL)\.png$/.test(l.nm));
+    if (cajas.length !== 6 || barras.length !== 6) throw new Error('resultados: cuadros negros o barras inesperados');
+    const yCajas = [...new Set(cajas.map(l => l.ks.p.k[1]))].sort((a, b) => a - b);
+    if (yCajas.length !== 3) throw new Error('resultados: los cuadros negros no están en tres filas');
+    const fila = y => { const n = yCajas.findIndex(c => Math.abs(c - y) < 10) + 1; if (!n) throw new Error(`fila de la y ${y}`); return n; };
+
+    // ---- textos
+    for (let n = 1; n <= 3; n++) {
+        rename(d, '.VISITA' + n, 'NOMBREVISITA' + n);
+        rename(d, '.LOCAL' + n, 'NOMBRELOCAL' + n);
+        rename(d, '.CARRERASVISITA' + n, 'CARRERASVISITA' + n);
+        rename(d, (n === 3 ? ',' : '.') + 'CARRERASLOCAL' + n, 'CARRERASLOCAL' + n);   // la del 3 llega con coma: sin clase
+        delete layer(d, '.NOMBRELOCAL' + n).ef;   // los controles del preset Deslizar y entrar, quietos
+    }
+    rename(d, 'RESULTADOS', 'titulo');
+    // los nombres, centrados donde están, hasta RES_MARGEN antes del cuadro negro de su lado
+    const [x0Caja, x1Caja] = [Math.min(...cajas.map(l => rectangulo(d, l, 0)[0])), Math.max(...cajas.map(l => rectangulo(d, l, 0)[1]))];
+    for (let n = 1; n <= 3; n++) for (const lado of ['VISITA', 'LOCAL']) {
+        const l = layer(d, `.NOMBRE${lado}${n}`), s = doc(d, l.nm);
+        const centro = enPantalla(d, l, s.ps[0] + s.sz[0] / 2);
+        const medio = lado === 'VISITA' ? x0Caja - RES_MARGEN - centro : centro - x1Caja - RES_MARGEN;
+        anchoCentrado(s, 2 * medio / escalaX(d, l));
+    }
+    // el título, en su caja negra (Capa de formas 10)
+    const [t0, t1] = rectangulo(d, layer(d, 'Capa de formas 10'), 0);
+    anchoCentrado(doc(d, '.titulo'), (t1 - t0 - 2 * RES_MARGEN) / escalaX(d, layer(d, '.titulo')));
+    const fuente = f => d.fonts.list.find(x => x.fName === f) || (() => { throw new Error(`fuente ${f}`); })();
+    for (const l of d.layers) if (l.ty === 5) for (const k of l.t.d.k) {
+        if (!k.s.sz) throw new Error(`${l.nm}: no es de caja`);
+        k.s.lh = 1.2 * k.s.s;
+        k.s.sz[1] = +(fuente(k.s.f).ascent * k.s.s / 100 + 2).toFixed(2);
+    }
+
+    // ---- las barras: las 8 de cada lado en cada juego, apiladas y visibles al arrancar, como en los otros
+    // juegos; arriba queda Magallanes, la del diseño. Cada una con el ancla en el centro de lo que se ve
+    // (algunos PNG traen un borde transparente: a la derecha en las locales, a la izquierda en las de la
+    // visita) y su máscara (la que la destapa del 32 al 44) corrida lo mismo.
+    const carpeta = path.join(SRC, RES_BARRAS);
+    const archivos = fs.readdirSync(carpeta).filter(f => f.endsWith('.png'));
+    const imagenes = {};
+    fs.mkdirSync(path.join(REPO, 'resultados/images'), { recursive: true });
+    for (const f of archivos) {
+        const m = f.match(/^BARRA_([A-Z]+)_(LOCAL|VISITA|VISITANTE)(_ROJO)?\.png$/);
+        if (!m || !SIGLAS[m[1]]) throw new Error(`${RES_BARRAS}/${f}: nombre inesperado`);
+        const lado = m[2] === 'LOCAL' ? 'LOCAL' : 'VISITA', [w, h] = tamanoPng(path.join(carpeta, f));
+        if (imagenes[SIGLAS[m[1]] + lado]) throw new Error(`${f}: repetida`);
+        const p = `barra_${SIGLAS[m[1]]}_${lado}.png`;
+        fs.copyFileSync(path.join(carpeta, f), path.join(REPO, 'resultados/images', p));
+        imagenes[SIGLAS[m[1]] + lado] = { id: `image_barra_${SIGLAS[m[1]]}_${lado}`, w, h, u: 'images/', p, e: 0 };
+    }
+    if (Object.keys(imagenes).length !== 16) throw new Error(`${RES_BARRAS}: ${Object.keys(imagenes).length} barras`);
+    let ind = Math.max(...d.layers.map(l => l.ind));
+    const fuera = new Set(barras.map(l => l.refId));
+    for (const l of barras) {
+        const lado = l.nm.includes('VISITA') ? 'VISITA' : 'LOCAL', n = fila(l.ks.p.k[1]);
+        const a = d.assets.find(x => x.id === l.refId);
+        if (a.w !== 401 || l.masksProperties.length !== 1 || l.ks.a.k[0] !== 200.5) throw new Error(`${l.nm}: barra inesperada`);
+        const orden = ['MAGA', ...Object.values(SIGLAS).filter(s => s !== 'MAGA')];
+        const copias = orden.map(s => {
+            const im = imagenes[s + lado], c = clone(l), dx = lado === 'VISITA' ? im.w - 401 : 0;
+            c.ind = ++ind;
+            c.nm = `.${s}${lado}${n}_opacidad`;
+            c.cl = c.nm.slice(1);
+            c.refId = im.id;
+            c.ks.a.k = [dx + 200.5, im.h / 2, 0];
+            for (const k of c.masksProperties[0].pt.k) for (const v of k.s[0].v) { v[0] += dx; v[1] *= im.h / a.h; }
+            return c;
+        });
+        d.layers.splice(d.layers.indexOf(l), 1, ...copias);
+    }
+    d.assets = d.assets.filter(a => !fuera.has(a.id)).concat(Object.values(imagenes));
+
+    // ---- la publicidad: el cuadro del patrocinante es la clave publicidad, como en el parcial (316 × 200,
+    // el mismo tamaño): por defecto, Tu Azar.com, y otra imagen entra entera (pr meet)
+    const pub = rename(d, 'Insert Tu Azar.com Suelto con Mencion.png', 'publicidad');
+    const pubAsset = d.assets.find(a => a.id === pub.refId);
+    if (pubAsset.w !== 316 || pubAsset.h !== 200) throw new Error('publicidad: otro tamaño');
+    pubAsset.pr = 'xMidYMid meet';
+    // el cuadro termina de cerrarse en el 269: ahí se va todo (con el matte a ancho 0, Lottie a veces lo
+    // pintaba entero)
+    const mPub = d.layers[d.layers.indexOf(pub) - 1], marco = layer(d, 'Capa de formas 18'), nulo8 = layer(d, 'Nulo 8');
+    if (!mPub.td || mPub.nm !== 'Shape Layer 9' || pub.parent !== nulo8.ind || marco.parent !== nulo8.ind) throw new Error('publicidad: matte o parent inesperados');
+    const patrocinio = [pub, mPub, marco, nulo8];
+    for (const l of patrocinio) l.op = RES_PATROCINIO;
+    for (const p of propiedadesAnimadas(patrocinio.map(l => [l.ks, l.shapes]))) if (Math.max(...p.k.map(k => k.t)) > RES_PATROCINIO) throw new Error('publicidad: anima después de RES_PATROCINIO');
+
+    // ---- el logo y su brillo (en Add, que Lottie no pinta: Screen en el JSON y plus-lighter en el CSS)
+    const logos = d.layers.filter(l => l.nm === 'LOGO FINAL ATRAPA LA EMOCION.png');
+    const brillo = layer(d, 'Shape Layer 2');
+    if (logos.length !== 2 || !logos[0].td || d.layers[d.layers.indexOf(logos[0]) + 1] !== brillo || brillo.bm !== 16) throw new Error('logo: el brillo no es el Add mateado con el logo');
+    brillo.bm = 2;
+    brillo.ln = 'brillo';
+    for (const nm of ['LVBP LOGO.png', 'PANEL AZUL_00366_1.png', 'FONDO LVBP_00000.png']) delete layer(d, nm).cl;
+    for (const l of logos) delete l.cl;
+
+    // ---- el fondo: el zoom lento (144 % → 109 % del 0 al 507, lineal) va por CSS en el index.html, para
+    // que siga en la pausa y en la salida, como en AE (ver el duelo de lanzadores)
+    const fondo = layer(d, 'FONDO LVBP_00000.png'), zoom = fondo.ks.s;
+    if (!zoom.a || zoom.k.length !== 2 || zoom.k[0].o.x[0] !== 0.167 || zoom.k[0].i.x[0] !== 0.833) throw new Error('fondo: zoom inesperado');
+    const css = { desde: zoom.k[0].s[0], hasta: zoom.k[1].s[0], segundos: +((zoom.k[1].t - zoom.k[0].t) / d.fr).toFixed(2) };
+    if (zoom.k[0].t !== 0 || JSON.stringify(css) !== JSON.stringify(RES_ZOOM)) throw new Error(`fondo: el zoom del export (${JSON.stringify(css)}) no es el del CSS (RES_ZOOM)`);
+    if (JSON.stringify(fondo.ks.a.k.slice(0, 2)) !== '[960,540]' || JSON.stringify(fondo.ks.p.k.slice(0, 2)) !== '[960,540]') throw new Error('fondo: el CSS escala desde el centro de la imagen');
+    fondo.ks.s = { a: 0, k: [100, 100, 100], ix: 6, l: 2 };
+    fondo.ln = 'fondo';
+
+    // ---- con menos juegos: fuera los de abajo, y el bloque (el título y los juegos) baja hasta quedar
+    // centrado donde estaba el de tres
+    const deJuego = n => d.layers.filter(l => {
+        for (let c = l; c; c = porInd(c.parent)) if (c === nulos[n]) return true;
+        return (l.cl || '').match(new RegExp(`(VISITA|LOCAL)${n}(_opacidad)?$`)) || (cajas.includes(l) && fila(l.ks.p.k[1]) === n);
+    });
+    if (juegos < 3) {
+        const quitar = new Set();
+        for (let n = juegos + 1; n <= 3; n++) deJuego(n).forEach(l => quitar.add(l));
+        d.layers = d.layers.filter(l => !quitar.has(l));
+        for (const l of d.layers) if (l.parent != null && !porInd(l.parent)) throw new Error(`${l.nm}: quedó sin parent`);
+        const dy = Math.round((yCajas[2] - yCajas[juegos - 1]) / 2);
+        const bloque = new Set([layer(d, 'Nulo 7'), ...[1, 2, 3].slice(0, juegos).flatMap(deJuego)]);
+        bloque.add(layer(d, 'Shape Layer 3'));   // los mattes de los nombres del juego 1
+        bloque.add(layer(d, 'Shape Layer 4'));
+        for (const l of bloque) {
+            if (l.parent != null) continue;
+            const p = l.ks.p;
+            if (p.s) throw new Error(`${l.nm}: posición separada`);
+            if (p.a) for (const k of p.k) k.s[1] += dy;
+            else p.k[1] += dy;
+        }
+    }
+
+    // ---- timeline: en la pausa (346) ya está el logo. La salida: el logo, su entrada al revés (346–366),
+    // y después todo lo demás, la entrada de los juegos al revés (366–443), sin el patrocinante, que ya
+    // se fue
+    const resto = d.layers.filter(l => !patrocinio.includes(l) && !logos.includes(l) && l !== brillo);
+    const tiempos = propiedadesAnimadas(resto.map(l => [l.ks, l.shapes, l.t, l.masksProperties, l.ef])).flatMap(p => p.k.map(k => k.t));
+    if (Math.max(...tiempos) > RES_FILAS + 0.5) throw new Error(`los juegos animan hasta el ${Math.max(...tiempos)}: medir de nuevo RES_FILAS`);
+    for (const l of logos) for (const p of propiedadesAnimadas([l.ks])) alReves(p, ...RES_LOGO, RES_PAUSA);
+    for (const l of [...logos, brillo]) l.op = RES_SALE + 1;
+    const vacio = RES_FIN;
+    for (const l of resto) {
+        for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) alReves(p, 0, RES_FILAS, RES_SALE);
+        const ref = l.td ? d.layers[d.layers.indexOf(l) + 1] : l;
+        l.op = Math.min(RES_FIN - Math.max(ref.ip, 1) + 0.001, vacio + 1);
+    }
+    for (const l of d.layers) l.ip = Math.max(l.ip, 1);   // el frame 0 queda vacío
+    d.op = vacio + 1;
+    d.markers = [
+        { tm: 0, cm: OJ_STAGE[juegos], dr: RES_PAUSA, payload: { name: OJ_STAGE[juegos], type: 'pause', order: 5 - juegos, stop: OJ_SALIDA[juegos] } },
+        { tm: RES_PAUSA, cm: OJ_SALIDA[juegos], dr: vacio + 1 - RES_PAUSA }
+    ];
+    return d;
+}
+if (hay('RESULTADOS')) {
+    // Los tres tramos en una timeline, como en los otros juegos (las mismas claves: un UPDATE llena los
+    // tres), corridos a RES_TRAMO; antes, en el frame 0, vacío, la espera: play pausa ahí
+    const tramos = [3, 2, 1].map(juegos => [juegos, resultados(juegos)]);
+    const d = tramos[0][1];
+    const capas = [];
+    const marcas = [
+        { tm: 0, cm: 'play', dr: 0, payload: { name: 'play', type: 'pause', order: 1 } },
+        { tm: 0, cm: 'stop', dr: 1 }
+    ];
+    let ind = 0, fin = 1;
+    for (const [juegos, v] of tramos) {
+        const S = RES_TRAMO[juegos];
+        if (S < fin) throw new Error(`el tramo de ${juegos} empezaría en el ${S}, antes del final del anterior (${fin})`);
+        const mapa = {};
+        for (const l of v.layers) mapa[l.ind] = ++ind;
+        for (const l of v.layers) {
+            l.ind = mapa[l.ind];
+            if (l.parent != null) l.parent = mapa[l.parent];
+            if (l.tp != null) l.tp = mapa[l.tp];
+            l.ip += S; l.op += S; l.st += S;
+            if (l.ty === 5 && l.t.d.k.length !== 1) throw new Error(`${l.nm}: texto animado`);
+            for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) for (const k of p.k) k.t += S;
+        }
+        capas.push(...v.layers);
+        for (const m of v.markers) marcas.push(Object.assign(m, { tm: m.tm + S }));
+        fin = v.op + S;
+    }
+    d.layers = capas;
+    d.markers = marcas;
+    d.op = fin;
+    const fuentes = { 'LTEnergy-Regular': 'font/LTEnergy-Regular.ttf', 'ChakraPetch-Bold': 'font/ChakraPetch-Bold.ttf' };
+    for (const f of d.fonts.list) {
+        if (!fuentes[f.fName]) throw new Error(`fuente ${f.fName}`);
+        f.fPath = fuentes[f.fName];
+    }
+    allCaps(d);
+    // los textos arrancan vacíos, salvo el título: si no llega, queda RESULTADOS
+    for (const l of d.layers) if (l.ty === 5 && l.cl && l.cl !== 'titulo') for (const k of l.t.d.k) k.s.t = '';
+    save(path.join(REPO, 'resultados/data.json'), d);
 }

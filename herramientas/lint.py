@@ -13,7 +13,7 @@ GRAFICOS = sorted(g for g in os.listdir(REPO) if os.path.isfile(REPO + g + '/dat
 REPETIDAS = {g: re.compile(r'[A-Z]+_opacidad') for g in ('defensiva', 'ofensiva', 'bateador', 'lanzador')}
 # Gráficos con tramos: la timeline trae una copia de las capas por stage (los otros juegos: 3, 2 y 1
 # juegos), con las mismas clases. Una clase se repite una vez por tramo, nunca dentro del mismo.
-TRAMOS = {'otrosjuegos'}
+TRAMOS = {'otrosjuegos', 'resultados'}
 # Las compuertas: su 49 % va en el CSS (prep.js), no en la capa.
 PUERTAS = {g: 'g[id^="puerta"] > image' for g in ('defensiva', 'ofensiva')}
 # El escudo grande del lanzador, lo mismo: su 49 % va en el CSS.
@@ -94,7 +94,7 @@ for g in GRAFICOS:
             # posiciones (con y sin cliente) y el duelo son de pantalla completa (la tabla y el duelo, opacos desde su primer frame): ahí sí hay
             # JPG. En los otros juegos, el cuadro de Harina PAN (su precomp) es un rectángulo opaco en
             # todos sus frames: ahí también.
-            jpg_ok = g in ('defensiva', 'ofensiva', 'posiciones', 'posicionessincliente', 'duelo_lanzadores') or (g in JPG_PRECOMP and all(
+            jpg_ok = g in ('defensiva', 'ofensiva', 'posiciones', 'posicionessincliente', 'duelo_lanzadores', 'resultados') or (g in JPG_PRECOMP and all(
                 l.get('refId') != a['id'] for l in d['layers'] + [l for c in comps.values() if c.get('nm') != JPG_PRECOMP[g] for l in c['layers']]))
             if not jpg_ok and re.search(r'\.jpe?g$', a['p'], re.I): p(g, f'asset {a["p"]}: JPG sin alfa, tapa el video')
     # data.md: cada clave del JSON documentada y cada clave documentada existe
