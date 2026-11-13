@@ -836,7 +836,9 @@ HTML-templates tienen el mismo código (allá ningún gráfico repite una capa d
 
 Revisado en Chromium cuadro por cuadro (la entrada, la pausa y la salida de los tres tramos); en CasparCG
 2.5.1 (2026-11-13, 1080p29.97, por CPU) la entrada y la pausa salen como en Chromium, el key es 255 en
-toda la pantalla y el `CG STOP` suelta el layer a los 3,7 s.
+toda la pantalla y el `CG STOP` suelta el layer a los 3,7 s. La viñeta del fondo (ver la receta) trababa la entrada: en CasparCG
+quedaban 12 a 15 cuadros quietos y un salto, varias veces; sin el filtro, la entrada sale continua (grabada
+el 2026-11-13: sólo cuadros repetidos sueltos, de la carga de grabar).
 
 ### Imágenes: `_assets/`
 
@@ -1496,6 +1498,13 @@ Comparado frame a frame: la salida, contra la entrada al revés, idéntica (0 ni
   entera.
 - **Brillo:** `Shape Layer 2`, de Add (`bm` 16) a Screen, con `ln` `brillo`. Falla si no es el Add
   mateado con el logo.
+- **Viñeta:** `Sólido Negro 2` (un negro al 71 % con una elipse invertida) llega con Mask Expansion
+  −28. Lottie la pinta con un feMorphology erode sobre una máscara de pantalla completa, que costaba
+  300–400 ms en muchos cuadros: la entrada se trababa y saltaba (Leon, 2026-11-13, también en su
+  CasparCG). `resViñetaSinExpansion()` la cambia por dos máscaras sin filtro que dan lo mismo: un
+  rectángulo 27,5 px adentro de la pantalla (suma) y la elipse agrandada por el cuadrado del erode (resta;
+  cada cuarto corrido 28 px hacia su esquina, unidos por rectas). Contra la de antes, sólo el suavizado de
+  los bordes (1 px). El lint no lo controla: falla `prep.js` si la máscara llega de otra forma.
 - **Fondo:** el zoom sale del Lottie (la capa al 100 %, `ln` fondo) y va por CSS; falla si el del
   export no es `RES_ZOOM`.
 - **Tramos:** `resultados(juegos)`; con menos juegos, fuera las capas de los de abajo y el bloque baja

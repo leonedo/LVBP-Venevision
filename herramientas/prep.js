@@ -2502,6 +2502,35 @@ const RES_TRAMO = { 3: 100, 2: 600, 1: 1100 };
 const RES_ZOOM = { desde: 144, hasta: 109, segundos: 16.92 };   // el del fondo, como lo tiene el CSS del index.html
 const RES_BARRAS = 'BARRAS PNG RESULTADOS';
 const tamanoPng = f => { const b = fs.readFileSync(f); if (b.toString('ascii', 12, 16) !== 'IHDR') throw new Error(`${f}: no es PNG`); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
+// La viñeta del fondo, sin la expansión de su máscara y como se veía con ella. Lottie aplica la expansión
+// negativa de una máscara invertida a la máscara ya invertida (la pantalla menos la elipse), con un
+// feMorphology erode, que es un cuadrado de 2|x| de lado: el negro queda 28 px adentro de los bordes de la
+// pantalla (27,5: el trazo de 1 px que Lottie le pone al path) y la elipse, agrandada por ese cuadrado.
+// Va igual con dos máscaras sin filtro: el rectángulo (suma, con la opacidad de la original) y la elipse
+// agrandada (resta). La elipse más el cuadrado es cada cuarto de la elipse corrido (±x, ±x) hacia su
+// esquina, unidos por rectas. Falla si la máscara no es una elipse quieta con expansión −28, invertida.
+const RES_VIÑETA = 28;
+function resViñetaSinExpansion(l) {
+    const m = l.masksProperties || [];
+    if (m.length !== 1 || !m[0].inv || m[0].mode !== 'a' || m[0].pt.a || m[0].o.a || m[0].x.a || m[0].x.k !== -RES_VIÑETA) throw new Error(`${l.nm}: la máscara no es la elipse invertida con expansión −${RES_VIÑETA}`);
+    const k = m[0].pt.k, v = k.v, cx = v[0][0], cy = v[1][1];
+    if (v.length !== 4 || v[2][0] !== cx || v[3][1] !== cy || Math.abs(v[0][1] + v[2][1] - 2 * cy) > 1e-6 || Math.abs(v[1][0] + v[3][0] - 2 * cx) > 1e-6) throw new Error(`${l.nm}: la máscara no es una elipse`);
+    if (l.ty !== 1 || l.sw !== 1920 || l.sh !== 1080 || l.parent || JSON.stringify([l.ks.a.k, l.ks.p.k, l.ks.s.k, l.ks.r.k]) !== '[[960,540,0],[960,540,0],[100,100,100],0]') throw new Error(`${l.nm}: no es un sólido de pantalla completa quieto`);
+    const x = RES_VIÑETA, borde = x - 0.5, cero = [0, 0];
+    const esquina = [[-x, -x], [-x, x], [x, x], [x, -x]];   // el cuarto que sale de cada vértice (arriba, izquierda, abajo, derecha)
+    const elipse = { i: [], o: [], v: [], c: true };
+    for (let j = 0; j < 4; j++) {
+        const [dx, dy] = esquina[j], sig = (j + 1) % 4;
+        elipse.v.push([v[j][0] + dx, v[j][1] + dy], [v[sig][0] + dx, v[sig][1] + dy]);
+        elipse.i.push(cero, k.i[sig]);
+        elipse.o.push(k.o[j], cero);
+    }
+    const rect = { i: [cero, cero, cero, cero], o: [cero, cero, cero, cero], v: [[borde, borde], [1920 - borde, borde], [1920 - borde, 1080 - borde], [borde, 1080 - borde]], c: true };
+    l.masksProperties = [
+        { inv: false, mode: 'a', pt: { a: 0, k: rect }, o: m[0].o, x: { a: 0, k: 0 }, nm: 'Máscara 1' },
+        { inv: false, mode: 's', pt: { a: 0, k: elipse }, o: { a: 0, k: 100 }, x: { a: 0, k: 0 }, nm: 'Máscara 2' },
+    ];
+}
 function resultados(juegos) {
     const d = load(path.join(SRC, 'RESULTADOS/data.json'));
     if (d.layers.some(l => l.ty === 0) || d.assets.some(a => a.layers)) throw new Error('resultados: precomps inesperados');
@@ -2604,6 +2633,12 @@ function resultados(juegos) {
     brillo.bm = 2;
     brillo.ln = 'brillo';
     for (const nm of ['LVBP LOGO.png', 'PANEL AZUL_00366_1.png', 'FONDO LVBP_00000.png']) delete layer(d, nm).cl;
+
+    // ---- la viñeta del fondo (Sólido Negro 2: un negro al 71 % con una elipse invertida) trae Mask
+    // Expansion −28. Lottie la pinta con un filtro SVG (feMorphology erode) sobre una máscara de pantalla
+    // completa, que en Chromium y en CasparCG cuesta 300–400 ms en muchos cuadros: la entrada se trababa
+    // y saltaba. Va sin filtro, con dos máscaras que dan lo mismo (ver resViñetaSinExpansion).
+    resViñetaSinExpansion(layer(d, 'Sólido Negro 2'));
     for (const l of logos) delete l.cl;
 
     // ---- el fondo: el zoom lento (144 % → 109 % del 0 al 507, lineal) va por CSS en el index.html, para
