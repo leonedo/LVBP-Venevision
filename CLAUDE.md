@@ -6,12 +6,12 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Dieciséis gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
+proyecto*). Diecisiete gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
 variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva, el
-bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones (con y sin cliente), el score final (con y sin publicidad), el duelo de lanzadores y los resultados con `font/LTEnergy-Regular.ttf`,
+bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones (con y sin cliente), el score final (con y sin publicidad), el duelo de lanzadores, los resultados y los árbitros con `font/LTEnergy-Regular.ttf`,
 la estática que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable:
 mide igual, y en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y
-los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, el del score final, del 2026-10-29, y el del duelo de lanzadores, del 2026-11-06, otra vez la estática). Los otros juegos y los resultados llevan además Chakra Petch Bold
+los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, el del score final, del 2026-10-29, el del duelo de lanzadores, del 2026-11-06, y el de los árbitros, del 2026-11-14, otra vez la estática). Los otros juegos y los resultados llevan además Chakra Petch Bold
 (`font/ChakraPetch-Bold.ttf`, libre, de Google Fonts) en el título y las carreras, y el score, Tahoma
 Bold en la barra de jugadores, el conteo, OUTS y el inning (`font/Tahoma-Bold.ttf`: ver *Score*). Las keys del
 UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una vez cada una (ver
@@ -35,6 +35,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `scorefinalsinpublicidad/` | El score final sin publicidad: el de antes del 2026-11-05, con el logo de ATRAPA LA EMOCIÓN fijo en la caja de la derecha (con su sombra blanca). Mismo export, mismas claves y misma data que `scorefinal` (el controlador elige con o sin publicidad por el template) | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48, la caja del logo del 40 al 58 y el logo crece del 49 al 56 | `salida`: la entrada al revés (1,9 s) |
 | `duelo_lanzadores/` | El duelo de lanzadores (el export es DUELO DE PICHEO; el título, DUELO DE HOY), a pantalla completa y opaco: el fondo azul de ATRAPA LA EMOCIÓN; a cada lado, el panel del equipo con la foto del lanzador delante (`fotolanzadorvisita` / `fotolanzadorlocal`, imágenes) y abajo la barra con el nombre y el número; al centro, el logo, el título y 7 estadísticas (la visita a la izquierda, los rótulos al medio, la local a la derecha). El frame 0 está vacío | stage `play` pause (0–53): las fotos entran de los lados del 0 al 15, el logo crece del 8 al 18, el título aparece letra por letra del 10 al 30, las barras entran del 17 al 37, las estadísticas bajan fila por fila del 22 al 52 y los nombres del 43 al 49; el zoom del fondo (CSS) sigue en la pausa | `salida`: la entrada al revés (1,8 s), con el fondo alejándose |
 | `resultados/` | Los resultados finales de los otros juegos (el export es RESULTADOS), a pantalla completa y opaco: el fondo de la LVBP (con un zoom lento por CSS), el panel azul y, encima, RESULTADOS y hasta tres juegos, cada uno con la barra de la visita (escudo y nombre), las dos carreras en cuadros negros y la barra de la local; arriba, el cuadro del patrocinante (`publicidad`, una imagen: Tu Azar.com) entra y se cierra, y queda el logo de ATRAPA LA EMOCIÓN. Sin inning (a diferencia de los otros juegos). El frame 0 está vacío | `play` lo pone al aire vacío (pausa en el 0); el controlador elige con un `goto`: `tresjuegos` (100–445), `dosjuegos` (600–945) o `unjuego` (1100–1445). En cada uno, desde el `goto`: el panel y el título entran, los juegos del 23 al 77, el patrocinante se cierra del 247 al 269, el logo entra del 273 al 293 y su brillo pasa del 307 al 345 (pausa a los 11,5 s) | `salida`, `salida2`, `salida1`: el logo, su entrada al revés, y después los juegos y el panel (3,2 s) |
+| `arbitros/` | Los cuatro árbitros (el export es IDENTIFICADOR UMPIRES), abajo a la izquierda (x 0–853, y 321–977): la barra de UMPIRES con el guante (en la imagen, sin clave) y un panel gris con cuatro barras azules, cada una con el nombre (blanco) y la posición (cian). Todo es una secuencia de PNG salvo los textos. Claves de IVC, como el de Meridiano. El frame 0 está vacío | stage `play` pause (0–50): la barra entra del 5 al 17, el panel del 13 al 24, las barras azules del 25 al 41 y los textos, letra por letra, del 31 al 49 | `salida`: la entrada al revés (1,5 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra), del 2026-10-24, y `score_equipos.png` (los 56 cruces
@@ -63,7 +64,7 @@ y `scorefinal_equipos.png` (los 56 cruces `visita_vs_local`, recortado al gráfi
 Pepsi en la caja de la derecha; `duelo_lanzadores.png` (pantalla completa con el ejemplo de su `data.md`
 y las fotos del diseño, en la pausa), `duelo_lanzadores_equipos.png` (8 casos que ponen cada equipo de
 cada lado, sin fotos) y `duelo_lanzadores_variantes.png` (nombres y valores largos y en minúsculas, sin
-foto y con una ruta que no carga, fotos de otra proporción y sin data), del 2026-11-06. `resultados.png` (pantalla completa, tres juegos, en la pausa), `resultados_juegos.png` (3, 2 y 1 juegos, dos combinaciones de cada uno), `resultados_equipos.png` (8 casos que ponen cada equipo en las 6 barras, recortado al bloque) y `resultados_variantes.png` (minúsculas, nombres largos, `100`, sin data y la publicidad: Tu Azar, otra imagen, `""` y una ruta que no carga), del 2026-11-13. Si un gráfico cambia, hay que
+foto y con una ruta que no carga, fotos de otra proporción y sin data), del 2026-11-06. `resultados.png` (pantalla completa, tres juegos, en la pausa), `resultados_juegos.png` (3, 2 y 1 juegos, dos combinaciones de cada uno), `resultados_equipos.png` (8 casos que ponen cada equipo en las 6 barras, recortado al bloque) y `resultados_variantes.png` (minúsculas, nombres largos, `100`, sin data y la publicidad: Tu Azar, otra imagen, `""` y una ruta que no carga), del 2026-11-13. `arbitros.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa) y `arbitros_variantes.png` (minúsculas, nombres de 19 letras, un nombre largo, `""`, otros rótulos y sin data), del 2026-11-14. Si un gráfico cambia, hay que
 regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último frame de la entrada). No
 entran al zip (`.gitattributes`).
 
@@ -840,6 +841,41 @@ toda la pantalla y el `CG STOP` suelta el layer a los 3,7 s. La viñeta del fond
 quedaban 12 a 15 cuadros quietos y un salto, varias veces; sin el filtro, la entrada sale continua (grabada
 el 2026-11-13: sólo cuadros repetidos sueltos, de la carga de grabar).
 
+**Árbitros.** Los cuatro árbitros del juego; el export es IDENTIFICADOR UMPIRES (2026-11-14), y la
+carpeta, `arbitros`, como su equivalente de LVBP-Meridiano. Gráfico nuevo. Abajo a la izquierda (x
+0–853, y 321–977): la barra de UMPIRES con el guante y, debajo, un panel gris con textura y cuatro
+barras azules en diagonal, cada una con el nombre (blanco, a la izquierda) y la posición (cian, a la
+derecha); a la izquierda del panel, un bloque gris oscuro con un patrón. Todo es una secuencia de PNG
+(un precomp de 151 frames de 1920 × 1080) salvo los ocho textos. Claves: las de Meridiano, que son
+las de IVC, para que el controlador les mande a los tres la misma data: `UMPIREHOME`,
+`UMPIREPRIMERA`, `UMPIRESEGUNDA`, `UMPIRETERCERA` (de arriba abajo) y los rótulos `rotulohome`…
+(`HOME`, `1B`, `2B`, `3B` por defecto, como en Meridiano; el diseño dice POS). UMPIRES está en la
+imagen: no hay `titulo` (en Meridiano dice ARBITROS). Los nombres arrancan vacíos, como en el
+bateador; los rótulos, no.
+
+Peso: el export trae 17,5 MB de imágenes (151 PNG a pantalla completa), y por eso pesaba. Quedan 2,97
+MB, sin perder nada a la vista: recortadas al gráfico (853 × 656, sin pérdida, `arbitros.py`), sin
+los cinco frames vacíos del principio y con una sola imagen desde el 41. Los PNG vienen reducidos a
+una paleta de 54 colores con tramado, y cada frame se trama distinto: desde el 41 la secuencia está
+quieta (medido con un desenfoque contra el 150: lo que cambia es el tramado, en el borde del panel y
+en el gris de la izquierda), así que en la pausa el panel ya no hierve. Quedan 37 de 151 imágenes.
+
+Textos: en mayúsculas. Los nombres, alineados a la derecha donde termina el del diseño (centrado:
+queda en el mismo píxel) y desde 8 px después del borde izquierdo de su barra: como las barras van en
+diagonal, en la de arriba entran unas 18 letras al tamaño del diseño y en la de abajo unas 15
+(`FRANCISCO RODRIGUEZ` baja un poco, más en las de abajo). Los rótulos, centrados donde estaba el POS
+del diseño, hasta 8 px antes del final de la barra o del nombre: entra `HOME`. El POS de la fila 1
+llegaba blanco y con dos espacios adelante: va cian, como los otros, y en su lugar. Aparecen letra por
+letra (un animador de opacidad), una fila detrás de la otra (31–49).
+
+Salida: el export no trae (no trae markers): es la entrada al revés (1,5 s), con los frames de la
+secuencia al revés.
+
+En CasparCG 2.5.1 (2026-11-14, 1080p29.97, por CPU): la pausa sale como en Chromium, el key es 255 en
+el panel y en la barra, la entrada y la salida no repiten frames (grabado con `crop=864:672:0:316`) y
+el `CG STOP` suelta el layer a los 1,7 s (en la pausa y a mitad de la entrada). CasparCG usa 1,1 a 1,3
+núcleos durante la entrada.
+
 ### Imágenes: `_assets/`
 
 Las imágenes de todos los gráficos van juntas en `_assets/`, una vez cada una, con el sha1 de su
@@ -884,10 +920,10 @@ posiciones como `TABLA DE POSICIONES.zip` (carpeta `TABLA DE POSICIONES/`; la si
 `TABLA DE POSICIONES SIN CLIENTE.zip`) y el score final como
 `SCORE FINAL 1.zip` (carpeta `SCORE FINAL/`), que da los dos score final, y el duelo de lanzadores como
 `DUELO DE PICHEO.zip` (carpeta `DUELO DE PICHEO/`), y los resultados como `RESULTADOS.zip` (carpeta
-`RESULTADOS/`), con las barras en `BARRAS PNG RESULTADOS.zip`; el parcial sin publicidad
-no tiene export, sale del parcial. La receta de los quince es `herramientas/prep.js`, que prepara los
-que encuentre, y el parcial sin publicidad siempre (las imágenes del 3 en línea y del prevenido,
-antes, `herramientas/tresenlinea.py` y `herramientas/prevenido.py`): buscar las capas por `nm` (los
+`RESULTADOS/`), con las barras en `BARRAS PNG RESULTADOS.zip`, y los árbitros como `IDENTIFICADOR UMPIRES.zip` (carpeta `IDENTIFICADOR UMPIRES/`); el parcial sin publicidad
+no tiene export, sale del parcial. La receta de los dieciséis es `herramientas/prep.js`, que prepara los
+que encuentre, y el parcial sin publicidad siempre (las imágenes del 3 en línea, del prevenido y de los árbitros,
+antes, `herramientas/tresenlinea.py`, `herramientas/prevenido.py` y `herramientas/arbitros.py`): buscar las capas por `nm` (los
 índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`. Las imágenes del export van
 antes a `<gráfico>/images/`, tal cual, y después de `prep.js`, `node herramientas/consolidar.mjs` las
 pasa a `_assets/` (ver *Imágenes: `_assets/`*).
@@ -1516,6 +1552,39 @@ Comparado frame a frame: la salida, contra la entrada al revés, idéntica (0 ni
   después del 77. Las capas que arrancan en el 0 pasan al 1.
 - **Textos vacíos:** al final, todos salvo `titulo`.
 
+**Árbitros**
+
+- **Imágenes, antes que `prep.js`:** `python3 herramientas/arbitros.py "$EXPORTS/IDENTIFICADOR
+  UMPIRES" .` recorta las 151 del export a `RECORTE` (x 0–853, y 321–977: lo que tapa la secuencia en
+  algún frame; falla si algo queda afuera). `prep.js` falla si no tienen el tamaño del recorte
+  (`ARB_RECORTE`).
+- **Clases:** `.PRINCIPAL`, `.PRIMERA`, `.SEGUNDA`, `.TERCERA` → `UMPIREHOME`, `UMPIREPRIMERA`,
+  `UMPIRESEGUNDA`, `UMPIRETERCERA`; `.POS PRINCIPAL`… (las cuatro con la clase `POS`) →
+  `rotulohome`, `rotuloprimera`, `rotulosegunda`, `rotulotercera`, con el texto `HOME`, `1B`, `2B`,
+  `3B`. Las imágenes de la secuencia pierden la clase `png`.
+- **Secuencia:** cada capa de imagen con el tamaño del recorte, el ancla en el 0 y la posición en la
+  esquina; los ip, sin los decimales de más (el frame k, del k al k + 1: antes se veía un frame tarde,
+  después de los textos). Fuera los frames 0–4 (`ARB_VACIOS`, vacíos) y los del 42 al 150: el 41
+  (`ARB_QUIETO`) queda hasta la salida.
+- **Fuente:** `fPath` llega como `IDENTIFICADOR UMPIRES/FONT` (la variable): pasa a
+  `font/LTEnergy-Regular.ttf`, la estática (el mismo archivo que el del bateador).
+- **All Caps:** llega prendido; `prep.js` lo deja igual.
+- **Textos de caja:** ya llegan de caja, con `lh` 272 (va 1.2 del cuerpo) y espacios al final o al
+  principio, que salen. Los nombres, a la derecha (`j` 1), terminando donde termina NOMBRE APELLIDO
+  en el diseño (`ARB_LW_NOMBRE`) y desde `ARB_MARGEN` (8) después del borde izquierdo de su barra
+  (`ARB_BARRAS`, medidos en la imagen del 41: si la secuencia cambia, medir de nuevo). Los rótulos,
+  centrados donde se veía el POS, hasta `ARB_MARGEN` antes del final de la barra o del nombre. El alto,
+  el ascent del cuerpo más 2. El rótulo de la fila 1, cian (llegaba blanco).
+- **Markers y timeline:** el export no trae markers → `play` 0–50 (pausa en el 49, `ARB_PAUSA`),
+  `salida` 50–96 y `stop` en el 0. Los textos suman su entrada al revés (`alReves`) y la secuencia sus
+  frames al revés: lo que la entrada muestra en el frame t, la salida lo muestra en el 99 − t, y el 95
+  es el primer frame vacío. La entrada termina en el 49 (`ARB_ENTRADA`, el nombre de la fila 4).
+- **Textos vacíos:** al final, los nombres.
+
+Comparado contra el export (con NOMBRE APELLIDO y POS): los textos, en el mismo píxel en las cuatro
+filas; la secuencia, un frame antes (los ip) y quieta desde el 41. La salida, contra la entrada al
+revés: idéntica.
+
 ### QA
 
 - Juzgar con el runtime real y la fuente cargada (`<gráfico>/index.html` en el browser o con
@@ -1563,6 +1632,9 @@ Comparado frame a frame: la salida, contra la entrada al revés, idéntica (0 ni
   y en minúsculas, `100`, la publicidad (otra imagen, `""`, una ruta que no carga, en los tres tramos),
   la salida, `stop` en la pausa y a mitad de la entrada, y que el layer se suelte; en CasparCG, la
   pausa y el key.
+- Árbitros: nombres largos (19 letras en cada fila) y en minúsculas, `""`, otros rótulos, sin data, la
+  salida contra la entrada al revés, `stop` en la pausa y a mitad de la entrada, y que el layer se
+  suelte; en CasparCG, el key y que la entrada no repita frames.
 - Imágenes (`consolidar.mjs`): cada gráfico, al píxel contra lo publicado, con todos los equipos
   prendidos y cada frame en su propia carga; y por `file://`.
 - Defensiva, ofensiva, bateador y lanzador: los 8 equipos (barra, color de las puertas, del fondo o
@@ -1592,6 +1664,7 @@ con Playwright global, `$(npm root -g)/playwright/index.mjs`).
 | `prep.js` | La receta de arriba, ejecutable: prepara el export del diseñador. Instrucciones en su encabezado |
 | `tresenlinea.py` | Las imágenes del 3 en línea: el recorte y los frames de la salida (va antes de `prep.js`) |
 | `prevenido.py` | Las imágenes del prevenido: el recorte (va antes de `prep.js`) |
+| `arbitros.py` | Las imágenes de los árbitros: el recorte (va antes de `prep.js`) |
 | `consolidar.mjs` | Las imágenes de todos los gráficos, a `_assets/` (va después de `prep.js`) |
 | `shot.mjs` | Frames de un gráfico con data: `node herramientas/shot.mjs <url> <salida> '<json>' <frames> [x,y,w,h]`; `JSON=<archivo>` sirve otro data.json para comparar versiones |
 | `matrix.mjs` | Muchas variantes de data en una carga (todos los cruces…), con reporte de textos y consola |
