@@ -11,7 +11,7 @@ variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva,
 bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones (con y sin cliente), el score final (con y sin publicidad), el duelo de lanzadores, los resultados y los árbitros con `font/LTEnergy-Regular.ttf`,
 la estática que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable:
 mide igual, y en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y
-los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, el del score final, del 2026-10-29, el del duelo de lanzadores, del 2026-11-06, y el de los árbitros, del 2026-11-14, otra vez la estática). Los otros juegos y los resultados llevan además Chakra Petch Bold
+los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, el del score final, del 2026-10-29, el del duelo de lanzadores, del 2026-11-06, y el de los árbitros y el del prevenido actualizado, del 2026-11-14, otra vez la estática). Los otros juegos y los resultados llevan además Chakra Petch Bold
 (`font/ChakraPetch-Bold.ttf`, libre, de Google Fonts) en el título y las carreras, y el score, Tahoma
 Bold en la barra de jugadores, el conteo, OUTS y el inning (`font/Tahoma-Bold.ttf`: ver *Score*). Las keys del
 UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una vez cada una (ver
@@ -28,7 +28,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `parcialsinpublicidad/` | El parcial sin el cuadro de Pepsi ni sus dos rayas grises, centrado (x 507–1411): la misma pizarra, con las mismas claves (el controlador elige con o sin publicidad por el template). Lo arma `prep.js` desde el parcial preparado. El frame 0 está vacío | stage `play` pause (0–42): la pizarra entra hasta el 41 | `salida`: la entrada al revés (1,4 s) |
 | `tresenlinea/` | Los tres que vienen al bate (el export es 3 EN LINEA), abajo a la derecha: un panel de Empire Keeway entra con sus logos y se va, y queda la caja, la banda naranja con el 3 EN LÍNEA y el recuadro azul con los tres nombres (todo una secuencia de PNG, salvo los nombres). El frame 0 está vacío | stage `play` pause (0–197): la caja crece del 16 al 43, los nombres aparecen del 40 al 60 y el panel se va del 177 al 193 | `salida`: los nombres y la caja, su entrada al revés, sin el panel (1,5 s) |
 | `otrosjuegos/` | Cómo van los otros juegos (el export es OTROS JUEGOS; el título, ASÍ VAN), una columna abajo a la derecha: arriba, un cuadro de Harina PAN entra, arma su logo y se va (una secuencia de JPG); debajo, el título y tres juegos, cada uno con la sede, las barras de visita y local (escudo y nombre), las carreras y el inning con sus flechas. El frame 0 está vacío | `play` lo pone al aire vacío (pausa en el 0); el controlador elige con un `goto`: `tresjuegos` (100–266), `dosjuegos` (400–566) o `unjuego` (700–866), el mismo gráfico con 3, 2 o 1 juegos. En cada uno, desde el `goto`, el cuadro entra del 11 al 23, la columna del 27 al 95 (un juego detrás del otro) y el cuadro se va del 157 al 164 | `salida`: la columna, su entrada al revés, sin el cuadro (2,3 s); `salida2` (1,9 s) y `salida1` (1,3 s) |
-| `prevenido/` | El bateador en el círculo (el export es PREVENIDO AL BATE), abajo a la derecha: un panel de LMV entra girando, muestra su logo con un brillo y se va (una secuencia de PNG); debajo, la barra negra con el PREVENIDO AL BATE y el recuadro azul con el nombre. El frame 0 está vacío | stage `play` pause (0–170): la barra entra del 23 al 32, el título del 31 al 39, el recuadro y el nombre del 33 al 48, y el panel se va del 151 al 168 | `salida`: la barra, el título, el recuadro y el nombre, su entrada al revés, sin el panel (0,9 s) |
+| `prevenido/` | El bateador en el círculo (el export es PREVENIDO AL BATE; desde el 2026-11-14, el actualizado), abajo a la derecha (x 1457–1773): un panel de LMV (el logo plano sobre un azul con brillos) baja girando, pasa sus brillos y se va; debajo, la barra negra con el PREVENIDO AL BATE y el recuadro azul con el nombre. Todo es una secuencia de PNG salvo el nombre. El frame 0 está vacío | stage `play` pause (0–222): la barra entra del 24 al 31, el recuadro del 37 al 44, el nombre del 40 al 56 y el panel se va del 216 al 220 | `salida`: la caja y el nombre, su entrada al revés, sin el panel (1,1 s) |
 | `posiciones/` | La tabla de posiciones (el export es TABLA DE POSICIONES), a pantalla completa y opaca: el fondo, el título POSICIONES, los rótulos de las columnas, el recuadro magenta de los números y el cuadro de GoGo Royal (una secuencia de JPG); encima, 8 filas, cada una con la barra del equipo (con su escudo), el nombre en una caja negra y JJ, JG, JP, AVE y DIF. El frame 0 está vacío; desde el 1, el gris del diseño tapa el video | stage `play` pause (0–76): el gris quieto hasta el 11, el fondo entra del 12 al 64, las barras bajan del 29 al 44, los nombres aparecen del 41 al 66 y los números del 60 al 75 | `salida`: la entrada al revés, que termina en el gris y corta al video (2,5 s) |
 | `posicionessincliente/` | La tabla de posiciones sin el cliente (el export es TABLA DE POSICIONES SIN CLIENTE): la misma tabla, con el cuadro de GoGo Royal vacío (queda su caja azul). Mismas claves, misma data y mismos tiempos que `posiciones` (el controlador elige con o sin cliente por el template) | stage `play` pause (0–76), como `posiciones` | `salida`: la entrada al revés (2,5 s) |
 | `scorefinal/` | El score final (el export es SCORE FINAL), el line score, abajo (x 302–1634, y 724–910): las barras de visita y local (escudo y nombre, las mismas imágenes de la tabla de posiciones), las carreras de los 9 innings sobre un recuadro magenta, C H E en negro y la caja del logo de ATRAPA LA EMOCIÓN (`publicidad`, una imagen que llena la caja: Pepsi por defecto), con una raya plateada a la derecha. El frame 0 está vacío | stage `play` pause (0–59): las barras entran del 0 al 27, el recuadro y los números del 9 al 48, la caja del logo del 40 al 58 y la publicidad entra deslizándose del 39 al 58 | `salida`: la entrada al revés (1,9 s) |
@@ -56,7 +56,7 @@ el ejemplo de su `data.md`, en la pausa) y `tresenlinea_panel.png` (en el 120, c
 casos que ponen cada equipo en las 6 filas, recortado al gráfico) y `otrosjuegos_dosjuegos.png` /
 `otrosjuegos_unjuego.png` (los tramos de 2 y 1 juegos, en su pausa), del 2026-10-22; `prevenido.png`
 (pantalla completa con el ejemplo de su `data.md`, en la pausa) y `prevenido_panel.png` (en el 100,
-con el panel), del 2026-10-23; `posiciones.png` (pantalla completa con el ejemplo de su `data.md`, en
+con el panel), del 2026-11-14 (el export actualizado); `posiciones.png` (pantalla completa con el ejemplo de su `data.md`, en
 la pausa) y `posiciones_equipos.png` (8 casos que ponen cada equipo en las 8 filas, recortado a la
 tabla), del 2026-10-24; `posicionessincliente.png` (lo mismo, sin el cliente; los equipos son los de
 `posiciones_equipos.png`), del 2026-11-08; `scorefinal.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa)
@@ -77,7 +77,7 @@ publicidad es una imagen fija, el parcial sale al revés entero; en el parcial s
 pizarra sola). En el 3 en línea
 (su `stop`, 210–240, tampoco anima) la entrada al revés traería de vuelta el panel: sale la caja sola.
 En los otros juegos (su `STOP`, 167–197, tampoco), lo mismo: sale la columna, sin el cuadro de PAN.
-En el prevenido (su `STOP`, 180–210, tampoco), también: sale la caja, sin el panel de LMV. En la
+En el prevenido (su `STOP`, 217–247, tampoco), también: sale la caja, sin el panel de LMV. En la
 tabla de posiciones (su `stop`, 120–150, tampoco) es la entrada al revés entera: el fondo, una
 secuencia de JPG opaca, vuelve hasta el gris del principio, y de ahí corta al video, como entra.
 
@@ -558,55 +558,53 @@ entrada); el azul baja a −16,3, legal hasta −20. Quedan así, como el cian y
 HD (Rec.709) todo es legal.
 
 **Prevenido.** El bateador en el círculo; el export es PREVENIDO AL BATE, y la carpeta, `prevenido`,
-como su equivalente de Meridiano. Abajo a la derecha (x 1441–1757), un panel de LMV entra girando,
-muestra su logo con un brillo y se va por la derecha; debajo crecen la barra negra con el título
-PREVENIDO AL BATE y el recuadro azul con el nombre. El panel es una secuencia de PNG (un precomp de
-170 frames); la barra, el título, el recuadro y el nombre son capas de Lottie. Claves: las del
+como su equivalente de Meridiano. El del 2026-11-14 (llegó como PREVENODO AL BATE ACTUALIZADO)
+reemplazó al del 2026-10-23 (Leon): otro panel de LMV (el logo plano, con borde blanco, sobre un azul
+con brillos, en vez del logo 3D sobre fondo oscuro) que se queda más tiempo, y la barra, el título y
+el recuadro dentro de la secuencia. Abajo a la derecha (x 1457–1773, 16 px más a la derecha que el
+anterior): el panel baja girando, pasa sus brillos y se va hacia arriba; debajo crecen la barra negra
+con PREVENIDO AL BATE (en cursiva) y el recuadro azul (y 810–957, más alto que el anterior) con el
+nombre. Todo es una secuencia de PNG (un precomp de 248 frames) salvo el nombre. Claves: las del
 prevenido de LVBP-Meridiano, `jugador` (el nombre) y `titulo`, para que el controlador les mande a
-los dos la misma data; no tiene `valor` ni `publicidad` (el diseño no trae la estadística ni el
-cuadro de publicidad: el panel de LMV es fijo) ni `titulo_entrada`. El nombre arranca vacío, como en
-el bateador; el título, no: si no llega, queda PREVENIDO AL BATE. El de Meridiano recibe `titulo` con
-PREVENIDO: si el controlador le manda lo mismo acá, dice PREVENIDO.
+los dos la misma data, pero el título está en la imagen y `titulo` no hace nada (LVBP-Stats y
+cue-qs-beisbol le mandan PREVENIDO AL BATE, lo que dice la imagen). No tiene `valor` ni `publicidad`
+(el panel de LMV es fijo). El nombre arranca vacío, como en el bateador.
 
 Nombre: la inicial y el apellido, como en el de Meridiano (la misma clave y el mismo texto) y en el 3
-en línea. Al tamaño del diseño (cuerpo 45) entran unos 13 caracteres (`J. CASTILLO`, `F. RODRÍGUEZ`,
-`JOSÉ CASTILLO`); `A. MONASTERIOS` baja a 43, `AEVERSON ARTEAGA` a 36 y `ALEXANDER MONASTERIOS` a 27,
-y uno que encoge queda arriba en el recuadro (la caja de Lottie no centra en vertical). En
-mayúsculas, como en los demás. Aparece letra por letra (un animador de opacidad), del 36 al 48. El
-título encoge dentro de la barra (entran unos 18 caracteres al cuerpo del diseño).
+en línea. Al tamaño del diseño (cuerpo 35, el anterior era de 45) entran unos 16 caracteres
+(`J. CASTILLO`, `A. MONASTERIOS`); `AEVERSON ARTEAGA` baja un poco y `ALEXANDER MONASTERIOS` a
+unos 28, y uno que encoge queda arriba en el recuadro (la caja de Lottie no centra en vertical). En
+mayúsculas, como en los demás. Aparece con un fundido, del 40 al 56 (antes, letra por letra).
 
-Imágenes: el export las trae a 1920 × 1080 para un panel que ocupa 479 × 533, y `prevenido.py` las
-recorta, sin pérdida, como `tresenlinea.py` (a pantalla completa, en el 3 en línea CasparCG repetía
-frames). Arriba del panel, del 20 al 58, pasa un brillo muy tenue (alfa hasta 5 %, de la y 547 a la
-554): es del diseño.
+Imágenes: el export las trae a 1920 × 1080 (248, 3,9 MB) para algo que ocupa 316 × 483, y
+`prevenido.py` las recorta, sin pérdida, como `tresenlinea.py` (a pantalla completa, en el 3 en línea
+CasparCG repetía frames). Quedan 239 en `_assets/` (2,9 MB; las del panel anterior salen): los frames
+0–3 están vacíos y desde el 221 la secuencia está quieta.
+
+Tramado: los PNG vienen reducidos a una paleta con tramado, y cada frame se trama distinto. Con la
+caja quieta y el panel moviéndose (45–220), la barra, el título y el recuadro titilaban (cientos de
+píxeles a más de 40 niveles en el borde de las letras, y cada tanto la barra entera 29 niveles):
+`prevenido.py` pone en esos frames, debajo del panel (desde la y 758), la imagen quieta del 221. En
+la pausa queda esa imagen sola, sin titilar. El panel sí se trama distinto en cada frame, como el
+del 3 en línea: sus brillos se mueven todo el tiempo, no hay tramo quieto que congelar.
 
 Salida: el export no trae, y la entrada al revés traería de vuelta el panel. Es la entrada de la caja
-al revés, sin el panel, como en el 3 en línea: el nombre se apaga letra por letra, el recuadro se
-cierra hacia arriba, el título sale por la derecha y la barra se recoge hasta desaparecer (0,9 s).
+al revés, sin el panel, como en el 3 en línea: el nombre se apaga, el recuadro se cierra hacia arriba
+y la barra se recoge hasta desaparecer (1,1 s). Los frames de la caja (24–44) sin el panel los arma
+`prevenido.py` (`salida_<k>.png`): el panel termina en la y 757 en esos frames, y las tres filas que
+comparte con la barra van con las de la imagen quieta, al ancho de la barra.
 
-Tramo quieto: los PNG vienen reducidos a una paleta con tramado, como el Pepsi del parcial y el panel
-del 3 en línea, y cada frame se trama distinto: con el logo quieto, el panel hervía. Desde el frame
-112 de la secuencia (al aire, del 113 hasta que empieza a irse, en el 151) el logo no se mueve (medido
-con un desenfoque contra el 136: lo que cambia es el tramado; del 125 al 150 el export ya trae casi
-siempre la misma imagen), y se ve un solo PNG (`PRE_QUIETO`), como en el parcial. Antes, del 21 al
-112, el logo se acomoda y le pasa un brillo, y el tramado se ve como en el 3 en línea. Con PNG de
-color completo, `PRE_QUIETO` pasa a `null`.
+Key: con el panel, la fila donde se tocan el panel y la barra (y 755) llega al 92 % en el export:
+en el key de CasparCG quedaba una línea de 1 px de video al aire. `prevenido.py` la pone opaca donde
+tiene arriba y abajo píxeles opacos (del 24 al 220). En el key, con el panel y en la pausa, la caja
+es 255 salvo los bordes de afuera.
 
-Key: el último renglón del panel (y 755) llega al 60 %, y la barra negra, que empieza en la 755,9,
-casi no lo cubre: mientras está el panel, en el key de CasparCG quedaba una línea de 1 px de video al
-aire. La barra crece 1 px hacia arriba, por debajo del panel: cuando el panel se va, se ve 1 px más
-alta. La barra y el recuadro azul se tocan borde con borde (809,6 y 809,5): el recuadro crece 1 px
-hacia arriba, por debajo de la barra. En el key, con el panel y en la pausa, la caja es 255 salvo los
-bordes de afuera.
+En CasparCG 2.5.1 (2026-11-14, 1080p29.97, render por CPU): la entrada y la salida no repiten frames
+(grabado con `crop=320:496:1456:552`), la pausa sale como en Chromium y el `CG STOP` suelta el layer a
+los 1,25 s (en la pausa y a mitad de la entrada).
 
-En CasparCG (1080p29.97, render por CPU) la entrada no repite frames: sólo los que la secuencia trae
-iguales (del 1 al 3) y el tramo quieto con la caja completa. En la primera prueba, la primera vez que
-CasparCG abrió el gráfico, la entrada se trabó unos 6 frames donde aparece el título (el 32); no
-volvió a pasar en siete pruebas más, una recién reiniciado el server.
-
-Colores en NTSC compuesto (2026-10-23, con setup de 7,5 IRE): todo legal. Lo más alto, el brillo del
-logo de LMV (119,1 IRE en unos 110 px, del 51 al 53; fuera del brillo, hasta 111,5) y el cian del
-título (`#01D4E7`, 112,1); lo más bajo, el azul del recuadro (6,2). En HD (Rec.709), también.
+Colores en NTSC compuesto (2026-11-14, con setup de 7,5 IRE): todo legal. Lo más alto, el cian del
+título (112,1 IRE); lo más bajo, el azul del recuadro (6). En HD (Rec.709), también.
 
 **Posiciones.** La tabla de posiciones; el export es TABLA DE POSICIONES, y la carpeta, `posiciones`
 (Leon, 2026-10-24). A pantalla completa y opaca: el fondo, el título POSICIONES con el logo de ATRAPA
@@ -915,7 +913,7 @@ defensiva como `DEFENSIVA.rar` y la ofensiva como `OFENSIVA.rar` (carpetas `DEFE
 carpeta `LOWBAR BATEADOR/`, con espacio), el parcial como `FINAL_DE_INNING.zip` (carpeta `FINAL DE
 INNING/`), el lanzador como `PITCHERS.zip` (carpeta `PITCHERS/`), el 3 en línea como
 `3_EN_LINEA.zip` (carpeta `3 EN LINEA/`), los otros juegos como `OTROS_JUEGOS.zip` (carpeta `OTROS
-JUEGOS/`), el prevenido como `PREVENIDO_AL_BATE.zip` (carpeta `PREVENIDO AL BATE/`) y la tabla de
+JUEGOS/`), el prevenido como `PREVENIDO_AL_BATE.zip` (carpeta `PREVENIDO AL BATE/`; el del 2026-11-14, `PREVENODO_AL_BATE_ACTUALIZADO.zip`) y la tabla de
 posiciones como `TABLA DE POSICIONES.zip` (carpeta `TABLA DE POSICIONES/`; la sin cliente,
 `TABLA DE POSICIONES SIN CLIENTE.zip`) y el score final como
 `SCORE FINAL 1.zip` (carpeta `SCORE FINAL/`), que da los dos score final, y el duelo de lanzadores como
@@ -1348,44 +1346,36 @@ nivel), salvo el borde de abajo.
 
 **Prevenido**
 
-- **Imágenes, antes que `prep.js`:** `python3 herramientas/prevenido.py "$EXPORTS/PREVENIDO AL BATE" .`
-  recorta las 170 del export a `RECORTE` (x 1441–1920, y 547–1080: lo que tapa la secuencia en algún
-  frame; falla si algo queda afuera). `prep.js` falla si las imágenes no tienen el tamaño del recorte
-  (`PRE_RECORTE`).
-- **Clases:** `.PREVENIDO` → `jugador`; `PREVENIDO AL BATE` (sin clase) → `titulo`. El precomp `lmv
-  logo`, los nulos y las `Capa de formas` (la barra, su copia que matea el título y el recuadro)
-  quedan como vienen.
-- **Recorte:** como en el 3 en línea, cada imagen con el tamaño del recorte, y cada capa de imagen con
-  el ancla en el 0 y la posición en la esquina del recorte.
-- **Fuente:** `fPath` llega como `PREVENIDO AL BATE / FONT`: pasa a `font/LTEnergy-Regular.ttf` (el
-  mismo archivo que el del bateador).
-- **All Caps:** llega apagado: `prep.js` lo prende.
-- **Textos de caja:** ya llegan de caja, pero la del nombre llegaba a 3 px de los bordes del recuadro.
-  El nombre y el título quedan centrados donde estaban (en la x 1599,1 y la 1595,8: el título, 3,6 px a
-  la izquierda del centro de la barra, como en el diseño), con la caja hasta 8 px antes del borde más
-  cercano de su recuadro (`PRE_MARGEN`, medido con `rectangulo()`). El alto, el ascent del cuerpo
-  más 2.
-- **Tramo quieto:** desde el frame 112 de la secuencia (`PRE_QUIETO`), un solo PNG: la capa de ese
-  frame dura hasta el 150 y las de en medio salen del JSON con sus imágenes (`img_113`–`150` no se
-  usan: no pasan a `_assets/`).
-- **Key:** la barra (`Capa de formas 1`) y el recuadro (`Capa de formas 2`), 1 px más altos hacia
-  arriba (`creceRectanguloY`; ver *Key* arriba).
-- **Markers y timeline:** `START` (0–30) y `STOP` (180–210) del diseñador → `play` 0–170 (pausa en
-  el 169, el primer frame sin el panel: `PRE_PAUSA`), `salida` 170–196 y `stop` en el 0. Todo lo que no
-  es el panel suma su entrada al revés (`alReves`) desde el 170: una capa que entraba en el frame t se
-  va en el 218 − t, y el 195 (la barra sin ancho) es el primer frame vacío. El título arranca en el
-  31,0000012 (unos decimales de más, como en la secuencia) y en la entrada se ve desde el 32: en la
-  salida, hasta el 186. La entrada de la caja termina en el 48 (`PRE_ENTRADA`, el nombre): `prep.js`
-  falla si algo anima después. Las capas que arrancan en el 0 pasan al 1: el frame 0 queda vacío (la
-  secuencia trae algo en el suyo).
-- **Textos vacíos:** al final, todos salvo `titulo`.
-- **Imágenes:** las 170 del export, recortadas, en `prevenido/images/`.
+El del 2026-11-14. El zip llegó como `PREVENODO_AL_BATE_ACTUALIZADO.zip` (carpeta `PREVENODO AL BATE
+ACTUALIZADO/`): va a EXPORTS como `PREVENIDO AL BATE/`.
 
-Comparado frame a frame contra el export (con IVAN MEDINA, del 0 al 172): idéntico del 1 al 23;
-desde el 24, la fila 755 (la barra 1 px más alta, debajo del renglón al 60 % del panel) y 1 px del
-recuadro en la x 1441, el tramo quieto (114–151, en el panel) y, desde que se va el panel, la fila de
-arriba de la barra. El frame 0, vacío (el export mostraba una esquina del panel). La salida, contra
-la entrada al revés (debajo del panel): idéntica (hasta 1 nivel).
+- **Imágenes, antes que `prep.js`:** `python3 herramientas/prevenido.py "$EXPORTS/PREVENIDO AL BATE" .`
+  recorta las 248 del export a `RECORTE` (x 1457–1773, y 555–1038: lo que tapa la secuencia en algún
+  frame; falla si algo queda afuera), pone la caja quieta del 221 debajo del panel del 45 al 220
+  (`CORTE`, falla si la caja cambia de forma), cierra la fila 755 del key y arma `salida_24`…`salida_44.png`.
+  `prep.js` falla si las imágenes no tienen el tamaño del recorte (`PRE_RECORTE`).
+- **Clases:** `jackson chourio` (sin clase) → `jugador`. Las imágenes de la secuencia pierden la
+  clase `png`. No hay capa del título.
+- **Secuencia:** cada capa de imagen con el tamaño del recorte, el ancla en el 0 y la posición en la
+  esquina; los ip, sin los decimales de más (el frame k, del k al k + 1). Fuera los frames 0–3
+  (`PRE_VACIOS`, vacíos) y los del 222 al 247: el 221 (`PRE_QUIETO`) queda hasta la salida.
+- **Fuente:** `fPath` llega como `PREVENIDO AL BATE ACTUALIZADO/FONT`: pasa a
+  `font/LTEnergy-Regular.ttf` (el mismo archivo que el del bateador).
+- **All Caps:** llega prendido; `prep.js` lo deja igual.
+- **Textos de caja:** el nombre ya llega de caja (centrado, cuerpo 35, `lh` 102: va 1.2 del cuerpo).
+  Queda centrado donde estaba (x 1611,9), con la caja hasta 8 px antes del borde más cercano del
+  recuadro azul (`PRE_RECUADRO`, x 1457–1773, medido en la imagen del 221). El alto, el ascent del
+  cuerpo más 2.
+- **Markers y timeline:** `START` (0–30) y `STOP` (217–247) del diseñador → `play` 0–222 (pausa en
+  el 221, el primer frame sin el panel: `PRE_PAUSA`), `salida` 222–256 y `stop` en el 0. El nombre
+  suma su entrada al revés (`alReves`) y la caja las imágenes sin el panel: lo que la entrada muestra
+  en el frame t, la salida lo muestra en el 278 − t, y el 255 es el primer frame vacío. La entrada
+  termina en el 56 (`PRE_ENTRADA`, el fundido del nombre); la caja, en el 44 (`PRE_CAJA`).
+- **Textos vacíos:** al final, el nombre.
+
+Comparado contra el export (con JACKSON CHOURIO): el panel, idéntico; la caja, la imagen quieta
+desde el 45 (sólo cambia el tramado) y la fila 755 opaca. La salida, contra la entrada al revés:
+idéntica salvo el panel.
 
 **Posiciones**
 
@@ -1663,7 +1653,7 @@ con Playwright global, `$(npm root -g)/playwright/index.mjs`).
 |---|---|
 | `prep.js` | La receta de arriba, ejecutable: prepara el export del diseñador. Instrucciones en su encabezado |
 | `tresenlinea.py` | Las imágenes del 3 en línea: el recorte y los frames de la salida (va antes de `prep.js`) |
-| `prevenido.py` | Las imágenes del prevenido: el recorte (va antes de `prep.js`) |
+| `prevenido.py` | Las imágenes del prevenido: el recorte, la caja quieta, el key y los frames de la salida (va antes de `prep.js`) |
 | `arbitros.py` | Las imágenes de los árbitros: el recorte (va antes de `prep.js`) |
 | `consolidar.mjs` | Las imágenes de todos los gráficos, a `_assets/` (va después de `prep.js`) |
 | `shot.mjs` | Frames de un gráfico con data: `node herramientas/shot.mjs <url> <salida> '<json>' <frames> [x,y,w,h]`; `JSON=<archivo>` sirve otro data.json para comparar versiones |
