@@ -3,7 +3,7 @@
 // defensiva y la ofensiva (DEFENSIVA, OFENSIVA, 2026-10-15), del bateador (LOWBAR BATEADOR,
 // 2026-10-18), del parcial (FINAL DE INNING, 2026-10-18), del lanzador (PITCHERS, 2026-10-21), del
 // 3 en línea (3 EN LINEA, 2026-10-22), de los otros juegos (OTROS JUEGOS, 2026-10-22), del prevenido
-// (PREVENIDO AL BATE, 2026-10-23), de la tabla de posiciones (TABLA DE POSICIONES, 2026-10-22) y del
+// (PREVENIDO AL BATE, 2026-10-23; el del 2026-11-14, rehecho), de la tabla de posiciones (TABLA DE POSICIONES, 2026-10-22) y del
 // score final (SCORE FINAL, 2026-10-29), del duelo de lanzadores (DUELO DE PICHEO, 2026-11-06) y de los
 // resultados (RESULTADOS, con BARRAS PNG RESULTADOS, 2026-11-13) y de los árbitros (IDENTIFICADOR
 // UMPIRES, 2026-11-14): si
@@ -1857,36 +1857,48 @@ if (hay('OTROS JUEGOS')) {
 }
 
 // ---------------------------------------------------------------- prevenido
-// El bateador en el círculo (el export es PREVENIDO AL BATE): abajo a la derecha, un panel de LMV (una
-// secuencia de PNG: un precomp de 170 frames) gira, muestra su logo con un brillo y se va por la
-// derecha; debajo entran una barra negra con el título PREVENIDO AL BATE y el recuadro azul con el
-// nombre, que aparece letra por letra (un animador de opacidad). Las claves, las del prevenido de
-// LVBP-Meridiano: jugador (el nombre) y titulo, para que el controlador les mande a los dos la misma
-// data. Las imágenes las recorta antes herramientas/prevenido.py (PRE_RECORTE).
-const PRE_RECORTE = [1441, 547, 479, 533]; // x, y, ancho y alto en pantalla (RECORTE de prevenido.py)
-const PRE_MARGEN = 8;                  // el nombre y el título, 8 px adentro de su recuadro (centrados donde estaban)
-// Flujo: el panel entra girando (3–20), la barra crece a lo ancho (23–32), el título entra por la
-// derecha (31–39), el recuadro azul crece hacia abajo (33–45) y aparece el nombre (36–48); el panel
-// se va por la derecha (151–168) y la entrada para en el 169, sin él. El export no trae salida (su
-// STOP, 180–210, no anima nada), y la entrada al revés traería de vuelta el panel: es la entrada de la
-// barra, el título, el recuadro y el nombre al revés, sin el panel, como en el 3 en línea. Los ip de
-// la secuencia traen unos decimales de más: en el frame entero k se ve su frame k − 1.
-const PRE_PAUSA = 170;                 // play 0–170: queda en el 169, el primer frame sin el panel
-const PRE_ENTRADA = 48;                // la entrada de la caja termina en el 48 (el nombre)
-// Los PNG de la secuencia vienen reducidos a una paleta con tramado, y cada frame se trama distinto:
-// con el logo quieto, el panel hervía. En los frames 112–150 de la secuencia (al aire, del 113 al 151,
-// antes de que se vaya) el logo no se mueve (medido con desenfoque contra el 136: lo que cambia es el
-// tramado; del 125 al 150 el export ya trae casi siempre la misma imagen), y se ve un solo PNG, el
-// primero, como en el parcial. Con PNG de color completo, null.
-const PRE_QUIETO = [112, 151];
+// El bateador en el círculo (el export es PREVENIDO AL BATE; el del 2026-11-14 llegó como PREVENODO AL
+// BATE ACTUALIZADO: va a EXPORTS como PREVENIDO AL BATE/), abajo a la derecha (x 1457–1773, y 555–957):
+// un panel de LMV con su logo sobre un azul con brillos, la barra negra con PREVENIDO AL BATE y el
+// recuadro azul con el nombre. Todo es una secuencia de PNG (un precomp de 248 frames de 1920 × 1080,
+// BASE PREVENIDO) salvo el nombre. Las claves, las del prevenido de LVBP-Meridiano: jugador (el nombre)
+// y titulo; el título está en la imagen, así que titulo no hace nada (las dos apps mandan PREVENIDO AL
+// BATE, lo que dice la imagen). Las imágenes las recorta y arregla antes herramientas/prevenido.py.
+// Flujo: el panel baja girando (4–19), la barra crece a lo ancho (24–31) con el título, el recuadro azul
+// crece hacia abajo (37–44) y el nombre aparece con un fundido (40–56); el panel pasa sus brillos y se
+// va hacia arriba (216–220), y la entrada para en el 221, sin él. El export no trae salida (su STOP,
+// 217–247, no anima nada), y la entrada al revés traería de vuelta el panel: es la entrada de la caja
+// y el nombre al revés, sin el panel (salida_<k>.png, de prevenido.py), como en el 3 en línea.
+const PRE_RECORTE = [1457, 555, 316, 483]; // x, y, ancho y alto en pantalla (RECORTE de prevenido.py)
+const PRE_MARGEN = 8;                  // el nombre, 8 px adentro del recuadro azul (centrado donde estaba)
+const PRE_RECUADRO = [1457, 1773];     // el recuadro azul en pantalla (medido en la imagen del 221)
+const PRE_VACIOS = 4;                  // los frames 0–3 de la secuencia, vacíos
+const PRE_CAJA = [24, 44];             // la barra aparece en el 24 y el recuadro termina de crecer en el 44
+const PRE_QUIETO = 221;                // la primera imagen sin el panel: queda hasta la salida
+const PRE_PAUSA = 222;                 // play 0–222: queda en el 221
+const PRE_ENTRADA = 56;                // la entrada termina en el 56 (el fundido del nombre)
 if (hay('PREVENIDO AL BATE')) {
     const d = load(path.join(SRC, 'PREVENIDO AL BATE/data.json'));
-    const panel = layer(d, 'lmv logo');
-    const secuencia = d.assets.find(a => a.id === panel.refId);
-    if (!secuencia || secuencia.layers.length !== 170 || panel.st !== 0) throw new Error('lmv logo: secuencia inesperada');
+    const base = layer(d, 'BASE PREVENIDO');
+    const secuencia = d.assets.find(a => a.id === base.refId);
+    if (!secuencia || secuencia.layers.length !== 248 || base.st !== 0 || d.layers.length !== 2) throw new Error('BASE PREVENIDO: secuencia inesperada');
 
-    // ---- el recorte, como en el 3 en línea
+    // ---- el recorte, como en los árbitros; las imágenes después del 221 no se usan
     const [rx, ry, rw, rh] = PRE_RECORTE;
+    secuencia.layers.forEach((l, k) => {
+        const { a, p } = l.ks;
+        if (l.ty !== 2 || a.a || p.a || a.k[0] !== 960 || a.k[1] !== 540 || p.k[0] !== 960 || p.k[1] !== 540) throw new Error(`${l.nm}: transform inesperado`);
+        if (Math.round(l.ip) !== k || Math.round(l.op) !== k + 1) throw new Error(`${l.nm}: no es el frame ${k}`);
+        a.k = [0, 0, 0];
+        p.k = [rx, ry, 0];
+        delete l.cl;
+        // los ip traen unos decimales de más (k × 1,00000004): en el frame entero k se veía el k − 1
+        l.ip = k;
+        l.op = k + 1;
+    });
+    secuencia.layers = secuencia.layers.slice(PRE_VACIOS, PRE_QUIETO + 1);
+    const usadas = new Set(secuencia.layers.map(c => c.refId));
+    d.assets = d.assets.filter(a => a.layers || usadas.has(a.id));
     for (const a of d.assets) {
         if (!a.p) continue;
         if (a.u !== 'images/' || a.w !== 1920 || a.h !== 1080) throw new Error(`${a.p}: ${a.w} × ${a.h} en ${a.u}`);
@@ -1895,64 +1907,39 @@ if (hay('PREVENIDO AL BATE')) {
         a.w = rw;
         a.h = rh;
     }
-    for (const l of secuencia.layers) {
-        const { a, p } = l.ks;
-        if (l.ty !== 2 || a.a || p.a || a.k[0] !== 960 || a.k[1] !== 540 || p.k[0] !== 960 || p.k[1] !== 540) throw new Error(`${l.nm}: transform inesperado`);
-        a.k = [0, 0, 0];
-        p.k = [rx, ry, 0];
-    }
 
-    // ---- el tramo quieto: la capa del primer frame dura hasta el final; las otras se van, con sus imágenes
-    if (PRE_QUIETO) {
-        const capa = k => secuencia.layers.find(c => c.ip <= k + 0.5 && k + 0.5 < c.op);
-        const [k0, k1] = PRE_QUIETO;
-        const primera = capa(k0), fuera = new Set();
-        for (let k = k0 + 1; k < k1; k++) fuera.add(capa(k));
-        primera.op = capa(k1 - 1).op;
-        secuencia.layers = secuencia.layers.filter(c => !fuera.has(c));
-        const usadas = new Set(secuencia.layers.map(c => c.refId));
-        d.assets = d.assets.filter(a => usadas.has(a.id) || ![...fuera].some(c => c.refId === a.id));
-    }
+    // ---- el nombre: centrado donde lo puso el diseño, hasta PRE_MARGEN antes del borde más cercano del
+    // recuadro azul; el alto, el ascent del cuerpo más 2, y lh 1.2 del cuerpo (llegaba 102)
+    const nombre = layer(d, 'jackson chourio'), s = doc(d, 'jackson chourio');
+    if (nombre.ty !== 5 || nombre.parent || s.j !== 2 || s.s !== 35) throw new Error('jackson chourio: texto inesperado');
+    const centro = enPantalla(d, nombre, s.ps[0] + s.sz[0] / 2);
+    const [x0, x1] = PRE_RECUADRO;
+    anchoCentrado(s, (2 * Math.min(centro - x0, x1 - centro) - 2 * PRE_MARGEN) / escalaX(d, nombre));
+    s.sz[1] = +(d.fonts.list[0].ascent * s.s / 100 + 2).toFixed(2);
+    s.lh = +(1.2 * s.s).toFixed(2);
+    rename(d, 'jackson chourio', 'jugador');
 
-    // ---- los textos: centrados donde los puso el diseño, hasta PRE_MARGEN antes del borde más cercano
-    // de su recuadro (el título, de la barra negra; el nombre, del recuadro azul); el alto, el ascent
-    // del cuerpo más 2, como en el bateador
-    const barra = layer(d, 'Capa de formas 1'), caja = layer(d, 'Capa de formas 2');
-    for (const [nm, recuadro, clave] of [['PREVENIDO AL BATE', barra, 'titulo'], ['.PREVENIDO', caja, 'jugador']]) {
-        const l = layer(d, nm), s = doc(d, nm);
-        const [x0, x1] = rectangulo(d, recuadro, 0);
-        const centro = enPantalla(d, l, s.ps[0] + s.sz[0] / 2);
-        anchoCentrado(s, (2 * Math.min(centro - x0, x1 - centro) - 2 * PRE_MARGEN) / escalaX(d, l));
-        s.sz[1] = +(d.fonts.list[0].ascent * s.s / 100 + 2).toFixed(2);
-        rename(d, nm, clave);
-    }
-
-    // ---- key: el último renglón del panel (y 755) llega al 60 % y la barra negra lo cubre apenas
-    // (empieza en la 755.9): mientras está el panel quedaba una línea de video al aire. La barra crece
-    // 1 px hacia arriba, por debajo del panel. Y la barra y el recuadro azul se tocan borde con borde
-    // (809.6 y 809.5): el recuadro crece 1 px hacia arriba, por debajo de la barra.
-    creceRectanguloY(d, barra, 1, 0);
-    creceRectanguloY(d, caja, 1, 0);
-
-    // ---- timeline: los markers del diseñador (START 0–30, STOP 180–210) no sirven. La salida es la
-    // entrada de la caja al revés desde la pausa: una capa que entraba en el frame t se va en el
-    // FIN − t, del 170 (el nombre completo) al 195 (la barra sin ancho, vacío); 0,9 s.
+    // ---- timeline: los markers del diseñador (START 0–30, STOP 217–247) no sirven. La salida es la
+    // entrada de la caja y el nombre al revés desde la pausa: lo que la entrada muestra en el frame t, la
+    // salida lo muestra en el FIN − t (la caja, con las imágenes sin el panel), del 222 al 254; el 255,
+    // vacío (1,1 s).
     const FIN = PRE_PAUSA + PRE_ENTRADA;
-    const resto = d.layers.filter(l => l !== panel);
-    const tiempos = [];
-    for (const l of resto) for (const p of propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties, l.ef])) {
-        tiempos.push(p.k[0].t);
-        alReves(p, 0, PRE_ENTRADA, PRE_PAUSA);
+    const vacio = FIN - PRE_CAJA[0] + 1;
+    for (const p of propiedadesAnimadas([nombre.ks, nombre.t])) alReves(p, 0, PRE_ENTRADA, PRE_PAUSA);
+    nombre.ip = Math.max(nombre.ip, 1);
+    nombre.op = vacio + 1;
+    const quieta = secuencia.layers[secuencia.layers.length - 1];
+    quieta.op = FIN - PRE_CAJA[1];
+    let ind = Math.max(...secuencia.layers.map(c => c.ind));
+    for (let k = PRE_CAJA[1]; k >= PRE_CAJA[0]; k--) {
+        const id = `salida_${k}`;
+        d.assets.push({ id, w: rw, h: rh, u: 'images/', p: `${id}.png`, e: 0 });
+        const [w, h] = medidasPng(path.join(REPO, 'prevenido/images', `${id}.png`));
+        if (w !== rw || h !== rh) throw new Error(`${id}.png: ${w} × ${h}: correr antes herramientas/prevenido.py`);
+        secuencia.layers.push(Object.assign(clone(quieta), { ind: ++ind, nm: `${id}.png`, refId: id, ip: FIN - k, op: FIN - k + 1 }));
     }
-    const vacio = Math.ceil(FIN - Math.min(...tiempos));
-    for (const l of resto) {
-        // los mattes, con la capa que matean; un ip con decimales (el del título, 31.0000012) se ve
-        // desde el frame siguiente
-        const ref = l.td ? d.layers[d.layers.indexOf(l) + 1] : l;
-        l.op = Math.min(FIN - Math.ceil(Math.max(ref.ip, 1)) + 0.001, vacio + 1);
-    }
-    if (Math.round(panel.op) > PRE_PAUSA) throw new Error(`lmv logo: termina en el ${panel.op}, después de la pausa`);
-    for (const l of d.layers) l.ip = Math.max(l.ip, 1);
+    base.ip = 1;
+    base.op = vacio + 1;
     d.op = vacio + 1;
     d.markers = [
         { tm: 0, cm: 'play', dr: PRE_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
@@ -1961,8 +1948,7 @@ if (hay('PREVENIDO AL BATE')) {
     ];
     d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
     allCaps(d);
-    // Los textos arrancan vacíos, como en el bateador, salvo el título: si no llega, queda PREVENIDO AL BATE.
-    for (const l of d.layers) if (l.ty === 5 && l.cl && l.cl !== 'titulo') for (const k of l.t.d.k) k.s.t = '';
+    s.t = '';                          // el nombre arranca vacío, como en el bateador
     save(path.join(REPO, 'prevenido/data.json'), d);
 }
 
