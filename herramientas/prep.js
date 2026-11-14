@@ -5,14 +5,14 @@
 // 3 en línea (3 EN LINEA, 2026-10-22), de los otros juegos (OTROS JUEGOS, 2026-10-22), del prevenido
 // (PREVENIDO AL BATE, 2026-10-23; el del 2026-11-14, rehecho), de la tabla de posiciones (TABLA DE POSICIONES, 2026-10-22) y del
 // score final (SCORE FINAL, 2026-10-29), del duelo de lanzadores (DUELO DE PICHEO, 2026-11-06) y de los
-// resultados (RESULTADOS, con BARRAS PNG RESULTADOS, 2026-11-13) y de los árbitros (IDENTIFICADOR
-// UMPIRES, 2026-11-14): si
+// resultados (RESULTADOS, con BARRAS PNG RESULTADOS, 2026-11-13), de los árbitros (IDENTIFICADOR
+// UMPIRES, 2026-11-14) y de la sustitución (INSERT SUSTITUCION, 2026-11-14): si
 // el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
 //      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/,
-//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, TABLA DE POSICIONES SIN CLIENTE/, SCORE FINAL/, DUELO DE PICHEO/, RESULTADOS/ (con BARRAS PNG RESULTADOS/), IDENTIFICADOR UMPIRES/. Los que no estén se saltean: alcanza con el zip que
+//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, TABLA DE POSICIONES SIN CLIENTE/, SCORE FINAL/, DUELO DE PICHEO/, RESULTADOS/ (con BARRAS PNG RESULTADOS/), IDENTIFICADOR UMPIRES/, INSERT SUSTITUCION/. Los que no estén se saltean: alcanza con el zip que
 //      llegó. El parcial sin publicidad no tiene export: sale del parcial preparado, y se arma siempre.
 //   2. Las imágenes de cada export que llegó, a <gráfico>/images/ (se copian tal cual; consolidar.mjs
 //      las pasa después a _assets/ y borra la carpeta). Si llegó el 3 EN LINEA: python3
@@ -2855,4 +2855,108 @@ if (hay('IDENTIFICADOR UMPIRES')) {
     // los nombres arrancan vacíos, como en el bateador; los rótulos quedan (HOME, 1B, 2B, 3B)
     for (const l of textos) if (/^UMPIRE/.test(l.cl)) for (const k of l.t.d.k) k.s.t = '';
     save(path.join(REPO, 'arbitros/data.json'), d);
+}
+
+// ---------------------------------------------------------------- sustitución
+// El cambio de un jugador (el export es INSERT SUSTITUCION, 2026-11-14), abajo a la izquierda (x 0–988,
+// y 717–965): la caja azul con el logo de ATRAPA LA EMOCIÓN y, a su derecha, la barra del equipo con el
+// nombre y el apellido (dos líneas), el número en un recuadro negro y, debajo, una barra gris con una
+// línea de texto libre. Las claves: nombre y apellido (las del lanzador de este repo), numerouniforme y
+// texto (la línea libre de bateador_informacion de LVBP-Meridiano, la que lleva CORREDOR EMERGENTE) y
+// <SIGLAS>_opacidad (el equipo, como en el bateador).
+// Las barras: el export trae una sola (BARRA_MAGALLANES_VISITA_1.png, que es la de Tigres en azul) y las
+// otras siete ocultas en AE (los ind salteados), cada una con su matte (Shape Layer 1–7, las ocho
+// iguales). Van las ocho de la visita de los resultados (Tigres en rojo, como en el score), apiladas y
+// visibles al arrancar, como en el score: el controlador manda 1 a la que va y 0 a las otras siete.
+// Arriba, Magallanes. Cada una alineada a la derecha de lo que se ve, como la del diseño, y su máscara
+// corrida lo mismo.
+// Flujo: la caja entra del 7 al 28 (se ve desde el 12), la barra del 18 al 38, el gris y el recuadro del
+// número del 30 al 48, y los textos aparecen del 27 al 55. El STOP del export (119–149) no anima: la
+// salida es la entrada al revés (1,5 s, sin los frames vacíos del principio).
+const SUS_PAUSA = 56;                  // play 0–56: queda en el 55
+const SUS_ENTRADA = 55;                // la entrada termina en el 55 (el texto)
+const SUS_VACIOS = 11;                 // del 0 al 11 no se ve nada
+const SUS_MARGEN = 8;
+const SUS_NOMBRE_HASTA = 814;          // el recuadro negro del número, en la fila de arriba del nombre (y 744; va en diagonal)
+const SUS_TEXTO_HASTA = 968;           // el final de la barra gris en la fila de arriba del texto (y 875)
+if (hay('INSERT SUSTITUCION')) {
+    const d = load(path.join(SRC, 'INSERT SUSTITUCION/data.json'));
+    if (d.layers.some(l => l.ty === 0) || d.assets.some(a => a.layers)) throw new Error('sustitución: precomps inesperados');
+
+    // ---- textos
+    const nombre = rename(d, '.NOMBRE', 'nombre'), apellido = rename(d, '. APELLIDO', 'apellido');
+    rename(d, '.NUMEROJUGADOR', 'numerouniforme');
+    const texto = rename(d, 'INFORMACION DEL PELOTERO', 'texto');
+    const sn = doc(d, '.nombre'), sa = doc(d, '.apellido'), st = doc(d, '.texto');
+    for (const s of [sn, sa, st]) if (s.j !== 0 || s.s !== 45) throw new Error('sustitución: texto inesperado');
+    // NOMBRE llega con un salto de línea al final y APELLIDO con dos espacios adelante: salen, y el
+    // apellido empieza donde el nombre
+    sn.t = sn.t.trim();
+    sa.t = sa.t.trim();
+    const x0 = enPantalla(d, nombre, sn.ps[0]);
+    sa.ps[0] = (x0 - enPantalla(d, apellido, 0)) / escalaX(d, apellido);
+    for (const [l, s] of [[nombre, sn], [apellido, sa]]) s.sz[0] = (SUS_NOMBRE_HASTA - SUS_MARGEN - x0) / escalaX(d, l);
+    st.sz[0] = (SUS_TEXTO_HASTA - SUS_MARGEN - enPantalla(d, texto, st.ps[0])) / escalaX(d, texto);
+    for (const l of d.layers) if (l.ty === 5) for (const k of l.t.d.k) {
+        if (!k.s.sz) throw new Error(`${l.nm}: no es de caja`);
+        k.s.lh = +(1.2 * k.s.s).toFixed(2);
+        k.s.sz[1] = +(d.fonts.list[0].ascent * k.s.s / 100 + 2).toFixed(2);
+    }
+
+    // ---- las barras
+    const barra = layer(d, '.BARRA_MAGALLANES_VISITA_1.png 8');
+    const matte = d.layers[d.layers.indexOf(barra) - 1];
+    const a0 = d.assets.find(a => a.id === barra.refId);
+    if (matte.nm !== 'Shape Layer 8' || !matte.td || barra.tp !== matte.ind || a0.w !== 405 || a0.h !== 99 || barra.ks.a.k[0] !== 256 || barra.masksProperties.length !== 1) throw new Error('sustitución: barra inesperada');
+    const sobran = d.layers.filter(l => /^Shape Layer [1-7]$/.test(l.nm));
+    if (sobran.length !== 7 || sobran.some(l => !l.td || JSON.stringify(l.shapes) !== JSON.stringify(matte.shapes))) throw new Error('sustitución: mattes inesperados');
+    const res = load(path.join(REPO, 'resultados/data.json'));
+    let ind = Math.max(...d.layers.map(l => l.ind));
+    const orden = ['MAGA', ...Object.values(SIGLAS).filter(s => s !== 'MAGA')];
+    const nuevas = [], assets = [];
+    for (const s of orden) {
+        const r = res.layers.find(l => l.cl === `${s}VISITA1_opacidad`);
+        const im = imagenDe('resultados', res.assets.find(a => a.id === r.refId));
+        const id = `image_barra_${s}`;
+        assets.push(Object.assign({ id }, im));
+        const m = clone(matte), b = clone(barra), dx = im.w - a0.w;
+        m.ind = ++ind;
+        b.ind = ++ind;
+        b.tp = m.ind;
+        b.nm = `.${s}_opacidad`;
+        b.cl = `${s}_opacidad`;
+        b.refId = id;
+        b.ks.a.k = [256 + dx, 62 + (im.h - a0.h) / 2, 0];
+        // la máscara, en el mismo lugar de la pantalla que la del diseño: una barra de 100 px de alto no asoma
+        // debajo de la de arriba de la pila
+        for (const v of b.masksProperties[0].pt.k.v) { v[0] += dx; v[1] += (im.h - a0.h) / 2; }
+        nuevas.push(m, b);
+    }
+    d.layers.splice(d.layers.indexOf(matte), 2, ...nuevas);
+    d.layers = d.layers.filter(l => !sobran.includes(l));
+    d.assets = d.assets.filter(a => a.id !== a0.id).concat(assets);
+    for (const nm of ['LOGO FINAL ATRAPA LA EMOCION.png', 'base azul.png', 'TEXTURA BASE_.png']) delete layer(d, nm).cl;
+
+    // ---- timeline: la salida es la entrada al revés desde la pausa (lo que la entrada muestra en el
+    // frame t, la salida lo muestra en el FIN − t), hasta el primer frame vacío
+    const FIN = SUS_PAUSA + SUS_ENTRADA, vacio = FIN - SUS_VACIOS;
+    for (const l of d.layers) {
+        const ps = propiedadesAnimadas([l.ks, l.shapes, l.t, l.masksProperties]);
+        for (const p of ps) {
+            if (Math.max(...p.k.map(k => k.t)) > SUS_ENTRADA + 0.5) throw new Error(`${l.nm}: anima después de SUS_ENTRADA`);
+            alReves(p, 0, SUS_ENTRADA, SUS_PAUSA);
+        }
+        l.ip = Math.max(l.ip, 1);
+        l.op = Math.min(FIN - l.ip + 1, vacio + 1);
+    }
+    d.op = vacio + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: SUS_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: SUS_PAUSA, cm: 'salida', dr: vacio + 1 - SUS_PAUSA }
+    ];
+    d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
+    allCaps(d);
+    vaciaTextos(d);
+    save(path.join(REPO, 'sustitucion/data.json'), d);
 }
