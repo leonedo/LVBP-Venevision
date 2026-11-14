@@ -5,19 +5,21 @@
 // 3 en línea (3 EN LINEA, 2026-10-22), de los otros juegos (OTROS JUEGOS, 2026-10-22), del prevenido
 // (PREVENIDO AL BATE, 2026-10-23), de la tabla de posiciones (TABLA DE POSICIONES, 2026-10-22) y del
 // score final (SCORE FINAL, 2026-10-29), del duelo de lanzadores (DUELO DE PICHEO, 2026-11-06) y de los
-// resultados (RESULTADOS, con BARRAS PNG RESULTADOS, 2026-11-13): si
+// resultados (RESULTADOS, con BARRAS PNG RESULTADOS, 2026-11-13) y de los árbitros (IDENTIFICADOR
+// UMPIRES, 2026-11-14): si
 // el diseñador cambia nombres de capas, falla diciendo cuál no encuentra (no adivina).
 //
 // Uso, desde la raíz del repo:
 //   1. Descomprimir los zips del diseñador en una carpeta (EXPORTS): SCOREBUG/, DEFENSIVA/,
 //      OFENSIVA/, LOWBAR BATEADOR/, FINAL DE INNING/, PITCHERS/, 3 EN LINEA/, OTROS JUEGOS/,
-//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, TABLA DE POSICIONES SIN CLIENTE/, SCORE FINAL/, DUELO DE PICHEO/, RESULTADOS/ (con BARRAS PNG RESULTADOS/). Los que no estén se saltean: alcanza con el zip que
+//      PREVENIDO AL BATE/, TABLA DE POSICIONES/, TABLA DE POSICIONES SIN CLIENTE/, SCORE FINAL/, DUELO DE PICHEO/, RESULTADOS/ (con BARRAS PNG RESULTADOS/), IDENTIFICADOR UMPIRES/. Los que no estén se saltean: alcanza con el zip que
 //      llegó. El parcial sin publicidad no tiene export: sale del parcial preparado, y se arma siempre.
 //   2. Las imágenes de cada export que llegó, a <gráfico>/images/ (se copian tal cual; consolidar.mjs
 //      las pasa después a _assets/ y borra la carpeta). Si llegó el 3 EN LINEA: python3
 //      herramientas/tresenlinea.py "$EXPORTS/3 EN LINEA" . (sus imágenes: el recorte y los frames de
 //      la salida). Si llegó el PREVENIDO AL BATE: python3 herramientas/prevenido.py "$EXPORTS/PREVENIDO
-//      AL BATE" . (el recorte de sus imágenes).
+//      AL BATE" . (el recorte de sus imágenes). Si llegó el IDENTIFICADOR UMPIRES: python3
+//      herramientas/arbitros.py "$EXPORTS/IDENTIFICADOR UMPIRES" . (el recorte de sus imágenes).
 //   3. node herramientas/prep.js $EXPORTS .
 //   4. node herramientas/consolidar.mjs (las imágenes, a _assets/).
 //   5. git diff, herramientas/lint.py y QA con el runtime real (CLAUDE.md).
@@ -2737,4 +2739,134 @@ if (hay('RESULTADOS')) {
     // los textos arrancan vacíos, salvo el título: si no llega, queda RESULTADOS
     for (const l of d.layers) if (l.ty === 5 && l.cl && l.cl !== 'titulo') for (const k of l.t.d.k) k.s.t = '';
     save(path.join(REPO, 'resultados/data.json'), d);
+}
+
+// ---------------------------------------------------------------- árbitros
+// Los cuatro árbitros (el export es IDENTIFICADOR UMPIRES), abajo a la izquierda (x 0–853, y 321–977):
+// la barra de UMPIRES (con el guante) y un panel gris con cuatro barras azules, cada una con el nombre
+// (blanco) y la posición (cian). Todo es una secuencia de PNG (un precomp de 151 frames de 1920 ×
+// 1080, BASE UMPIRES) salvo los ocho textos. Las claves, las del gráfico de árbitros de LVBP-Meridiano,
+// que son las de IVC: UMPIREHOME, UMPIREPRIMERA, UMPIRESEGUNDA y UMPIRETERCERA, de arriba abajo, y los
+// rótulos rotulohome… (HOME, 1B, 2B, 3B). UMPIRES está en la imagen: no hay titulo.
+// Flujo: la barra de UMPIRES entra del 5 al 17, el panel del 13 al 24 y las barras azules del 25 al 41;
+// los textos aparecen letra por letra, una fila detrás de la otra (31–49). El export no trae salida
+// (ni markers): es la entrada al revés (1,5 s).
+const ARB_RECORTE = [0, 321, 853, 656]; // x, y, ancho y alto en pantalla (RECORTE de arbitros.py)
+const ARB_PAUSA = 50;                  // play 0–50: queda en el 49
+const ARB_ENTRADA = 49;                // la entrada termina en el 49 (el nombre de la fila 4)
+const ARB_MARGEN = 8;                  // las cajas, 8 px antes del borde de su barra o del texto vecino
+// Los PNG vienen reducidos a una paleta de 54 colores con tramado, y cada frame se trama distinto:
+// desde el 41 la secuencia está quieta (medido con desenfoque contra el 150: lo que cambia es el
+// tramado, en el borde del panel y en el gris de la izquierda) y queda una sola imagen, la del 41, hasta
+// el final. Del 0 al 4, vacíos: salen. Quedan 37 de 151.
+const ARB_QUIETO = 41;
+const ARB_VACIOS = 5;                  // los frames 0–4 de la secuencia, vacíos
+// Las barras azules, en px de pantalla (medidas en la imagen del 41, en las filas de cada barra: el
+// borde izquierdo más a la derecha y el derecho más a la izquierda; van en diagonal).
+const ARB_BARRAS = [[142, 710], [158, 729], [178, 749], [197, 768]];
+// Las filas, de arriba abajo: el nm del nombre y de la posición, y sus claves.
+const ARB_FILAS = [['PRINCIPAL', 'UMPIREHOME', 'rotulohome', 'HOME'], ['PRIMERA', 'UMPIREPRIMERA', 'rotuloprimera', '1B'],
+    ['SEGUNDA', 'UMPIRESEGUNDA', 'rotulosegunda', '2B'], ['TERCERA', 'UMPIRETERCERA', 'rotulotercera', '3B']];
+const ARB_LW_NOMBRE = 333.26015625;    // el ancho de NOMBRE APELLIDO con la fuente cargada
+const ARB_LW_HOME = 103.55625;         // el de HOME, el rótulo más ancho
+const ARB_LW_ESPACIOS = 18;            // los dos espacios de "  POS" (la fila 1): 89.69 contra 71.69
+if (hay('IDENTIFICADOR UMPIRES')) {
+    const d = load(path.join(SRC, 'IDENTIFICADOR UMPIRES/data.json'));
+    const base = layer(d, 'BASE UMPIRES');
+    const secuencia = d.assets.find(a => a.id === base.refId);
+    if (!secuencia || secuencia.layers.length !== 151 || base.st !== 0 || d.layers.length !== 9) throw new Error('BASE UMPIRES: secuencia inesperada');
+
+    // ---- el recorte, como en el prevenido
+    const [rx, ry, rw, rh] = ARB_RECORTE;
+    for (const a of d.assets) {
+        if (!a.p) continue;
+        if (a.u !== 'images/' || a.w !== 1920 || a.h !== 1080) throw new Error(`${a.p}: ${a.w} × ${a.h} en ${a.u}`);
+        const [w, h] = medidasPng(path.join(REPO, 'arbitros/images', a.p));
+        if (w !== rw || h !== rh) throw new Error(`${a.p}: ${w} × ${h}: correr antes herramientas/arbitros.py`);
+        a.w = rw;
+        a.h = rh;
+    }
+    secuencia.layers.forEach((l, k) => {
+        const { a, p } = l.ks;
+        if (l.ty !== 2 || a.a || p.a || a.k[0] !== 960 || a.k[1] !== 540 || p.k[0] !== 960 || p.k[1] !== 540) throw new Error(`${l.nm}: transform inesperado`);
+        if (Math.round(l.ip) !== k || Math.round(l.op) !== k + 1) throw new Error(`${l.nm}: no es el frame ${k}`);
+        a.k = [0, 0, 0];
+        p.k = [rx, ry, 0];
+        delete l.cl;                   // clase png: no es una clave
+        // los ip traen unos decimales de más (k × 1,00000004): en el frame entero k se veía el k − 1, un
+        // frame después que los textos y que en AE
+        l.ip = k;
+        l.op = k + 1;
+    });
+
+    // ---- el tramo quieto y los vacíos: quedan los frames 5–41, y el 41 hasta el final
+    secuencia.layers = secuencia.layers.slice(ARB_VACIOS, ARB_QUIETO + 1);
+    const usadas = new Set(secuencia.layers.map(c => c.refId));
+    d.assets = d.assets.filter(a => a.layers || usadas.has(a.id));
+
+    // ---- los textos
+    const cian = doc(d, '.POS PRIMERA').fc;
+    ARB_FILAS.forEach(([fila, clave, rotulo, texto], i) => {
+        const [x0, x1] = ARB_BARRAS[i];
+        const n = layer(d, '.' + fila), sn = doc(d, '.' + fila);
+        const r = layer(d, '.POS ' + fila), sr = doc(d, '.POS ' + fila);
+        for (const s of [sn, sr]) {
+            if (s.j !== 2 || s.s !== 45) throw new Error(`${fila}: texto inesperado`);
+            s.t = s.t.trim();
+            s.lh = +(1.2 * s.s).toFixed(2);
+            s.sz[1] = +(d.fonts.list[0].ascent * s.s / 100 + 2).toFixed(2);
+        }
+        // la posición, centrada donde se ve en el diseño (la de la fila 1 llegaba con dos espacios
+        // adelante: su caja va corrida su ancho), hasta ARB_MARGEN antes del final de la barra o del nombre
+        let centro = enPantalla(d, r, sr.ps[0] + sr.sz[0] / 2);
+        if (fila === 'PRINCIPAL') {
+            sr.ps[0] += ARB_LW_ESPACIOS / 2;
+            centro += ARB_LW_ESPACIOS / 2;
+        }
+        // el nombre, alineado a la derecha donde termina el del diseño (centrado: queda en el mismo
+        // píxel), desde ARB_MARGEN después del borde izquierdo de la barra
+        const fin = enPantalla(d, n, sn.ps[0] + sn.sz[0] / 2) + ARB_LW_NOMBRE / 2;
+        if (centro - ARB_LW_HOME / 2 - fin < ARB_MARGEN) throw new Error(`${fila}: HOME no entra entre el nombre y la barra`);
+        anchoCentrado(sr, 2 * Math.min(x1 - centro, centro - fin) - 2 * ARB_MARGEN);
+        sr.t = texto;
+        sr.fc = clone(cian);                // la de la fila 1 llegaba blanca
+        const desde = x0 + ARB_MARGEN;
+        sn.sz[0] = (fin - desde) / escalaX(d, n);
+        sn.ps[0] = (desde - enPantalla(d, n, 0)) / escalaX(d, n);
+        sn.j = 1;
+        rename(d, '.' + fila, clave);
+        rename(d, '.POS ' + fila, rotulo);
+    });
+
+    // ---- timeline: sin markers en el export. La salida es la entrada al revés desde la pausa: lo que la
+    // entrada muestra en el frame t, la salida lo muestra en el FIN − t; la secuencia, con sus frames
+    // al revés en el precomp (la imagen k, del FIN − k al FIN − k + 1)
+    const FIN = ARB_PAUSA + ARB_ENTRADA;
+    const vacio = FIN - ARB_VACIOS + 1;      // el primer frame vacío de la salida
+    const textos = d.layers.filter(l => l !== base);
+    for (const l of textos) {
+        if (l.ty !== 5 || l.parent || propiedadesAnimadas([l.ks]).length) throw new Error(`${l.nm}: capa inesperada`);
+        for (const p of propiedadesAnimadas([l.t])) alReves(p, 0, ARB_ENTRADA, ARB_PAUSA);
+        l.ip = Math.max(l.ip, 1);
+        l.op = vacio + 1;
+    }
+    let ind = Math.max(...secuencia.layers.map(c => c.ind));
+    const vuelta = [];
+    for (const c of secuencia.layers) {
+        if (c.ip === ARB_QUIETO) { c.op = FIN - ARB_QUIETO + 1; continue; }
+        vuelta.push(Object.assign(clone(c), { ind: ++ind, ip: FIN - c.ip, op: FIN - c.ip + 1 }));
+    }
+    secuencia.layers.push(...vuelta);
+    base.op = vacio + 1;
+    d.op = vacio + 1;
+    d.markers = [
+        { tm: 0, cm: 'play', dr: ARB_PAUSA, payload: { name: 'play', type: 'pause', order: 1, stop: 'salida' } },
+        { tm: 0, cm: 'stop', dr: 1 },
+        { tm: ARB_PAUSA, cm: 'salida', dr: vacio + 1 - ARB_PAUSA }
+    ];
+    d.fonts.list[0].fPath = 'font/LTEnergy-Regular.ttf';
+    allCaps(d);
+    // los nombres arrancan vacíos, como en el bateador; los rótulos quedan (HOME, 1B, 2B, 3B)
+    for (const l of textos) if (/^UMPIRE/.test(l.cl)) for (const k of l.t.d.k) k.s.t = '';
+    save(path.join(REPO, 'arbitros/data.json'), d);
 }
