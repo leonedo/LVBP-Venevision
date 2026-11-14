@@ -6,9 +6,9 @@ Base de templates HTML para gráficos Lottie en CasparCG (webcg-framework).
 
 Gráficos de la LVBP para Venevisión. Repo público, armado el 2026-10-13 desde HTML-templates
 (c759d52) con los arreglos generales de `index.js` que tenía LVBP-Meridiano (ver *Modelo del
-proyecto*). Diecisiete gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
+proyecto*). Dieciocho gráficos, en LT Energy: el score y el parcial (con y sin publicidad) con `font/LTEnergyVFVF.ttf` (fuente
 variable con un solo eje, `ital`, que por defecto es la Regular) y la defensiva, la ofensiva, el
-bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones (con y sin cliente), el score final (con y sin publicidad), el duelo de lanzadores, los resultados y los árbitros con `font/LTEnergy-Regular.ttf`,
+bateador, el lanzador, el 3 en línea, los otros juegos, el prevenido, la tabla de posiciones (con y sin cliente), el score final (con y sin publicidad), el duelo de lanzadores, los resultados, los árbitros y la sustitución con `font/LTEnergy-Regular.ttf`,
 la estática que mandó el diseñador con sus primeros exports (los del 2026-10-18 traen la variable:
 mide igual, y en el render difiere en el suavizado de algunos bordes de letra; los del 3 en línea y
 los otros juegos y la tabla de posiciones, del 2026-10-22, y el del prevenido, del 2026-10-23, el del score final, del 2026-10-29, el del duelo de lanzadores, del 2026-11-06, y el de los árbitros y el del prevenido actualizado, del 2026-11-14, otra vez la estática). Los otros juegos y los resultados llevan además Chakra Petch Bold
@@ -36,6 +36,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 | `duelo_lanzadores/` | El duelo de lanzadores (el export es DUELO DE PICHEO; el título, DUELO DE HOY), a pantalla completa y opaco: el fondo azul de ATRAPA LA EMOCIÓN; a cada lado, el panel del equipo con la foto del lanzador delante (`fotolanzadorvisita` / `fotolanzadorlocal`, imágenes) y abajo la barra con el nombre y el número; al centro, el logo, el título y 7 estadísticas (la visita a la izquierda, los rótulos al medio, la local a la derecha). El frame 0 está vacío | stage `play` pause (0–53): las fotos entran de los lados del 0 al 15, el logo crece del 8 al 18, el título aparece letra por letra del 10 al 30, las barras entran del 17 al 37, las estadísticas bajan fila por fila del 22 al 52 y los nombres del 43 al 49; el zoom del fondo (CSS) sigue en la pausa | `salida`: la entrada al revés (1,8 s), con el fondo alejándose |
 | `resultados/` | Los resultados finales de los otros juegos (el export es RESULTADOS), a pantalla completa y opaco: el fondo de la LVBP (con un zoom lento por CSS), el panel azul y, encima, RESULTADOS y hasta tres juegos, cada uno con la barra de la visita (escudo y nombre), las dos carreras en cuadros negros y la barra de la local; arriba, el cuadro del patrocinante (`publicidad`, una imagen: Tu Azar.com) entra y se cierra, y queda el logo de ATRAPA LA EMOCIÓN. Sin inning (a diferencia de los otros juegos). El frame 0 está vacío | `play` lo pone al aire vacío (pausa en el 0); el controlador elige con un `goto`: `tresjuegos` (100–445), `dosjuegos` (600–945) o `unjuego` (1100–1445). En cada uno, desde el `goto`: el panel y el título entran, los juegos del 23 al 77, el patrocinante se cierra del 247 al 269, el logo entra del 273 al 293 y su brillo pasa del 307 al 345 (pausa a los 11,5 s) | `salida`, `salida2`, `salida1`: el logo, su entrada al revés, y después los juegos y el panel (3,2 s) |
 | `arbitros/` | Los cuatro árbitros (el export es IDENTIFICADOR UMPIRES), abajo a la izquierda (x 0–853, y 321–977): la barra de UMPIRES con el guante (en la imagen, sin clave) y un panel gris con cuatro barras azules, cada una con el nombre (blanco) y la posición (cian). Todo es una secuencia de PNG salvo los textos. Claves de IVC, como el de Meridiano. El frame 0 está vacío | stage `play` pause (0–50): la barra entra del 5 al 17, el panel del 13 al 24, las barras azules del 25 al 41 y los textos, letra por letra, del 31 al 49 | `salida`: la entrada al revés (1,5 s) |
+| `sustitucion/` | El cambio de un jugador (el export es INSERT SUSTITUCION), una barra baja abajo a la izquierda (x 0–988, y 699–965): la caja azul con el logo de ATRAPA LA EMOCIÓN, la barra del equipo con el nombre y el apellido (dos líneas) y el número en un recuadro negro, y debajo una barra gris con una línea libre (`texto`). El frame 0 está vacío | stage `play` pause (0–56): la caja entra del 7 al 28 (se ve desde el 12), la barra del 18 al 38, el gris y el número del 30 al 48 y los textos del 27 al 55 | `salida`: la entrada al revés (1,5 s) |
 
 Cómo se ve, en [capturas/](capturas/): `score.png` (pantalla completa con data de ejemplo y la barra
 arriba), `score_marcador.png` (sin la barra), del 2026-10-24, y `score_equipos.png` (los 56 cruces
@@ -64,7 +65,7 @@ y `scorefinal_equipos.png` (los 56 cruces `visita_vs_local`, recortado al gráfi
 Pepsi en la caja de la derecha; `duelo_lanzadores.png` (pantalla completa con el ejemplo de su `data.md`
 y las fotos del diseño, en la pausa), `duelo_lanzadores_equipos.png` (8 casos que ponen cada equipo de
 cada lado, sin fotos) y `duelo_lanzadores_variantes.png` (nombres y valores largos y en minúsculas, sin
-foto y con una ruta que no carga, fotos de otra proporción y sin data), del 2026-11-06. `resultados.png` (pantalla completa, tres juegos, en la pausa), `resultados_juegos.png` (3, 2 y 1 juegos, dos combinaciones de cada uno), `resultados_equipos.png` (8 casos que ponen cada equipo en las 6 barras, recortado al bloque) y `resultados_variantes.png` (minúsculas, nombres largos, `100`, sin data y la publicidad: Tu Azar, otra imagen, `""` y una ruta que no carga), del 2026-11-13. `arbitros.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa) y `arbitros_variantes.png` (minúsculas, nombres de 19 letras, un nombre largo, `""`, otros rótulos y sin data), del 2026-11-14. Si un gráfico cambia, hay que
+foto y con una ruta que no carga, fotos de otra proporción y sin data), del 2026-11-06. `resultados.png` (pantalla completa, tres juegos, en la pausa), `resultados_juegos.png` (3, 2 y 1 juegos, dos combinaciones de cada uno), `resultados_equipos.png` (8 casos que ponen cada equipo en las 6 barras, recortado al bloque) y `resultados_variantes.png` (minúsculas, nombres largos, `100`, sin data y la publicidad: Tu Azar, otra imagen, `""` y una ruta que no carga), del 2026-11-13. `arbitros.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa) y `arbitros_variantes.png` (minúsculas, nombres de 19 letras, un nombre largo, `""`, otros rótulos y sin data), del 2026-11-14. `sustitucion.png` (pantalla completa con el ejemplo de su `data.md`, en la pausa), `sustitucion_equipos.png` (los 8 equipos, recortado al gráfico) y `sustitucion_variantes.png` (textos largos, minúsculas, `100`, `""` y sin data), del 2026-11-14. Si un gráfico cambia, hay que
 regenerarlas (las de Leones, con el ejemplo de su `data.md`, en el último frame de la entrada). No
 entran al zip (`.gitattributes`).
 
@@ -874,6 +875,42 @@ el panel y en la barra, la entrada y la salida no repiten frames (grabado con `c
 el `CG STOP` suelta el layer a los 1,7 s (en la pausa y a mitad de la entrada). CasparCG usa 1,1 a 1,3
 núcleos durante la entrada.
 
+**Sustitución.** El cambio de un jugador; el export es INSERT SUSTITUCION (2026-11-14), y la carpeta,
+`sustitucion`. Gráfico nuevo. Abajo a la izquierda (x 0–988, y 699–965): la caja azul con el logo de
+ATRAPA LA EMOCIÓN (con su sombra blanca), y a su derecha la barra del equipo con el nombre y el
+apellido en dos líneas y el número en un recuadro negro; debajo, una barra gris con una línea libre.
+Claves: `nombre` y `apellido` (las del lanzador de este repo), `numerouniforme` (la del bateador y el
+lanzador), `texto` (la línea libre de `bateador_informacion` de LVBP-Meridiano, la que allá lleva
+CORREDOR EMERGENTE: ENTRA POR J. CASTILLO, NUEVO LANZADOR…) y `<SIGLAS>_opacidad`, las del bateador.
+Los textos arrancan vacíos, como en el bateador.
+
+Barras: el export trae una sola (`BARRA_MAGALLANES_VISITA_1.png`, que es la de Tigres en azul) y las
+otras siete ocultas en AE (los `ind` salteados), cada una con su matte. Van las ocho de la visita de
+los resultados (las mismas imágenes de `_assets/`, Tigres en rojo), apiladas y visibles al arrancar,
+como en el score: el controlador manda `1` a la que va y `0` a las otras siete. Sin data, Magallanes.
+Cada una alineada a la derecha de lo que se ve, como la del diseño, con la máscara del diseño en el
+mismo lugar de la pantalla (una de 100 px de alto no asoma debajo de la de arriba). Sin data, por el
+suavizado del borde de abajo asoma 1 px de la barra de debajo: con los otros siete en `0`, no.
+
+Textos: en mayúsculas. El nombre y el apellido, alineados a la izquierda donde empieza el NOMBRE del
+diseño (el APELLIDO llegaba con dos espacios adelante y el NOMBRE con un salto de línea al final,
+que salen), hasta 8 px antes del recuadro negro del número (que va en diagonal: en la fila de arriba
+del nombre): entran unas 11 letras por línea (`MONASTERIOS`), y cada línea encoge por su lado. El
+número, centrado en su recuadro: entran 2 cifras, `100` encoge un poco. La línea libre, desde donde
+empieza hasta 8 px antes del final de la barra gris: unos 33 caracteres (`ENTRA A JUGAR EL JARDÍN
+IZQUIERDO`).
+
+Salida: el export no trae (su `STOP`, 119–149, no anima): es la entrada al revés, hasta el primer
+frame vacío (del 0 al 11 no se ve nada): 1,5 s.
+
+Imágenes: cuatro, chicas (184 KB el zip entero), nada que optimizar.
+
+En CasparCG 2.5.1 (2026-11-14, 1080p29.97, por CPU): la pausa sale como en Chromium; la entrada y la
+salida no repiten frames (grabado con `crop=1008:288:0:688`, dos veces; en la primera carga en frío,
+uno en la entrada), y el `CG STOP` suelta el layer a los 1,65 s. El key es 255 en todo el gráfico salvo
+los bordes de afuera, la sombra del borde de arriba de la raya plateada (del diseño) y unos píxeles de
+la textura gris al 96 %.
+
 ### Imágenes: `_assets/`
 
 Las imágenes de todos los gráficos van juntas en `_assets/`, una vez cada una, con el sha1 de su
@@ -918,8 +955,8 @@ posiciones como `TABLA DE POSICIONES.zip` (carpeta `TABLA DE POSICIONES/`; la si
 `TABLA DE POSICIONES SIN CLIENTE.zip`) y el score final como
 `SCORE FINAL 1.zip` (carpeta `SCORE FINAL/`), que da los dos score final, y el duelo de lanzadores como
 `DUELO DE PICHEO.zip` (carpeta `DUELO DE PICHEO/`), y los resultados como `RESULTADOS.zip` (carpeta
-`RESULTADOS/`), con las barras en `BARRAS PNG RESULTADOS.zip`, y los árbitros como `IDENTIFICADOR UMPIRES.zip` (carpeta `IDENTIFICADOR UMPIRES/`); el parcial sin publicidad
-no tiene export, sale del parcial. La receta de los dieciséis es `herramientas/prep.js`, que prepara los
+`RESULTADOS/`), con las barras en `BARRAS PNG RESULTADOS.zip`, y los árbitros como `IDENTIFICADOR UMPIRES.zip` (carpeta `IDENTIFICADOR UMPIRES/`), y la sustitución como `INSERT SUSTITUCION.zip` (carpeta `INSERT SUSTITUCION/`); el parcial sin publicidad
+no tiene export, sale del parcial. La receta de los diecisiete es `herramientas/prep.js`, que prepara los
 que encuentre, y el parcial sin publicidad siempre (las imágenes del 3 en línea, del prevenido y de los árbitros,
 antes, `herramientas/tresenlinea.py`, `herramientas/prevenido.py` y `herramientas/arbitros.py`): buscar las capas por `nm` (los
 índices cambian) y comparar contra `git show HEAD:<gráfico>/data.json`. Las imágenes del export van
@@ -1574,6 +1611,28 @@ Comparado frame a frame: la salida, contra la entrada al revés, idéntica (0 ni
 Comparado contra el export (con NOMBRE APELLIDO y POS): los textos, en el mismo píxel en las cuatro
 filas; la secuencia, un frame antes (los ip) y quieta desde el 41. La salida, contra la entrada al
 revés: idéntica.
+
+**Sustitución**
+
+- **Clases:** `.NOMBRE   ` → `nombre`, `. APELLIDO` → `apellido`, `.NUMEROJUGADOR` → `numerouniforme`,
+  `INFORMACION DEL PELOTERO` (sin clase) → `texto`. El logo, la caja azul y la textura pierden la
+  clase `png`.
+- **Barras:** la del export (`.BARRA_MAGALLANES_VISITA_1.png 8`, 405 × 99, ancla 256) y su matte
+  (`Shape Layer 8`) pasan a ocho pares matte + barra, con las barras de la visita de `resultados`
+  (`imagenDe()`); fuera los mattes `Shape Layer 1`–`7` (sin barra: las ocultas). Falla si la barra o
+  los mattes llegan de otra forma.
+- **Textos de caja:** el nombre y el apellido hasta `SUS_NOMBRE_HASTA` − 8 (el recuadro del número en
+  la y 744), el texto hasta `SUS_TEXTO_HASTA` − 8 (la barra gris en la y 875), medidos en el render:
+  si se mueven, medir de nuevo. El alto, el ascent del cuerpo más 2, y `lh` 1.2 del cuerpo.
+- **Markers y timeline:** `START` (0–30) y `STOP` (119–149) del diseñador → `play` 0–56 (pausa en el
+  55: `SUS_PAUSA`), `salida` 56–101 y `stop` en el 0. Todo suma su entrada al revés (`alReves`): lo que
+  la entrada muestra en el frame t, la salida lo muestra en el 111 − t, y el 100 (el 11 de la entrada)
+  es el primer frame vacío (`SUS_VACIOS`). Falla si algo anima después del 55 (`SUS_ENTRADA`).
+- **Fuente:** `fPath` llega como `INSERT SUSTITUCION/FONT` (la variable): pasa a
+  `font/LTEnergy-Regular.ttf`, la estática.
+- **Textos vacíos:** al final, todos.
+- **Imágenes:** `img_0`, `img_1` e `img_3` del export, tal cual a `sustitucion/images/` (la `img_2`, la
+  barra, no se usa).
 
 ### QA
 
