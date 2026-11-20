@@ -829,6 +829,44 @@ if (hay('OFENSIVA')) {
     save(path.join(REPO, 'ofensiva/data.json'), d);
 }
 
+// ---------------------------------------------------------------- ofensiva: publicidad
+// La publicidad de la ofensiva (Leon, 2026-11-20, con una referencia marcada): la clave `publicidad`,
+// una imagen en el rectángulo de arriba a la derecha, a la altura de la barra del equipo y el
+// OFENSIVA, sobre la esquina del panel gris. No viene del diseñador: corre siempre sobre la ofensiva
+// preparada (también sin exports en SRC), y si ya la tiene, la rehace. Entra por disolvencia
+// (OF_PUB_ENTRA) cuando el panel ya está quieto, mientras bajan las filas; como la salida es la
+// entrada al revés, se apaga por disolvencia antes de que salga el panel. Por defecto, el insert de
+// Empire Keeway (621 × 390); otra imagen entra entera, de cualquier proporción (meet), y "" o una
+// ruta que no carga dejan el rectángulo vacío (se ve el panel).
+const OF_PUB_IMAGEN = { w: 621, h: 390, p: '62f485b1b6a7.png' };
+const OF_PUB_CAJA = [1220, 80, 240];    // x, y y ancho en px de pantalla (el alto, el de la imagen: 151)
+const OF_PUB_ENTRA = [45, 60];          // la disolvencia (el panel queda quieto en el 40)
+if (fs.existsSync(path.join(REPO, 'ofensiva/data.json'))) {
+    const d = load(path.join(REPO, 'ofensiva/data.json'));
+    if (d.op !== ENTRADA_OF + 1) throw new Error(`ofensiva: op ${d.op}, mover OF_PUB_ENTRA`);
+    if (!fs.existsSync(path.join(REPO, '_assets', OF_PUB_IMAGEN.p))) throw new Error(`falta _assets/${OF_PUB_IMAGEN.p}`);
+    d.layers = d.layers.filter(l => l.cl !== 'publicidad');
+    d.assets = d.assets.filter(a => a.id !== 'image_publicidad');
+    d.assets.push({ id: 'image_publicidad', w: OF_PUB_IMAGEN.w, h: OF_PUB_IMAGEN.h, u: '../_assets/', p: OF_PUB_IMAGEN.p, e: 0, pr: 'xMidYMid meet' });
+    const [x, y, ancho] = OF_PUB_CAJA, s = ancho / OF_PUB_IMAGEN.w * 100;
+    const curva = { o: { x: [0.333], y: [0] }, i: { x: [0.667], y: [1] } };
+    const pub = {
+        ddd: 0, ind: Math.max(...d.layers.map(l => l.ind)) + 1, ty: 2, nm: '.publicidad', cl: 'publicidad',
+        refId: 'image_publicidad', sr: 1,
+        ks: {
+            o: { a: 1, k: [{ t: OF_PUB_ENTRA[0], s: [0], ...curva }, { t: OF_PUB_ENTRA[1], s: [100] }], ix: 11 },
+            r: { a: 0, k: 0, ix: 10 },
+            p: { a: 0, k: [x, y, 0], ix: 2, l: 2 },
+            a: { a: 0, k: [0, 0, 0], ix: 1, l: 2 },
+            s: { a: 0, k: [s, s, 100], ix: 6, l: 2 }
+        },
+        ao: 0, ip: 1, op: ENTRADA_OF + 1, st: 0, bm: 0
+    };
+    // encima del título (y de todo el contenido del panel), debajo de las puertas
+    d.layers.splice(d.layers.indexOf(layer(d, '.titulo')), 0, pub);
+    save(path.join(REPO, 'ofensiva/data.json'), d);
+}
+
 // ---------------------------------------------------------------- bateador
 // La barra baja del bateador. El export del 2026-10-18 (Leon: reemplaza al del 2026-10-16) es el
 // mismo diseño al 64 %, más arriba, con una barra negra encima para el split, y todo cuelga de

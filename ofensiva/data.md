@@ -25,6 +25,13 @@ teams overlap, so if you switch teams you have to turn off the previous one.
 **Lineup:** one row per batting slot, 1 to 9 top to bottom: position (`posicionN`) and player
 (`jugadorN`). Below, the manager (`manager`).
 
+**Sponsor:** `publicidad`, the path of an image (relative to the graphic's `index.html`, or
+absolute), top right, level with the team bar. The box is 240 × 151 px and the image fits whole, any
+proportion, centered. By default it is the Empire Keeway insert (`../_assets/62f485b1b6a7.png`; the
+ideal size is 480 × 302 or larger in that proportion). It fades in during the entry and fades out
+during the exit. `""` or a path that doesn't load leaves the box empty (the grey panel shows),
+without a broken-image icon.
+
 ```json
 {
   "AGUI_opacidad": 0,
@@ -53,7 +60,8 @@ teams overlap, so if you switch teams you have to turn off the previous one.
   "jugador8": "JOSÉ GODOY",
   "posicion9": "SS",
   "jugador9": "LUIS LIMA",
-  "manager": "JOSÉ ALGUACIL"
+  "manager": "JOSÉ ALGUACIL",
+  "publicidad": "../_assets/62f485b1b6a7.png"
 }
 ```
 
@@ -122,7 +130,12 @@ fixed in the design: a controller doesn't need to send them.
 
 ## Image layers
 
-Fixed images of the design. They can be swapped by path, but a controller doesn't need to.
+| Class | What | Default |
+|-------|------|---------|
+| `publicidad` | Sponsor box (240 × 151, fits whole) | `../_assets/62f485b1b6a7.png` (Empire Keeway) |
+
+The rest are fixed images of the design. They can be swapped by path, but a controller doesn't
+need to.
 
 | Class | nm | Ref ID |
 |-------|----|--------|
@@ -141,7 +154,7 @@ Fixed images of the design. They can be swapped by path, but a controller doesn'
 | `stop` | 0 | 1 | — (frame 0, empty) |
 | `salida` | 90 | -90 | — (the entry played backwards) |
 
-`play` enters and pauses on frame 90 (3 s). No update animation: data sent while on air replaces
+`play` enters and pauses on frame 90 (3 s). The sponsor fades in from frame 45 to 60. No update animation: data sent while on air replaces
 silently, the team included. The exit is the entry in reverse: `stop` plays `salida` (frame 90 → 0,
 3 s: the rows go out, the doors close and it ends on the empty frame) and releases the layer when
 it ends. The `play` stage is active from frame 0, so a `stop` that arrives mid-entry also plays
