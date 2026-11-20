@@ -21,7 +21,7 @@ UPDATE están en su `data.md`. Las imágenes de todos, juntas en `_assets/`, una
 |---|---|---|---|
 | `score/` | Pizarra arriba a la izquierda: logo (ATRAPA LA EMOCIÓN), barras de visita y local (escudo y siglas), carreras, inning con sus flechas, bases, conteo y outs; abajo, la barra de bateador (apellido, average, actuación) y lanzador (apellido, lanzamientos, velocidad) | `play` (0–59) → stages `marcador` → `jugadores` (la barra sube, 65–90) → `sinjugadores` (la barra baja, 100–125), los tres `pause` | `salida`: la entrada al revés (2 s); desde `jugadores`, `salida_jugadores` baja antes la barra (3 s) |
 | `defensiva/` | Pantalla completa: dos compuertas con los colores y el escudo del equipo se abren sobre el campo con las 9 posiciones (rótulo y apellido); arriba a la izquierda, la barra del equipo y DEFENSIVA. El frame 0 está vacío | stage `play` pause (0–53) | `salida`: la entrada al revés (1,8 s): las compuertas se cierran y termina en el frame vacío |
-| `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA. El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
+| `ofensiva/` | Pantalla completa, de la familia de la defensiva: dos compuertas con los colores y el escudo del equipo se abren sobre el lineup (9 filas de posición y nombre) y el mánager; arriba a la izquierda, la barra del equipo y OFENSIVA, y arriba a la derecha la publicidad (`publicidad`, una imagen: Empire Keeway). El frame 0 está vacío | stage `play` pause (0–90) | `salida`: la entrada al revés (3 s) |
 | `bateador/` | Barra baja del bateador, abajo a la izquierda: arriba, una barra negra con el split; a la izquierda, el fondo del color del equipo con su escudo grande; la barra del equipo con el nombre, y el número y la posición en sus placas; abajo, 4 estadísticas (valor y rótulo). El frame 0 está vacío | stage `play` pause (0–87), al 60 % de la velocidad del diseño: 1,7 s | `salida`: la entrada al revés (1,7 s) |
 | `lanzador/` | El lanzador (el export es PITCHERS), en la mitad izquierda: un panel del color del equipo con su escudo grande, de arriba abajo en el borde izquierdo; la barra del equipo con el nombre y el apellido (dos líneas) y el número, y debajo una barra negra con el split; la mano de lanzar y 6 estadísticas (rótulo y valor) sobre una textura gris. El frame 0 está vacío | stage `play` pause (0–110), al 60 % de la velocidad del diseño: 2,2 s | `salida`: la entrada al revés (2,2 s) |
 | `parcial/` | Score de fin de inning (el export es FINAL DE INNING), abajo, casi centrado (35 px a la izquierda): barras de visita y local (escudo y nombre), C H E de cada uno, inning con sus flechas, los tres que vienen AL BATE (posición y apellido) y el cuadro de la publicidad (`publicidad`, una imagen: Pepsi). El frame 0 está vacío | stage `play` pause (0–60): la pizarra entra hasta el 41, la publicidad entra deslizándose desde la izquierda, recortada por su cuadro (34–53), y la raya derecha del cuadro aparece del 51 al 59 | `salida`: la entrada al revés (2 s) |
@@ -244,6 +244,16 @@ Caribes, quedaba casi igual a Caribes). En NTSC compuesto, lo más alto de las p
 el escudo) baja de 123 IRE a 106, lo de su barra. El bateador y el lanzador traen sus propios
 colores desde el export del 2026-10-18 (ver ahí): Águilas y Leones, con el tono de su barra, y todos
 más claros que las puertas.
+
+Publicidad (Leon, 2026-11-20, sin export del diseñador: una referencia marcada): la clave
+`publicidad`, una imagen arriba a la derecha (x 1220–1460, y 80–231: 240 × 151, a la altura de la
+barra del equipo, sobre la esquina del panel gris). Por defecto, el insert de Empire Keeway (621 ×
+390); otra entra entera, de cualquier proporción (`pr` meet), y `""` o una ruta que no carga dejan
+ver el panel. Entra por disolvencia del 45 al 60 (el panel queda quieto en el 40), y en la salida,
+la entrada al revés, se apaga antes de que salga el panel. La agrega `prep.js` sobre la ofensiva
+preparada (`OF_PUB_*`), siempre, como el parcial sin publicidad: un export nuevo la conserva. En
+CasparCG 2.5.1 (2026-11-20): la pausa, el UPDATE al aire con otra imagen y el `CG STOP`, que suelta
+el layer. El controlador todavía no la manda: sale Empire Keeway.
 
 Textos: nombre y apellido, como en el diseño y en Meridiano (`ALÍ CASTILLO`). Al tamaño del diseño
 entran unas 21 letras en las filas (`ALEXANDER MONASTERIOS` entra) y 19 en el mánager; más largos
